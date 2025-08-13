@@ -24,7 +24,10 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  InputAdornment
+  InputAdornment,
+  Snackbar,
+  Alert,
+  Fade
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -37,6 +40,7 @@ import './CustomerManagement.css';
 
 const CustomerManagement = () => {
   const [customers, setCustomers] = useState([]);
+  const [companies, setCompanies] = useState([]);
   const [openRegistration, setOpenRegistration] = useState(false);
   const [openLocations, setOpenLocations] = useState(false);
   const [openLocationForm, setOpenLocationForm] = useState(false);
@@ -44,11 +48,20 @@ const CustomerManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [isEditing, setIsEditing] = useState(false);
+  
+  // Snackbar states
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success'
+  });
+  
   const [newCustomer, setNewCustomer] = useState({
     firstName: '',
     lastName: '',
     email: '',
     phone: '',
+    companyId: '',
     companyName: '',
     address: '',
     city: '',
@@ -58,69 +71,79 @@ const CustomerManagement = () => {
     status: 'active'
   });
 
+  const showSnackbar = (message, severity = 'success') => {
+    setSnackbar({
+      open: true,
+      message,
+      severity
+    });
+  };
+
+  const hideSnackbar = () => {
+    setSnackbar(prev => ({
+      ...prev,
+      open: false
+    }));
+  };
+
+  // Fetch companies from API
+  const fetchCompanies = async () => {
+    try {
+      const baseUrl = import.meta.env.VITE_LIVE_APP_BASEURL || 'https://localhost:7084/api';
+      const response = await axios.get(`${baseUrl}/Companies/GetAllCompanies`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.data.success) {
+        setCompanies(response.data.result || []);
+      } else {
+        console.error('Error fetching companies:', response.data.message);
+        // Fallback to sample companies if API fails
+        setCompanies([
+          { companyId: 1, companyName: 'Tech Solutions Inc.' },
+          { companyId: 2, companyName: 'Green Energy Corp.' },
+          { companyId: 3, companyName: 'Eco Systems Ltd.' },
+          { companyId: 4, companyName: 'BioTech Industries' },
+          { companyId: 7, companyName: 'SyncSquad' }
+        ]);
+      }
+    } catch (error) {
+      console.error('Error fetching companies:', error);
+      // Fallback to sample companies if API fails
+      setCompanies([
+        { companyId: 1, companyName: 'Tech Solutions Inc.' },
+        { companyId: 2, companyName: 'Green Energy Corp.' },
+        { companyId: 3, companyName: 'Eco Systems Ltd.' },
+        { companyId: 4, companyName: 'BioTech Industries' },
+        { companyId: 7, companyName: 'SyncSquad' }
+      ]);
+    }
+  };
+
   // Fetch customers from API
   useEffect(() => {
-    const fetchCustomers = async () => {
-      try {
-        const response = await axios.get('https://localhost:7084/api/customers');
-        if (response.data.success) {
-          setCustomers(response.data.result);
-        } else {
-          console.error('Error fetching customers:', response.data.message);
-          // Fallback to mock data if API fails
-          setCustomers([
-            {
-              customerId: 1,
-              firstName: 'John',
-              lastName: 'Doe',
-              email: 'john.doe@email.com',
-              phone: '+1 (555) 123-4567',
-              companyName: 'Tech Solutions Inc.',
-              address: '123 Main Street',
-              city: 'New York',
-              state: 'NY',
-              postalCode: '10001',
-              country: 'USA',
-              status: 'active',
-              createdDate: '2024-01-15',
-              locationCount: 3
-            },
-            {
-              customerId: 2,
-              firstName: 'Sarah',
-              lastName: 'Johnson',
-              email: 'sarah.johnson@email.com',
-              phone: '+1 (555) 234-5678',
-              companyName: 'Green Energy Corp.',
-              address: '456 Oak Avenue',
-              city: 'Los Angeles',
-              state: 'CA',
-              postalCode: '90210',
-              country: 'USA',
-              status: 'active',
-              createdDate: '2024-01-20',
-              locationCount: 2
-            },
-            {
-              customerId: 3,
-              firstName: 'Michael',
-              lastName: 'Brown',
-              email: 'michael.brown@email.com',
-              phone: '+1 (555) 345-6789',
-              companyName: 'Global Logistics Ltd.',
-              address: '789 Pine Street',
-              city: 'Chicago',
-              state: 'IL',
-              postalCode: '60601',
-              country: 'USA',
-              status: 'active',
-              createdDate: '2024-01-25',
-              locationCount: 1
-            }
-          ]);
+    fetchCustomers();
+    fetchCompanies();
+  }, []);
+
+  // Fetch customers from API
+  const fetchCustomers = async () => {
+    try {
+      const baseUrl = import.meta.env.VITE_LIVE_APP_BASEURL || 'https://localhost:7084/api';
+      const response = await axios.get(`${baseUrl}/Customers/GetAllCustomers`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
         }
-      } catch (error) {
-        console.error('Error fetching customers:', error);
+      });
+      
+      if (response.data.success) {
+        setCustomers(response.data.result || []);
+      } else {
+        console.error('Error fetching customers:', response.data.message);
         // Fallback to mock data if API fails
         setCustomers([
           {
@@ -129,6 +152,7 @@ const CustomerManagement = () => {
             lastName: 'Doe',
             email: 'john.doe@email.com',
             phone: '+1 (555) 123-4567',
+            companyId: 1,
             companyName: 'Tech Solutions Inc.',
             address: '123 Main Street',
             city: 'New York',
@@ -145,6 +169,7 @@ const CustomerManagement = () => {
             lastName: 'Johnson',
             email: 'sarah.johnson@email.com',
             phone: '+1 (555) 234-5678',
+            companyId: 2,
             companyName: 'Green Energy Corp.',
             address: '456 Oak Avenue',
             city: 'Los Angeles',
@@ -161,7 +186,8 @@ const CustomerManagement = () => {
             lastName: 'Brown',
             email: 'michael.brown@email.com',
             phone: '+1 (555) 345-6789',
-            companyName: 'Global Logistics Ltd.',
+            companyId: 3,
+            companyName: 'Eco Systems Ltd.',
             address: '789 Pine Street',
             city: 'Chicago',
             state: 'IL',
@@ -173,10 +199,64 @@ const CustomerManagement = () => {
           }
         ]);
       }
-    };
-
-    fetchCustomers();
-  }, []);
+    } catch (error) {
+      console.error('Error fetching customers:', error);
+      // Fallback to mock data if API fails
+      setCustomers([
+        {
+          customerId: 1,
+          firstName: 'John',
+          lastName: 'Doe',
+          email: 'john.doe@email.com',
+          phone: '+1 (555) 123-4567',
+          companyId: 1,
+          companyName: 'Tech Solutions Inc.',
+          address: '123 Main Street',
+          city: 'New York',
+          state: 'NY',
+          postalCode: '10001',
+          country: 'USA',
+          status: 'active',
+          createdDate: '2024-01-15',
+          locationCount: 3
+        },
+        {
+          customerId: 2,
+          firstName: 'Sarah',
+          lastName: 'Johnson',
+          email: 'sarah.johnson@email.com',
+          phone: '+1 (555) 234-5678',
+          companyId: 2,
+          companyName: 'Green Energy Corp.',
+          address: '456 Oak Avenue',
+          city: 'Los Angeles',
+          state: 'CA',
+          postalCode: '90210',
+          country: 'USA',
+          status: 'active',
+          createdDate: '2024-01-20',
+          locationCount: 2
+        },
+        {
+          customerId: 3,
+          firstName: 'Michael',
+          lastName: 'Brown',
+          email: 'michael.brown@email.com',
+          phone: '+1 (555) 345-6789',
+          companyId: 3,
+          companyName: 'Eco Systems Ltd.',
+          address: '789 Pine Street',
+          city: 'Chicago',
+          state: 'IL',
+          postalCode: '60601',
+          country: 'USA',
+          status: 'active',
+          createdDate: '2024-01-25',
+          locationCount: 1
+        }
+      ]);
+    }
+  };
 
   const handleAddNew = () => {
     setIsEditing(false);
@@ -185,6 +265,7 @@ const CustomerManagement = () => {
       lastName: '',
       email: '',
       phone: '',
+      companyId: '',
       companyName: '',
       address: '',
       city: '',
@@ -203,6 +284,7 @@ const CustomerManagement = () => {
       lastName: customer.lastName,
       email: customer.email,
       phone: customer.phone,
+      companyId: customer.companyId || '',
       companyName: customer.companyName,
       address: customer.address,
       city: customer.city,
@@ -217,19 +299,35 @@ const CustomerManagement = () => {
 
   const handleSaveCustomer = async () => {
     try {
+      // Get company name from selected company
+      const selectedCompany = companies.find(c => c.companyId === parseInt(newCustomer.companyId));
+      const customerData = {
+        ...newCustomer,
+        companyName: selectedCompany ? selectedCompany.companyName : ''
+      };
+
       let response;
+      const baseUrl = import.meta.env.VITE_LIVE_APP_BASEURL || 'https://localhost:7084/api';
+      
       if (isEditing) {
-        response = await axios.put(`https://localhost:7084/api/customers/${selectedCustomer.customerId}`, newCustomer);
+        response = await axios.put(`${baseUrl}/Customers/UpdateCustomer/${selectedCustomer.customerId}`, customerData, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json'
+          }
+        });
       } else {
-        response = await axios.post('https://localhost:7084/api/customers', newCustomer);
+        response = await axios.post(`${baseUrl}/Customers/CreateCustomer`, customerData, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json'
+          }
+        });
       }
       
       if (response.data.success) {
         // Refresh the customers list
-        const refreshResponse = await axios.get('https://localhost:7084/api/customers');
-        if (refreshResponse.data.success) {
-          setCustomers(refreshResponse.data.result);
-        }
+        await fetchCustomers();
         setOpenRegistration(false);
         setIsEditing(false);
         setSelectedCustomer(null);
@@ -238,6 +336,7 @@ const CustomerManagement = () => {
           lastName: '',
           email: '',
           phone: '',
+          companyId: '',
           companyName: '',
           address: '',
           city: '',
@@ -246,12 +345,17 @@ const CustomerManagement = () => {
           country: '',
           status: 'active'
         });
+        
+        showSnackbar(
+          isEditing ? 'Customer updated successfully!' : 'Customer created successfully!',
+          'success'
+        );
       } else {
-        alert('Error saving customer: ' + response.data.message);
+        showSnackbar('Error saving customer: ' + response.data.message, 'error');
       }
     } catch (error) {
       console.error('Error saving customer:', error);
-      alert('Error saving customer. Please try again.');
+      showSnackbar('Error saving customer. Please try again.', 'error');
     }
   };
 
@@ -277,12 +381,51 @@ const CustomerManagement = () => {
     setOpenLocationForm(false);
   };
 
+  const handleDeleteCustomer = async (customer) => {
+    if (window.confirm(`Are you sure you want to delete ${customer.firstName} ${customer.lastName}?`)) {
+      try {
+        const baseUrl = import.meta.env.VITE_LIVE_APP_BASEURL || 'https://localhost:7084/api';
+        const response = await axios.delete(`${baseUrl}/Customers/DeleteCustomer/${customer.customerId}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (response.data.success) {
+          await fetchCustomers();
+          showSnackbar('Customer deleted successfully!', 'success');
+        } else {
+          showSnackbar('Error deleting customer: ' + response.data.message, 'error');
+        }
+      } catch (error) {
+        console.error('Error deleting customer:', error);
+        showSnackbar('Error deleting customer. Please try again.', 'error');
+      }
+    }
+  };
+
+  const handleCompanyChange = (companyId) => {
+    const selectedCompany = companies.find(c => c.companyId === parseInt(companyId));
+    setNewCustomer(prev => ({
+      ...prev,
+      companyId: companyId,
+      companyName: selectedCompany ? selectedCompany.companyName : ''
+    }));
+  };
+
+  const getCompanyNameById = (companyId) => {
+    const company = companies.find(c => c.companyId === companyId);
+    return company ? company.companyName : 'Unknown Company';
+  };
+
   const filteredCustomers = customers.filter(customer => {
+    const companyName = customer.companyId ? getCompanyNameById(customer.companyId) : customer.companyName || '';
     const matchesSearch = 
       customer.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customer.companyName.toLowerCase().includes(searchTerm.toLowerCase());
+      companyName.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesStatus = filterStatus === 'all' || customer.status === filterStatus;
     
@@ -399,7 +542,9 @@ const CustomerManagement = () => {
                     </Box>
                   </TableCell>
                   <TableCell sx={{ py: 1 }}>
-                    <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>{customer.companyName}</Typography>
+                    <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>
+                      {customer.companyId ? getCompanyNameById(customer.companyId) : customer.companyName || 'No Company'}
+                    </Typography>
                   </TableCell>
                   <TableCell sx={{ py: 1 }}>
                     <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>
@@ -448,7 +593,12 @@ const CustomerManagement = () => {
                       >
                         <EditIcon sx={{ fontSize: '1rem' }} />
                       </IconButton>
-                      <IconButton size="small" sx={{ color: '#f44336', p: 0.5 }} title="Delete">
+                      <IconButton 
+                        size="small" 
+                        sx={{ color: '#f44336', p: 0.5 }} 
+                        title="Delete"
+                        onClick={() => handleDeleteCustomer(customer)}
+                      >
                         <DeleteIcon sx={{ fontSize: '1rem' }} />
                       </IconButton>
                     </Box>
@@ -514,13 +664,23 @@ const CustomerManagement = () => {
               />
             </Grid>
             <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Company"
-                value={newCustomer.companyName}
-                onChange={(e) => setNewCustomer({...newCustomer, companyName: e.target.value})}
-                margin="normal"
-              />
+              <FormControl fullWidth margin="normal">
+                <InputLabel>Company</InputLabel>
+                <Select
+                  value={newCustomer.companyId}
+                  label="Company"
+                  onChange={(e) => handleCompanyChange(e.target.value)}
+                >
+                  <MenuItem value="">
+                    <em>Select a company</em>
+                  </MenuItem>
+                  {companies.map((company) => (
+                    <MenuItem key={company.companyId} value={company.companyId}>
+                      {company.companyName}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Grid>
             <Grid item xs={12}>
               <TextField
@@ -623,6 +783,30 @@ const CustomerManagement = () => {
         customerId={selectedCustomer?.customerId}
         onSave={handleSaveLocation}
       />
+
+      {/* Enhanced Snackbar */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={hideSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        TransitionComponent={Fade}
+      >
+        <Alert 
+          onClose={hideSnackbar} 
+          severity={snackbar.severity} 
+          sx={{ 
+            width: '100%',
+            borderRadius: 2,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+            '& .MuiAlert-icon': {
+              fontSize: '1.5rem'
+            }
+          }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

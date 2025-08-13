@@ -173,7 +173,8 @@ const Dashboard = ({ user, onLogout, children }) => {
                   primary={item.label} 
                   sx={{ 
                     '& .MuiListItemText-primary': { 
-                      fontWeight: 400 // Removed currentView check
+                      fontWeight: 400,
+                      color: 'white'
                     } 
                   }}
                 />

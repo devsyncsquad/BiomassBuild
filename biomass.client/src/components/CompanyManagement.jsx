@@ -16,14 +16,24 @@ import {
   IconButton,
   InputAdornment,
   Paper,
-  Snackbar
+  Snackbar,
+  Card,
+  CardContent,
+  Divider,
+  Fade,
+  Zoom
 } from '@mui/material';
 import {
   Search as SearchIcon,
   Business as BusinessIcon,
   Visibility as VisibilityIcon,
   Add as AddIcon,
-  FilterList as FilterIcon
+  FilterList as FilterIcon,
+  LocationOn as LocationIcon,
+  People as PeopleIcon,
+  Work as WorkIcon,
+  Phone as PhoneIcon,
+  Email as EmailIcon
 } from '@mui/icons-material';
 import CompanyForm from './CompanyForm';
 import './CompanyManagement.css';
@@ -52,10 +62,11 @@ const CompanyManagement = () => {
     search: ''
   });
 
-  // Sample company colors for avatars
+  // Enhanced company colors with better contrast
   const companyColors = [
-    '#2196F3', '#4CAF50', '#FF9800', '#9C27B0', 
-    '#F44336', '#00BCD4', '#795548', '#607D8B'
+    '#1976d2', '#388e3c', '#f57c00', '#7b1fa2', 
+    '#d32f2f', '#0097a7', '#5d4037', '#455a64',
+    '#1565c0', '#2e7d32', '#ef6c00', '#6a1b9a'
   ];
 
   useEffect(() => {
@@ -67,6 +78,7 @@ const CompanyManagement = () => {
   }, [companies, filters]);
 
   const showSnackbar = (message, severity = 'success') => {
+    console.log('showSnackbar called with:', message, severity);
     setSnackbar({
       open: true,
       message,
@@ -84,8 +96,8 @@ const CompanyManagement = () => {
   const fetchCompanies = async () => {
     try {
       setLoading(true);
-      const baseUrl = import.meta.env.VITE_BACKEND_URL || 'https://localhost:7084';
-      const response = await fetch(`${baseUrl}/api/Companies/GetCompanyList`, {
+      const iconUrl = import.meta.env.VITE_LIVE_APP_BASEURL || 'https://localhost:7084/api';
+      const response = await fetch(`${iconUrl}/Companies/GetAllCompanies`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json'
@@ -117,7 +129,7 @@ const CompanyManagement = () => {
     {
       companyId: 1,
       companyName: 'BSP (Bullah Shah)',
-      companyDescription: 'Leading energy solutions provider',
+      companyDescription: 'Leading energy solutions provider specializing in renewable energy and sustainable power generation',
       ntn: '123456789',
       contactPersonName: 'Ahmed Khan',
       contactPersonPhone: '+92-300-1234567',
@@ -128,7 +140,7 @@ const CompanyManagement = () => {
     {
       companyId: 2,
       companyName: 'Sapphaler',
-      companyDescription: 'Healthcare technology platform improving patient care through innovation',
+      companyDescription: 'Healthcare technology platform improving patient care through innovative digital solutions',
       ntn: '987654321',
       contactPersonName: 'Fatima Ali',
       contactPersonPhone: '+92-300-9876543',
@@ -139,7 +151,7 @@ const CompanyManagement = () => {
     {
       companyId: 3,
       companyName: 'Nishat',
-      companyDescription: 'Digital banking solutions for modern businesses and consumers',
+      companyDescription: 'Digital banking solutions for modern businesses and consumers with cutting-edge fintech',
       ntn: '456789123',
       contactPersonName: 'Usman Malik',
       contactPersonPhone: '+92-300-4567891',
@@ -150,7 +162,7 @@ const CompanyManagement = () => {
     {
       companyId: 4,
       companyName: 'Ithad Chemicals',
-      companyDescription: 'E-commerce platform connecting vendors with global customers',
+      companyDescription: 'E-commerce platform connecting vendors with global customers worldwide',
       ntn: '789123456',
       contactPersonName: 'Ayesha Hassan',
       contactPersonPhone: '+92-300-7891234',
@@ -222,6 +234,7 @@ const CompanyManagement = () => {
   };
 
   const handleCompanySaved = () => {
+    console.log('Company saved, showing snackbar...');
     handleFormClose();
     fetchCompanies();
     showSnackbar('Company saved successfully!');
@@ -240,196 +253,381 @@ const CompanyManagement = () => {
     return companyColors[companyId % companyColors.length];
   };
 
+  const getIndustryIcon = (industry) => {
+    switch (industry) {
+      case 'Technology': return <WorkIcon />;
+      case 'Healthcare': return <BusinessIcon />;
+      case 'Finance': return <BusinessIcon />;
+      case 'Manufacturing': return <WorkIcon />;
+      case 'Energy': return <WorkIcon />;
+      case 'Retail': return <BusinessIcon />;
+      case 'Education': return <BusinessIcon />;
+      default: return <BusinessIcon />;
+    }
+  };
+
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
-        <CircularProgress />
+      <Box 
+        display="flex" 
+        flexDirection="column"
+        justifyContent="center" 
+        alignItems="center" 
+        minHeight="60vh"
+        gap={3}
+      >
+        <CircularProgress size={60} thickness={4} />
+        <Typography variant="h6" color="text.secondary">
+          Loading companies...
+        </Typography>
       </Box>
     );
   }
 
   return (
-    <Box sx={{ p: 0 }}>
-      {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5, p: 3 }}>
-        <Box>
-          <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', fontSize: '1.25rem', mb: 0.5 }}>
-            Companies Directory
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
-            Discover and explore companies in your industry
-          </Typography>
-        </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={handleAddCompany}
-          size="small"
-          sx={{ borderRadius: 1.5 }}
-        >
-          Add Company
-        </Button>
-      </Box>
-
-      {/* Filters */}
-      <Box sx={{ mb: 1.5, p: 3, bgcolor: 'background.paper', borderRadius: 0, boxShadow: 1, mx: 0 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
-          <FilterIcon sx={{ mr: 1, fontSize: '1rem' }} />
-          <Typography variant="h6" sx={{ fontSize: '1rem' }}>Filters</Typography>
-        </Box>
-        
-        <Grid container spacing={1.5}>
-          <Grid item xs={12} sm={6} md={3}>
-            <TextField
-              fullWidth
-              label="Industry"
-              value={filters.industry}
-              onChange={(e) => handleFilterChange('industry', e.target.value)}
-              size="small"
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <TextField
-              fullWidth
-              label="Company Size"
-              value={filters.companySize}
-              onChange={(e) => handleFilterChange('companySize', e.target.value)}
-              size="small"
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <TextField
-              fullWidth
-              label="Location"
-              value={filters.location}
-              onChange={(e) => handleFilterChange('location', e.target.value)}
-              size="small"
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <TextField
-              fullWidth
-              label="Search"
-              placeholder="Search companies..."
-              value={filters.search}
-              onChange={(e) => handleFilterChange('search', e.target.value)}
-              size="small"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Grid>
-        </Grid>
-        
-        <Box sx={{ display: 'flex', gap: 1.5, mt: 1.5 }}>
-          <Button variant="contained" onClick={applyFilters} size="small">
-            Apply Filters
-          </Button>
-          <Button variant="outlined" onClick={clearFilters} size="small">
-            Clear All
+    <Box sx={{ p: 0, backgroundColor: '#f8fafc', minHeight: '100vh' }}>
+      {/* Enhanced Header */}
+      <Box sx={{ 
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        color: 'white',
+        p: 4,
+        mb: 3,
+        borderRadius: '0 0 24px 24px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+      }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Box>
+            <Typography variant="h4" gutterBottom sx={{ fontWeight: 700, mb: 1 }}>
+              Companies Directory
+            </Typography>
+            <Typography variant="h6" sx={{ opacity: 0.9, fontWeight: 300 }}>
+              Discover and explore companies in your industry
+            </Typography>
+          </Box>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleAddCompany}
+            size="large"
+            sx={{ 
+              borderRadius: 3,
+              px: 4,
+              py: 1.5,
+              fontSize: '1rem',
+              fontWeight: 600,
+              boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
+              '&:hover': {
+                transform: 'translateY(-2px)',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.3)'
+              },
+              transition: 'all 0.3s ease'
+            }}
+          >
+            Add Company
           </Button>
         </Box>
       </Box>
 
-      {/* Results Count */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5, px: 3 }}>
-        <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
-          Showing {filteredCompanies.length} of {companies.length} companies
-        </Typography>
+      {/* Enhanced Filters Section */}
+      <Box sx={{ mb: 4, px: 3 }}>
+        <Card sx={{ 
+          borderRadius: 4, 
+          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+          overflow: 'visible'
+        }}>
+          <CardContent sx={{ p: 3 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+              <FilterIcon sx={{ mr: 2, fontSize: '1.5rem', color: 'primary.main' }} />
+              <Typography variant="h5" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                Search & Filters
+              </Typography>
+            </Box>
+            
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={6} md={3}>
+                <TextField
+                  fullWidth
+                  label="Industry"
+                  value={filters.industry}
+                  onChange={(e) => handleFilterChange('industry', e.target.value)}
+                  size="medium"
+                  variant="outlined"
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                      '&:hover fieldset': {
+                        borderColor: 'primary.main',
+                      },
+                    },
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={3}>
+                <TextField
+                  fullWidth
+                  label="Company Size"
+                  value={filters.companySize}
+                  onChange={(e) => handleFilterChange('companySize', e.target.value)}
+                  size="medium"
+                  variant="outlined"
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                      '&:hover fieldset': {
+                        borderColor: 'primary.main',
+                      },
+                    },
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={3}>
+                <TextField
+                  fullWidth
+                  label="Location"
+                  value={filters.location}
+                  onChange={(e) => handleFilterChange('location', e.target.value)}
+                  size="medium"
+                  variant="outlined"
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                      '&:hover fieldset': {
+                        borderColor: 'primary.main',
+                      },
+                    },
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={3}>
+                <TextField
+                  fullWidth
+                  label="Search Companies"
+                  placeholder="Search by name, description..."
+                  value={filters.search}
+                  onChange={(e) => handleFilterChange('search', e.target.value)}
+                  size="medium"
+                  variant="outlined"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon color="primary" />
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                      '&:hover fieldset': {
+                        borderColor: 'primary.main',
+                      },
+                    },
+                  }}
+                />
+              </Grid>
+            </Grid>
+            
+            <Box sx={{ display: 'flex', gap: 2, mt: 3, flexWrap: 'wrap' }}>
+              <Button 
+                variant="contained" 
+                onClick={applyFilters} 
+                size="large"
+                sx={{ 
+                  borderRadius: 2,
+                  px: 4,
+                  py: 1.5,
+                  fontWeight: 600
+                }}
+              >
+                Apply Filters
+              </Button>
+              <Button 
+                variant="outlined" 
+                onClick={clearFilters} 
+                size="large"
+                sx={{ 
+                  borderRadius: 2,
+                  px: 4,
+                  py: 1.5,
+                  fontWeight: 600
+                }}
+              >
+                Clear All
+              </Button>
+            </Box>
+          </CardContent>
+        </Card>
+      </Box>
+
+      {/* Enhanced Results Count */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, px: 3 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
+            Results
+          </Typography>
+          <Chip 
+            label={`${filteredCompanies.length} of ${companies.length} companies`}
+            color="primary"
+            variant="outlined"
+            sx={{ fontWeight: 500 }}
+          />
+        </Box>
       </Box>
 
       {/* Error Alert */}
       {error && (
-        <Box sx={{ px: 3, mb: 1.5 }}>
-          <Alert severity="error" sx={{ fontSize: '0.8rem' }}>
+        <Box sx={{ px: 3, mb: 3 }}>
+          <Alert severity="error" sx={{ borderRadius: 2, fontSize: '0.9rem' }}>
             {error}
           </Alert>
         </Box>
       )}
 
-      {/* Companies Grid */}
-      <Box sx={{ px: 3 }}>
-        <Grid container spacing={1.5}>
-          {filteredCompanies.map((company) => (
+      {/* Enhanced Companies Grid */}
+      <Box sx={{ px: 3, pb: 4 }}>
+        <Grid container spacing={3}>
+          {filteredCompanies.map((company, index) => (
             <Grid item xs={12} sm={6} md={4} lg={3} key={company.companyId}>
-              <Paper 
-                sx={{ 
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  transition: 'transform 0.2s, box-shadow 0.2s',
-                  p: 1.5,
-                  borderRadius: 1.5,
-                  '&:hover': {
-                    transform: 'translateY(-2px)',
-                    boxShadow: 3
-                  }
-                }}
-              >
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
-                  <Avatar
-                    sx={{
-                      bgcolor: getCompanyColor(company.companyId),
-                      width: 40,
-                      height: 40,
-                      mr: 1.5,
-                      fontSize: '0.9rem'
-                    }}
-                    src={company.logoPath ? `${import.meta.env.VITE_BACKEND_URL || 'https://localhost:7084'}/api/Companies/${company.companyId}/logo` : null}
-                  >
-                    {getCompanyInitials(company.companyName)}
-                  </Avatar>
-                  <Box sx={{ flexGrow: 1 }}>
-                    <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 0.25, fontSize: '0.9rem' }}>
-                      {company.companyName}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5, fontSize: '0.75rem' }}>
+              <Zoom in={true} style={{ transitionDelay: `${index * 100}ms` }}>
+                <Card 
+                  sx={{ 
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    borderRadius: 3,
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                    transition: 'all 0.3s ease',
+                    cursor: 'pointer',
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                      boxShadow: '0 12px 40px rgba(0,0,0,0.15)',
+                    }
+                  }}
+                  onClick={() => handleViewDetails(company)}
+                >
+                  {/* Company Header */}
+                  <Box sx={{ 
+                    p: 3, 
+                    background: `linear-gradient(135deg, ${getCompanyColor(company.companyId)} 0%, ${getCompanyColor(company.companyId)}dd 100%)`,
+                    color: 'white',
+                    borderRadius: '12px 12px 0 0'
+                  }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                      <Avatar
+                        sx={{
+                          bgcolor: 'rgba(255,255,255,0.2)',
+                          width: 50,
+                          height: 50,
+                          mr: 2,
+                          fontSize: '1.2rem',
+                          fontWeight: 600,
+                          border: '2px solid rgba(255,255,255,0.3)'
+                        }}
+                        src={company.logoPath ? `${import.meta.env.VITE_LIVE_APP_BASEURL || 'https://localhost:7084/api'}/Companies/${company.companyId}/logo` : null}
+                      >
+                        {getCompanyInitials(company.companyName)}
+                      </Avatar>
+                      <Box sx={{ flexGrow: 1 }}>
+                        <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5, fontSize: '1.1rem', color: 'white' }}>
+                          {company.companyName}
+                        </Typography>
+                        <Typography variant="body2" sx={{ opacity: 0.9, fontSize: '0.85rem', color: 'white', fontWeight: 500 }}>
+                          {company.industry || 'Industry not specified'}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Box>
+
+                  {/* Company Content */}
+                  <CardContent sx={{ p: 3, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 3, lineHeight: 1.6 }}>
                       {company.companyDescription}
                     </Typography>
-                  </Box>
-                </Box>
 
-                <Box sx={{ mb: 1.5 }}>
-                  <Typography variant="body2" sx={{ mb: 0.25, fontSize: '0.75rem' }}>
-                    <strong>NTN:</strong> {company.ntn || 'N/A'}
-                  </Typography>
-                  <Typography variant="body2" sx={{ mb: 0.25, fontSize: '0.75rem' }}>
-                    <strong>Primary Contact Person:</strong> {company.contactPersonName || 'N/A'}
-                  </Typography>
-                  <Typography variant="body2" sx={{ mb: 0.25, fontSize: '0.75rem' }}>
-                    <strong>Contact Number:</strong> {company.contactPersonPhone || 'N/A'}
-                  </Typography>
-                </Box>
+                    <Box sx={{ mb: 3, flexGrow: 1 }}>
+                      {/* Company Details */}
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
+                        <LocationIcon sx={{ mr: 1, fontSize: '1rem', color: 'text.secondary' }} />
+                        <Typography variant="body2" sx={{ fontSize: '0.85rem', color: 'text.secondary' }}>
+                          {company.location || 'Location not specified'}
+                        </Typography>
+                      </Box>
+                      
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
+                        <PeopleIcon sx={{ mr: 1, fontSize: '1rem', color: 'text.secondary' }} />
+                        <Typography variant="body2" sx={{ fontSize: '0.85rem', color: 'text.secondary' }}>
+                          {company.companySize || 'Size not specified'}
+                        </Typography>
+                      </Box>
 
-                <Box sx={{ mt: 'auto' }}>
-                  <Button
-                    variant="outlined"
-                    fullWidth
-                    startIcon={<VisibilityIcon />}
-                    onClick={() => handleViewDetails(company)}
-                    size="small"
-                    sx={{ borderRadius: 1.5, fontSize: '0.75rem', py: 0.5 }}
-                  >
-                    View Details
-                  </Button>
-                </Box>
-              </Paper>
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
+                        <PhoneIcon sx={{ mr: 1, fontSize: '1rem', color: 'text.secondary' }} />
+                        <Typography variant="body2" sx={{ fontSize: '0.85rem', color: 'text.secondary' }}>
+                          {company.contactPersonPhone || 'Phone not specified'}
+                        </Typography>
+                      </Box>
+
+                      {company.ntn && (
+                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
+                          <BusinessIcon sx={{ mr: 1, fontSize: '1rem', color: 'text.secondary' }} />
+                          <Typography variant="body2" sx={{ fontSize: '0.85rem', color: 'text.secondary' }}>
+                            NTN: {company.ntn}
+                          </Typography>
+                        </Box>
+                      )}
+                    </Box>
+
+                    {/* Action Button */}
+                    <Button
+                      variant="outlined"
+                      fullWidth
+                      startIcon={<VisibilityIcon />}
+                      size="medium"
+                      sx={{ 
+                        borderRadius: 2,
+                        py: 1.5,
+                        fontWeight: 600,
+                        borderWidth: 2,
+                        '&:hover': {
+                          borderWidth: 2,
+                          transform: 'scale(1.02)'
+                        },
+                        transition: 'all 0.2s ease'
+                      }}
+                    >
+                      View Details
+                    </Button>
+                  </CardContent>
+                </Card>
+              </Zoom>
             </Grid>
           ))}
         </Grid>
-      </Box>
 
-      {/* Information Banner */}
-      <Box sx={{ mt: 2, px: 3 }}>
-        <Alert severity="info" icon={<BusinessIcon />} sx={{ fontSize: '0.8rem' }}>
-          <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>
-            <strong>Information:</strong> Ensure all mandatory fields are completed. Optional compliance numbers should be provided if your company is registered for these services. This information will be used for regulatory compliance and business documentation.
-          </Typography>
-        </Alert>
+        {/* Empty State */}
+        {filteredCompanies.length === 0 && !loading && (
+          <Box sx={{ 
+            textAlign: 'center', 
+            py: 8,
+            px: 3
+          }}>
+            <BusinessIcon sx={{ fontSize: 80, color: 'text.secondary', mb: 2, opacity: 0.5 }} />
+            <Typography variant="h5" color="text.secondary" sx={{ mb: 1 }}>
+              No companies found
+            </Typography>
+            <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+              Try adjusting your filters or add a new company to get started.
+            </Typography>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleAddCompany}
+              size="large"
+              sx={{ borderRadius: 2, px: 4, py: 1.5 }}
+            >
+              Add First Company
+            </Button>
+          </Box>
+        )}
       </Box>
 
       {/* Company Form Dialog */}
@@ -439,7 +637,7 @@ const CompanyManagement = () => {
         maxWidth="md"
         fullWidth
         PaperProps={{
-          sx: { borderRadius: 3 }
+          sx: { borderRadius: 4, overflow: 'hidden' }
         }}
       >
         <CompanyForm
@@ -450,21 +648,34 @@ const CompanyManagement = () => {
         />
       </Dialog>
 
-      {/* Snackbar for notifications */}
+      {/* Enhanced Snackbar */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={4000}
         onClose={hideSnackbar}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        TransitionComponent={Fade}
       >
         <Alert 
           onClose={hideSnackbar} 
           severity={snackbar.severity} 
-          sx={{ width: '100%' }}
+          sx={{ 
+            width: '100%',
+            borderRadius: 2,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+            '& .MuiAlert-icon': {
+              fontSize: '1.5rem'
+            }
+          }}
         >
           {snackbar.message}
         </Alert>
       </Snackbar>
+      
+      {/* Debug info */}
+      <div style={{ display: 'none' }}>
+        Snackbar state: {JSON.stringify(snackbar)}
+      </div>
     </Box>
   );
 };

@@ -1,0 +1,498 @@
+{
+  "Version": 1,
+  "ManifestType": "Publish",
+  "Endpoints": [
+    {
+      "Route": "uploads/companies/logos/0e056da1-9b09-4950-9306-824949275bbd_sync-squad logo.8qzigcxsrh.jpeg",
+      "AssetFile": "uploads/companies/logos/0e056da1-9b09-4950-9306-824949275bbd_sync-squad logo.jpeg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "18955"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"oKrZJPi92bvVSORgjzLeY3Fw1IQqhbLMSH5xvh9jivA=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 08 Aug 2025 08:10:20 GMT"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "8qzigcxsrh"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-oKrZJPi92bvVSORgjzLeY3Fw1IQqhbLMSH5xvh9jivA="
+        },
+        {
+          "Name": "label",
+          "Value": "uploads/companies/logos/0e056da1-9b09-4950-9306-824949275bbd_sync-squad logo.jpeg"
+        }
+      ]
+    },
+    {
+      "Route": "uploads/companies/logos/0e056da1-9b09-4950-9306-824949275bbd_sync-squad logo.jpeg",
+      "AssetFile": "uploads/companies/logos/0e056da1-9b09-4950-9306-824949275bbd_sync-squad logo.jpeg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "18955"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"oKrZJPi92bvVSORgjzLeY3Fw1IQqhbLMSH5xvh9jivA=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 08 Aug 2025 08:10:20 GMT"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-oKrZJPi92bvVSORgjzLeY3Fw1IQqhbLMSH5xvh9jivA="
+        }
+      ]
+    },
+    {
+      "Route": "uploads/companies/logos/3404d319-470e-433a-b74f-c84074262dea_WhatsApp Image 2025-06-21 at 11.25.09 AM.8qzigcxsrh.jpeg",
+      "AssetFile": "uploads/companies/logos/3404d319-470e-433a-b74f-c84074262dea_WhatsApp Image 2025-06-21 at 11.25.09 AM.jpeg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "18955"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"oKrZJPi92bvVSORgjzLeY3Fw1IQqhbLMSH5xvh9jivA=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 08 Aug 2025 07:46:46 GMT"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "8qzigcxsrh"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-oKrZJPi92bvVSORgjzLeY3Fw1IQqhbLMSH5xvh9jivA="
+        },
+        {
+          "Name": "label",
+          "Value": "uploads/companies/logos/3404d319-470e-433a-b74f-c84074262dea_WhatsApp Image 2025-06-21 at 11.25.09 AM.jpeg"
+        }
+      ]
+    },
+    {
+      "Route": "uploads/companies/logos/3404d319-470e-433a-b74f-c84074262dea_WhatsApp Image 2025-06-21 at 11.25.09 AM.jpeg",
+      "AssetFile": "uploads/companies/logos/3404d319-470e-433a-b74f-c84074262dea_WhatsApp Image 2025-06-21 at 11.25.09 AM.jpeg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "18955"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"oKrZJPi92bvVSORgjzLeY3Fw1IQqhbLMSH5xvh9jivA=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 08 Aug 2025 07:46:46 GMT"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-oKrZJPi92bvVSORgjzLeY3Fw1IQqhbLMSH5xvh9jivA="
+        }
+      ]
+    },
+    {
+      "Route": "uploads/companies/logos/586e8c36-f1e5-415c-92b6-a0aced3dc2ed_WhatsApp Image 2025-06-21 at 11.25.09 AM.8qzigcxsrh.jpeg",
+      "AssetFile": "uploads/companies/logos/586e8c36-f1e5-415c-92b6-a0aced3dc2ed_WhatsApp Image 2025-06-21 at 11.25.09 AM.jpeg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "18955"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"oKrZJPi92bvVSORgjzLeY3Fw1IQqhbLMSH5xvh9jivA=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 08 Aug 2025 07:40:22 GMT"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "8qzigcxsrh"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-oKrZJPi92bvVSORgjzLeY3Fw1IQqhbLMSH5xvh9jivA="
+        },
+        {
+          "Name": "label",
+          "Value": "uploads/companies/logos/586e8c36-f1e5-415c-92b6-a0aced3dc2ed_WhatsApp Image 2025-06-21 at 11.25.09 AM.jpeg"
+        }
+      ]
+    },
+    {
+      "Route": "uploads/companies/logos/586e8c36-f1e5-415c-92b6-a0aced3dc2ed_WhatsApp Image 2025-06-21 at 11.25.09 AM.jpeg",
+      "AssetFile": "uploads/companies/logos/586e8c36-f1e5-415c-92b6-a0aced3dc2ed_WhatsApp Image 2025-06-21 at 11.25.09 AM.jpeg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "18955"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"oKrZJPi92bvVSORgjzLeY3Fw1IQqhbLMSH5xvh9jivA=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 08 Aug 2025 07:40:22 GMT"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-oKrZJPi92bvVSORgjzLeY3Fw1IQqhbLMSH5xvh9jivA="
+        }
+      ]
+    },
+    {
+      "Route": "uploads/companies/logos/75f888b9-9c75-4eec-b71c-3caf4c4726c8_WhatsApp Image 2025-06-21 at 11.25.09 AM.8qzigcxsrh.jpeg",
+      "AssetFile": "uploads/companies/logos/75f888b9-9c75-4eec-b71c-3caf4c4726c8_WhatsApp Image 2025-06-21 at 11.25.09 AM.jpeg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "18955"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"oKrZJPi92bvVSORgjzLeY3Fw1IQqhbLMSH5xvh9jivA=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 08 Aug 2025 07:42:20 GMT"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "8qzigcxsrh"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-oKrZJPi92bvVSORgjzLeY3Fw1IQqhbLMSH5xvh9jivA="
+        },
+        {
+          "Name": "label",
+          "Value": "uploads/companies/logos/75f888b9-9c75-4eec-b71c-3caf4c4726c8_WhatsApp Image 2025-06-21 at 11.25.09 AM.jpeg"
+        }
+      ]
+    },
+    {
+      "Route": "uploads/companies/logos/75f888b9-9c75-4eec-b71c-3caf4c4726c8_WhatsApp Image 2025-06-21 at 11.25.09 AM.jpeg",
+      "AssetFile": "uploads/companies/logos/75f888b9-9c75-4eec-b71c-3caf4c4726c8_WhatsApp Image 2025-06-21 at 11.25.09 AM.jpeg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "18955"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"oKrZJPi92bvVSORgjzLeY3Fw1IQqhbLMSH5xvh9jivA=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 08 Aug 2025 07:42:20 GMT"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-oKrZJPi92bvVSORgjzLeY3Fw1IQqhbLMSH5xvh9jivA="
+        }
+      ]
+    },
+    {
+      "Route": "uploads/companies/logos/8f27e69b-6dc4-42e1-adf2-a467a8ecb193_sync-squad logo.8qzigcxsrh.jpeg",
+      "AssetFile": "uploads/companies/logos/8f27e69b-6dc4-42e1-adf2-a467a8ecb193_sync-squad logo.jpeg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "18955"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"oKrZJPi92bvVSORgjzLeY3Fw1IQqhbLMSH5xvh9jivA=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 08 Aug 2025 09:38:11 GMT"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "8qzigcxsrh"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-oKrZJPi92bvVSORgjzLeY3Fw1IQqhbLMSH5xvh9jivA="
+        },
+        {
+          "Name": "label",
+          "Value": "uploads/companies/logos/8f27e69b-6dc4-42e1-adf2-a467a8ecb193_sync-squad logo.jpeg"
+        }
+      ]
+    },
+    {
+      "Route": "uploads/companies/logos/8f27e69b-6dc4-42e1-adf2-a467a8ecb193_sync-squad logo.jpeg",
+      "AssetFile": "uploads/companies/logos/8f27e69b-6dc4-42e1-adf2-a467a8ecb193_sync-squad logo.jpeg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "18955"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"oKrZJPi92bvVSORgjzLeY3Fw1IQqhbLMSH5xvh9jivA=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 08 Aug 2025 09:38:11 GMT"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-oKrZJPi92bvVSORgjzLeY3Fw1IQqhbLMSH5xvh9jivA="
+        }
+      ]
+    },
+    {
+      "Route": "uploads/companies/logos/ef9f8bf2-6041-4e59-89d5-ad726bc959f7_WhatsApp Image 2025-06-21 at 11.25.09 AM.8qzigcxsrh.jpeg",
+      "AssetFile": "uploads/companies/logos/ef9f8bf2-6041-4e59-89d5-ad726bc959f7_WhatsApp Image 2025-06-21 at 11.25.09 AM.jpeg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "18955"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"oKrZJPi92bvVSORgjzLeY3Fw1IQqhbLMSH5xvh9jivA=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 08 Aug 2025 07:41:24 GMT"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "8qzigcxsrh"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-oKrZJPi92bvVSORgjzLeY3Fw1IQqhbLMSH5xvh9jivA="
+        },
+        {
+          "Name": "label",
+          "Value": "uploads/companies/logos/ef9f8bf2-6041-4e59-89d5-ad726bc959f7_WhatsApp Image 2025-06-21 at 11.25.09 AM.jpeg"
+        }
+      ]
+    },
+    {
+      "Route": "uploads/companies/logos/ef9f8bf2-6041-4e59-89d5-ad726bc959f7_WhatsApp Image 2025-06-21 at 11.25.09 AM.jpeg",
+      "AssetFile": "uploads/companies/logos/ef9f8bf2-6041-4e59-89d5-ad726bc959f7_WhatsApp Image 2025-06-21 at 11.25.09 AM.jpeg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "18955"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"oKrZJPi92bvVSORgjzLeY3Fw1IQqhbLMSH5xvh9jivA=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 08 Aug 2025 07:41:24 GMT"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-oKrZJPi92bvVSORgjzLeY3Fw1IQqhbLMSH5xvh9jivA="
+        }
+      ]
+    }
+  ]
+}

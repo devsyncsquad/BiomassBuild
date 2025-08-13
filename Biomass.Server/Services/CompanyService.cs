@@ -105,7 +105,7 @@ namespace Biomass.Server.Services
             return response;
         }
 
-        public async Task<ServiceResponse<CompanyDto>> CreateCompanyAsync(CreateCompanyRequest request)
+        public async Task<ServiceResponse<CompanyDto>> CreateCompanyAsync(CompanyDto request)
         {
             var response = new ServiceResponse<CompanyDto>();
             
@@ -166,8 +166,8 @@ namespace Biomass.Server.Services
 
             return response;
         }
-
-        public async Task<ServiceResponse<CompanyDto>> UpdateCompanyAsync(UpdateCompanyRequest request)
+       
+        public async Task<ServiceResponse<CompanyDto>> UpdateCompanyAsync(int id, UpdateCompanyRequest request)
         {
             var response = new ServiceResponse<CompanyDto>();
             
@@ -372,11 +372,6 @@ namespace Biomass.Server.Services
             }
 
             return response;
-        }
-
-        public Task<ServiceResponse<CompanyDto>> UpdateCompanyAsync(int id, UpdateCompanyRequest request)
-        {
-            throw new NotImplementedException();
         }
 
         Task<ServiceResponse<string>> ICompanyService.UpdateCompanyLogoAsync(int companyId, string logoPath)

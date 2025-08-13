@@ -19,7 +19,7 @@ namespace Biomass.Server.Controllers.Api
             _fileService = fileService;
         }
 
-        [HttpGet]
+        [HttpGet("GetCompanyList")]
         public async Task<IActionResult> GetAllCompanies()
         {
             var response = await _companyService.GetAllCompaniesAsync();
@@ -30,7 +30,7 @@ namespace Biomass.Server.Controllers.Api
             return Ok(response);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("GetCompany")]
         public async Task<IActionResult> GetCompanyById(int id)
         {
             var response = await _companyService.GetCompanyByIdAsync(id);
@@ -41,8 +41,8 @@ namespace Biomass.Server.Controllers.Api
             return Ok(response);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateCompany([FromBody] CreateCompanyRequest request)
+        [HttpPost("AddCompany")]
+        public async Task<IActionResult> CreateCompany([FromBody] CompanyDto request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -55,24 +55,26 @@ namespace Biomass.Server.Controllers.Api
             return CreatedAtAction(nameof(GetCompanyById), new { id = response.Result.CompanyId }, response);
         }
 
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> UpdateCompany(int id, [FromBody] UpdateCompanyRequest request)
-        //{
-        //    if (!ModelState.IsValid)
-        //        return BadRequest(ModelState);
 
-        //    if (id != request.CompanyId)
-        //        return BadRequest("ID mismatch");
 
-        //    var response = await _companyService.UpdateCompanyAsync(request);
-            
-        //    if (!response.Success)
-        //        return NotFound(response);
-                
-        //    return Ok(response);
-        //}
+        [HttpPut("UpdateCompany")]
+        public async Task<IActionResult> UpdateCompany(int id, [FromBody] UpdateCompanyRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-        [HttpDelete("{id}")]
+            if (id != request.CompanyId)
+                return BadRequest("ID mismatch");
+
+            var response = await _companyService.UpdateCompanyAsync(id, request);
+
+            if (!response.Success)
+                return NotFound(response);
+
+            return Ok(response);
+        }
+
+        [HttpDelete("DeleteCompany")]
         public async Task<IActionResult> DeleteCompany(int id)
         {
             var response = await _companyService.DeleteCompanyAsync(id);

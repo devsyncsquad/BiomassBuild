@@ -17,12 +17,21 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  FormHelperText
+  FormHelperText,
+  Card,
+  CardContent,
+  Divider,
+  Chip
 } from '@mui/material';
 import {
   Close as CloseIcon,
   Upload as UploadIcon,
-  Business as BusinessIcon
+  Business as BusinessIcon,
+  LocationOn as LocationIcon,
+  Phone as PhoneIcon,
+  Email as EmailIcon,
+  Work as WorkIcon,
+  People as PeopleIcon
 } from '@mui/icons-material';
 
 const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
@@ -110,7 +119,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
     setError('');
 
     try {
-      const baseUrl = import.meta.env.VITE_BACKEND_URL || 'https://localhost:7084';
+      const iconUrl = import.meta.env.VITE_LIVE_APP_BASEURL || 'https://localhost:7084/api';
       let response;
 
       if (company) {
@@ -131,7 +140,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
           logoPath: formData.logoPath
         };
 
-        response = await fetch(`${baseUrl}/api/Companies/UpdateCompany?id=${company.companyId}`, {
+        response = await fetch(`${iconUrl}/Companies/UpdateCompany?id=${company.companyId}`, {
           method: 'PUT',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -159,7 +168,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
           logoPath: formData.logoPath
         };
 
-        response = await fetch(`${baseUrl}/api/Companies/AddCompany`, {
+        response = await fetch(`${iconUrl}/Companies/CreateCompany`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -179,11 +188,16 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
         throw new Error(result.message || 'Failed to save company');
       }
 
-      // For update operations, we need to get the result from the response
-      let finalResult = result;
+      // Get the result from the response
+      let finalResult;
       if (company) {
+        // For update operations, we need to get the result from the response
         finalResult = await response.json();
+      } else {
+        // For create operations, we already have the result
+        finalResult = result;
       }
+      
       if (finalResult.success) {
         onSaved();
       } else {
@@ -258,280 +272,442 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
     <Dialog
       open={true}
       onClose={onClose}
-      maxWidth="md"
+      maxWidth="lg"
       fullWidth
       PaperProps={{
-        sx: { borderRadius: 3 }
+        sx: { 
+          borderRadius: 4, 
+          overflow: 'hidden',
+          maxHeight: '90vh'
+        }
       }}
     >
-      <DialogTitle sx={{ pb: 1 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
-            Company Identity & Compliance
-          </Typography>
-          <IconButton onClick={onClose} size="small">
-            <CloseIcon />
-          </IconButton>
-        </Box>
-        <Typography variant="body2" color="text.secondary">
-          Manage basic identity and compliance details for your business company
-        </Typography>
-      </DialogTitle>
+      {/* Enhanced Header */}
+      <Box sx={{ 
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        color: 'white',
+        p: 3
+      }}>
+        <DialogTitle sx={{ p: 0, color: 'white' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box>
+              <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
+                {company ? (isViewMode ? 'Company Details' : 'Edit Company') : 'Add New Company'}
+              </Typography>
+              <Typography variant="h6" sx={{ opacity: 0.9, fontWeight: 300 }}>
+                {company ? 'Update company information and compliance details' : 'Create a new company profile with complete details'}
+              </Typography>
+            </Box>
+            <IconButton 
+              onClick={onClose} 
+              size="large"
+              sx={{ 
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: 'rgba(255,255,255,0.1)'
+                }
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+      </Box>
 
-      <DialogContent sx={{ pt: 2 }}>
+      <DialogContent sx={{ p: 0 }}>
         {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
+          <Box sx={{ p: 3, pb: 0 }}>
+            <Alert severity="error" sx={{ borderRadius: 2 }}>
+              {error}
+            </Alert>
+          </Box>
         )}
 
-        <Grid container spacing={3}>
-          {/* Company Logo Section */}
-          <Grid item xs={12}>
-            <Typography variant="h6" gutterBottom>
-              Company Logo
-            </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                              <Avatar
-                  sx={{
-                    width: 80,
-                    height: 80,
-                    bgcolor: '#e0e0e0',
-                    border: '2px dashed #ccc'
-                  }}
-                  src={logoPreview || (company?.logoPath ? `${import.meta.env.VITE_BACKEND_URL || 'https://localhost:7084'}/api/Companies/${company.companyId}/logo` : null)}
-                >
-                {formData.companyName ? (
-                  getCompanyInitials(formData.companyName)
-                ) : (
-                  <BusinessIcon sx={{ fontSize: 40, color: '#999' }} />
-                )}
-              </Avatar>
-              <Box>
-                <input
-                  accept="image/*"
-                  style={{ display: 'none' }}
-                  id="logo-upload"
-                  type="file"
-                  onChange={handleLogoUpload}
-                  disabled={isViewMode && !isEditing}
-                />
-                <label htmlFor="logo-upload">
-                  <Button
-                    variant="contained"
-                    component="span"
-                    startIcon={<UploadIcon />}
-                    disabled={isViewMode && !isEditing}
-                  >
-                    {logoPreview || company?.logoPath ? 'Change logo' : 'Upload logo'}
-                  </Button>
-                </label>
-                <Typography variant="caption" display="block" sx={{ mt: 1 }}>
-                  PNG, JPG, GIF, BMP up to 5MB
-                </Typography>
-              </Box>
-            </Box>
-          </Grid>
+        <Box sx={{ p: 3 }}>
+          <Grid container spacing={4}>
+            {/* Company Logo Section */}
+            <Grid item xs={12}>
+              <Card sx={{ borderRadius: 3, overflow: 'hidden' }}>
+                <CardContent sx={{ p: 3 }}>
+                  <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <BusinessIcon color="primary" />
+                    Company Logo & Branding
+                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                    <Avatar
+                      sx={{
+                        width: 100,
+                        height: 100,
+                        bgcolor: '#e0e0e0',
+                        border: '3px dashed #ccc',
+                        fontSize: '2rem',
+                        fontWeight: 600
+                      }}
+                      src={logoPreview || (company?.logoPath ? `${import.meta.env.VITE_LIVE_APP_BASEURL || 'https://localhost:7084/api'}/Companies/${company.companyId}/logo` : null)}
+                    >
+                      {formData.companyName ? (
+                        getCompanyInitials(formData.companyName)
+                      ) : (
+                        <BusinessIcon sx={{ fontSize: 50, color: '#999' }} />
+                      )}
+                    </Avatar>
+                    <Box>
+                      <input
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        id="logo-upload"
+                        type="file"
+                        onChange={handleLogoUpload}
+                        disabled={isViewMode && !isEditing}
+                      />
+                      <label htmlFor="logo-upload">
+                        <Button
+                          variant="contained"
+                          component="span"
+                          startIcon={<UploadIcon />}
+                          disabled={isViewMode && !isEditing}
+                          sx={{ 
+                            borderRadius: 2,
+                            px: 3,
+                            py: 1.5,
+                            fontWeight: 600
+                          }}
+                        >
+                          {logoPreview || company?.logoPath ? 'Change Logo' : 'Upload Logo'}
+                        </Button>
+                      </label>
+                      <Typography variant="caption" display="block" sx={{ mt: 2, color: 'text.secondary' }}>
+                        PNG, JPG, GIF, BMP up to 5MB
+                      </Typography>
+                    </Box>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
 
-          {/* Basic Information Section */}
-          <Grid item xs={12}>
-            <Typography variant="h6" gutterBottom>
-              Basic Information
-            </Typography>
-          </Grid>
+            {/* Basic Information Section */}
+            <Grid item xs={12}>
+              <Card sx={{ borderRadius: 3, overflow: 'hidden' }}>
+                <CardContent sx={{ p: 3 }}>
+                  <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <BusinessIcon color="primary" />
+                    Basic Information
+                  </Typography>
+                  <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        label="Company Name"
+                        value={formData.companyName}
+                        onChange={(e) => handleInputChange('companyName', e.target.value)}
+                        error={!!errors.companyName}
+                        helperText={errors.companyName || 'Legal name of your business company'}
+                        required
+                        disabled={isViewMode && !isEditing}
+                        variant="outlined"
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: 2,
+                            '&:hover fieldset': {
+                              borderColor: 'primary.main',
+                            },
+                          },
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        label="Company Address"
+                        value={formData.companyAddress}
+                        onChange={(e) => handleInputChange('companyAddress', e.target.value)}
+                        error={!!errors.companyAddress}
+                        helperText={errors.companyAddress || 'Complete registered address including city, state, and postal code'}
+                        multiline
+                        rows={3}
+                        required
+                        disabled={isViewMode && !isEditing}
+                        variant="outlined"
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: 2,
+                            '&:hover fieldset': {
+                              borderColor: 'primary.main',
+                            },
+                          },
+                        }}
+                      />
+                    </Grid>
+                  </Grid>
+                </CardContent>
+              </Card>
+            </Grid>
 
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Company Name"
-              value={formData.companyName}
-              onChange={(e) => handleInputChange('companyName', e.target.value)}
-              error={!!errors.companyName}
-              helperText={errors.companyName || 'Legal name of your business company'}
-              required
-              disabled={isViewMode && !isEditing}
-            />
-          </Grid>
+            {/* Tax & Registration Details Section */}
+            <Grid item xs={12}>
+              <Card sx={{ borderRadius: 3, overflow: 'hidden' }}>
+                <CardContent sx={{ p: 3 }}>
+                  <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <WorkIcon color="primary" />
+                    Tax & Registration Details
+                  </Typography>
+                  <Grid container spacing={3}>
+                    <Grid item xs={12} sm={6} md={4}>
+                      <TextField
+                        fullWidth
+                        label="Company NTN (Optional)"
+                        value={formData.ntn}
+                        onChange={(e) => handleInputChange('ntn', e.target.value)}
+                        placeholder="Enter NTN number"
+                        helperText="National Tax Number"
+                        disabled={isViewMode && !isEditing}
+                        variant="outlined"
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: 2,
+                            '&:hover fieldset': {
+                              borderColor: 'primary.main',
+                            },
+                          },
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={4}>
+                      <TextField
+                        fullWidth
+                        label="Company STRN (If applicable)"
+                        value={formData.strn}
+                        onChange={(e) => handleInputChange('strn', e.target.value)}
+                        placeholder="Enter STRN number"
+                        helperText="Sales Tax Registration Number"
+                        disabled={isViewMode && !isEditing}
+                        variant="outlined"
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: 2,
+                            '&:hover fieldset': {
+                              borderColor: 'primary.main',
+                            },
+                          },
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={4}>
+                      <TextField
+                        fullWidth
+                        label="Company PRA (If applicable)"
+                        value={formData.pra}
+                        onChange={(e) => handleInputChange('pra', e.target.value)}
+                        placeholder="Enter PRA number"
+                        helperText="Pakistan Revenue Authority registration number"
+                        disabled={isViewMode && !isEditing}
+                        variant="outlined"
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: 2,
+                            '&:hover fieldset': {
+                              borderColor: 'primary.main',
+                            },
+                          },
+                        }}
+                      />
+                    </Grid>
+                  </Grid>
+                </CardContent>
+              </Card>
+            </Grid>
 
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Company Address"
-              value={formData.companyAddress}
-              onChange={(e) => handleInputChange('companyAddress', e.target.value)}
-              error={!!errors.companyAddress}
-              helperText={errors.companyAddress || 'Complete registered address including city, state, and postal code'}
-              multiline
-              rows={3}
-              required
-              disabled={isViewMode && !isEditing}
-            />
-          </Grid>
+            {/* Primary Contact Information Section */}
+            <Grid item xs={12}>
+              <Card sx={{ borderRadius: 3, overflow: 'hidden' }}>
+                <CardContent sx={{ p: 3 }}>
+                  <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <PhoneIcon color="primary" />
+                    Primary Contact Information
+                  </Typography>
+                  <Grid container spacing={3}>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        label="Contact Person Name (Optional)"
+                        value={formData.contactPersonName}
+                        onChange={(e) => handleInputChange('contactPersonName', e.target.value)}
+                        placeholder="Enter person name"
+                        helperText="Primary contact person for business communications"
+                        disabled={isViewMode && !isEditing}
+                        variant="outlined"
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: 2,
+                            '&:hover fieldset': {
+                              borderColor: 'primary.main',
+                            },
+                          },
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        label="Contact Person Phone (Optional)"
+                        value={formData.contactPersonPhone}
+                        onChange={(e) => handleInputChange('contactPersonPhone', e.target.value)}
+                        placeholder="Enter number with country code"
+                        helperText="Phone number with country code"
+                        disabled={isViewMode && !isEditing}
+                        variant="outlined"
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: 2,
+                            '&:hover fieldset': {
+                              borderColor: 'primary.main',
+                            },
+                          },
+                        }}
+                      />
+                    </Grid>
+                  </Grid>
+                </CardContent>
+              </Card>
+            </Grid>
 
-          {/* Tax & Registration Details Section */}
-          <Grid item xs={12}>
-            <Typography variant="h6" gutterBottom>
-              Tax & Registration Details
-            </Typography>
+            {/* Additional Information Section */}
+            <Grid item xs={12}>
+              <Card sx={{ borderRadius: 3, overflow: 'hidden' }}>
+                <CardContent sx={{ p: 3 }}>
+                  <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <PeopleIcon color="primary" />
+                    Additional Information
+                  </Typography>
+                  <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        label="Company Description"
+                        value={formData.companyDescription}
+                        onChange={(e) => handleInputChange('companyDescription', e.target.value)}
+                        placeholder="Enter company description"
+                        multiline
+                        rows={3}
+                        disabled={isViewMode && !isEditing}
+                        variant="outlined"
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: 2,
+                            '&:hover fieldset': {
+                              borderColor: 'primary.main',
+                            },
+                          },
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={4}>
+                      <FormControl fullWidth>
+                        <InputLabel>Industry</InputLabel>
+                        <Select
+                          value={formData.industry}
+                          label="Industry"
+                          onChange={(e) => handleInputChange('industry', e.target.value)}
+                          disabled={isViewMode && !isEditing}
+                          sx={{
+                            borderRadius: 2,
+                            '&:hover .MuiOutlinedInput-notchedOutline': {
+                              borderColor: 'primary.main',
+                            },
+                          }}
+                        >
+                          <MenuItem value="">Select Industry</MenuItem>
+                          <MenuItem value="Technology">Technology</MenuItem>
+                          <MenuItem value="Healthcare">Healthcare</MenuItem>
+                          <MenuItem value="Finance">Finance</MenuItem>
+                          <MenuItem value="Manufacturing">Manufacturing</MenuItem>
+                          <MenuItem value="Energy">Energy</MenuItem>
+                          <MenuItem value="Retail">Retail</MenuItem>
+                          <MenuItem value="Education">Education</MenuItem>
+                          <MenuItem value="Other">Other</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={4}>
+                      <FormControl fullWidth>
+                        <InputLabel>Company Size</InputLabel>
+                        <Select
+                          value={formData.companySize}
+                          label="Company Size"
+                          onChange={(e) => handleInputChange('companySize', e.target.value)}
+                          disabled={isViewMode && !isEditing}
+                          sx={{
+                            borderRadius: 2,
+                            '&:hover .MuiOutlinedInput-notchedOutline': {
+                              borderColor: 'primary.main',
+                            },
+                          }}
+                        >
+                          <MenuItem value="">Select Size</MenuItem>
+                          <MenuItem value="Small">Small (1-50 employees)</MenuItem>
+                          <MenuItem value="Medium">Medium (51-200 employees)</MenuItem>
+                          <MenuItem value="Large">Large (200+ employees)</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={4}>
+                      <TextField
+                        fullWidth
+                        label="Location"
+                        value={formData.location}
+                        onChange={(e) => handleInputChange('location', e.target.value)}
+                        placeholder="Enter location"
+                        disabled={isViewMode && !isEditing}
+                        variant="outlined"
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: 2,
+                            '&:hover fieldset': {
+                              borderColor: 'primary.main',
+                            },
+                          },
+                        }}
+                      />
+                    </Grid>
+                  </Grid>
+                </CardContent>
+              </Card>
+            </Grid>
           </Grid>
-
-          <Grid item xs={12} sm={6} md={4}>
-            <TextField
-              fullWidth
-              label="Company NTN (Optional)"
-              value={formData.ntn}
-              onChange={(e) => handleInputChange('ntn', e.target.value)}
-              placeholder="Enter NTN number"
-              helperText="National Tax Number"
-              disabled={isViewMode && !isEditing}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={4}>
-            <TextField
-              fullWidth
-              label="Company STRN (If applicable)"
-              value={formData.strn}
-              onChange={(e) => handleInputChange('strn', e.target.value)}
-              placeholder="Enter STRN number"
-              helperText="Sales Tax Registration Number"
-              disabled={isViewMode && !isEditing}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={4}>
-            <TextField
-              fullWidth
-              label="Company PRA (If applicable)"
-              value={formData.pra}
-              onChange={(e) => handleInputChange('pra', e.target.value)}
-              placeholder="Enter PRA number"
-              helperText="Pakistan Revenue Authority registration number"
-              disabled={isViewMode && !isEditing}
-            />
-          </Grid>
-
-          {/* Primary Contact Information Section */}
-          <Grid item xs={12}>
-            <Typography variant="h6" gutterBottom>
-              Primary Contact Information
-            </Typography>
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label="Contact Person Name (Optional)"
-              value={formData.contactPersonName}
-              onChange={(e) => handleInputChange('contactPersonName', e.target.value)}
-              placeholder="Enter person name"
-              helperText="Primary contact person for business communications"
-              disabled={isViewMode && !isEditing}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label="Contact Person Phone (Optional)"
-              value={formData.contactPersonPhone}
-              onChange={(e) => handleInputChange('contactPersonPhone', e.target.value)}
-              placeholder="Enter number with country code"
-              helperText="Phone number with country code"
-              disabled={isViewMode && !isEditing}
-            />
-          </Grid>
-
-          {/* Additional Information Section */}
-          <Grid item xs={12}>
-            <Typography variant="h6" gutterBottom>
-              Additional Information
-            </Typography>
-          </Grid>
-
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Company Description"
-              value={formData.companyDescription}
-              onChange={(e) => handleInputChange('companyDescription', e.target.value)}
-              placeholder="Enter company description"
-              multiline
-              rows={2}
-              disabled={isViewMode && !isEditing}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={4}>
-            <FormControl fullWidth>
-              <InputLabel>Industry</InputLabel>
-              <Select
-                value={formData.industry}
-                label="Industry"
-                onChange={(e) => handleInputChange('industry', e.target.value)}
-                disabled={isViewMode && !isEditing}
-              >
-                <MenuItem value="">Select Industry</MenuItem>
-                <MenuItem value="Technology">Technology</MenuItem>
-                <MenuItem value="Healthcare">Healthcare</MenuItem>
-                <MenuItem value="Finance">Finance</MenuItem>
-                <MenuItem value="Manufacturing">Manufacturing</MenuItem>
-                <MenuItem value="Energy">Energy</MenuItem>
-                <MenuItem value="Retail">Retail</MenuItem>
-                <MenuItem value="Education">Education</MenuItem>
-                <MenuItem value="Other">Other</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={4}>
-            <FormControl fullWidth>
-              <InputLabel>Company Size</InputLabel>
-              <Select
-                value={formData.companySize}
-                label="Company Size"
-                onChange={(e) => handleInputChange('companySize', e.target.value)}
-                disabled={isViewMode && !isEditing}
-              >
-                <MenuItem value="">Select Size</MenuItem>
-                <MenuItem value="Small">Small (1-50 employees)</MenuItem>
-                <MenuItem value="Medium">Medium (51-200 employees)</MenuItem>
-                <MenuItem value="Large">Large (200+ employees)</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={4}>
-            <TextField
-              fullWidth
-              label="Location"
-              value={formData.location}
-              onChange={(e) => handleInputChange('location', e.target.value)}
-              placeholder="Enter location"
-              disabled={isViewMode && !isEditing}
-            />
-          </Grid>
-        </Grid>
+        </Box>
       </DialogContent>
 
-      <DialogActions sx={{ px: 3, pb: 3 }}>
+      {/* Enhanced Actions */}
+      <DialogActions sx={{ p: 3, background: '#f8fafc', borderTop: '1px solid #e0e0e0' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-          <Typography variant="body2" color="text.secondary">
-            *Required fields
-          </Typography>
-          <Box sx={{ display: 'flex', gap: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="body2" color="text.secondary">
+              *Required fields
+            </Typography>
+            {company && (
+              <Chip 
+                label={isViewMode ? 'View Mode' : 'Edit Mode'} 
+                color={isViewMode ? 'default' : 'primary'} 
+                size="small" 
+                variant="outlined"
+              />
+            )}
+          </Box>
+          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
             {isViewMode && !isEditing ? (
               // View mode - show Edit and Close buttons
               <>
                 <Button
                   variant="outlined"
                   onClick={onClose}
+                  sx={{ borderRadius: 2, px: 4, py: 1.5, fontWeight: 600 }}
                 >
                   Close
                 </Button>
                 <Button
                   variant="contained"
                   onClick={handleEditToggle}
+                  sx={{ borderRadius: 2, px: 4, py: 1.5, fontWeight: 600 }}
                 >
                   Edit Company
                 </Button>
@@ -543,6 +719,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
                   variant="outlined"
                   onClick={isViewMode ? handleCancelEdit : onClose}
                   disabled={loading}
+                  sx={{ borderRadius: 2, px: 4, py: 1.5, fontWeight: 600 }}
                 >
                   {isViewMode ? 'Cancel Edit' : 'Cancel'}
                 </Button>
@@ -550,6 +727,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
                   <Button
                     variant="outlined"
                     disabled={loading}
+                    sx={{ borderRadius: 2, px: 4, py: 1.5, fontWeight: 600 }}
                   >
                     Save as Draft
                   </Button>
@@ -559,6 +737,17 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
                   onClick={handleSubmit}
                   disabled={loading}
                   startIcon={loading ? <CircularProgress size={20} /> : null}
+                  sx={{ 
+                    borderRadius: 2, 
+                    px: 4, 
+                    py: 1.5, 
+                    fontWeight: 600,
+                    '&:hover': {
+                      transform: 'translateY(-1px)',
+                      boxShadow: '0 4px 16px rgba(0,0,0,0.2)'
+                    },
+                    transition: 'all 0.2s ease'
+                  }}
                 >
                   {company ? 'Update Company Details' : 'Save Company Details'}
                 </Button>

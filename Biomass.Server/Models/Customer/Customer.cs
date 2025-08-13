@@ -7,6 +7,7 @@ namespace Biomass.Server.Models.Customer
     public class Customer
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("customerid")]
         public int CustomerId { get; set; }
         

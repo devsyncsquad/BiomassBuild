@@ -18,7 +18,6 @@ namespace Biomass.Server.Controllers.Api
             _companyService = companyService;
             _fileService = fileService;
         }
-
         
         [HttpGet("GetAllCompanies")]
         public async Task<IActionResult> GetAllCompanies()
@@ -42,9 +41,8 @@ namespace Biomass.Server.Controllers.Api
             return Ok(response);
         }
 
-
         [HttpPost("CreateCompany")]
-        public async Task<IActionResult> CreateCompany([FromBody] CreateCompanyRequest request)
+        public async Task<IActionResult> CreateCompany([FromBody] CompanyDto request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -57,24 +55,26 @@ namespace Biomass.Server.Controllers.Api
             return CreatedAtAction(nameof(GetCompanyById), new { id = response.Result.CompanyId }, response);
         }
 
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> UpdateCompany(int id, [FromBody] UpdateCompanyRequest request)
-        //{
-        //    if (!ModelState.IsValid)
-        //        return BadRequest(ModelState);
 
-        //    if (id != request.CompanyId)
-        //        return BadRequest("ID mismatch");
 
-        //    var response = await _companyService.UpdateCompanyAsync(request);
-            
-        //    if (!response.Success)
-        //        return NotFound(response);
-                
-        //    return Ok(response);
-        //}
+        [HttpPut("UpdateCompany")]
+        public async Task<IActionResult> UpdateCompany(int id, [FromBody] UpdateCompanyRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-		[HttpDelete("DeleteCompany/{id}")]
+            if (id != request.CompanyId)
+                return BadRequest("ID mismatch");
+
+            var response = await _companyService.UpdateCompanyAsync(id, request);
+
+            if (!response.Success)
+                return NotFound(response);
+
+            return Ok(response);
+        }
+
+        [HttpDelete("DeleteCompany")]
         public async Task<IActionResult> DeleteCompany(int id)
         {
             var response = await _companyService.DeleteCompanyAsync(id);

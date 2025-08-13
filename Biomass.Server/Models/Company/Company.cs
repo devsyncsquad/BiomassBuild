@@ -6,6 +6,7 @@ namespace Biomass.Server.Models.Company
     public class Company
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int CompanyId { get; set; }
         
         [Required]

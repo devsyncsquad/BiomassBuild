@@ -110,7 +110,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
     setError('');
 
     try {
-      const baseUrl = import.meta.env.VITE_APP_BASE_URL || 'https://localhost:7084';
+      const baseUrl = import.meta.env.VITE_BACKEND_URL || 'https://localhost:7084';
       let response;
 
       if (company) {
@@ -131,7 +131,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
           logoPath: formData.logoPath
         };
 
-        response = await fetch(`${baseUrl}/api/companies/${company.companyId}`, {
+        response = await fetch(`${baseUrl}/api/Companies/UpdateCompany?id=${company.companyId}`, {
           method: 'PUT',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -140,23 +140,8 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
           body: JSON.stringify(updateData)
         });
 
-        // If there's a new logo file, upload it separately
-        if (formData.logo && formData.logo instanceof File) {
-          const formDataLogo = new FormData();
-          formDataLogo.append('logo', formData.logo);
-
-          const logoResponse = await fetch(`${baseUrl}/api/companies/${company.companyId}/logo`, {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },
-            body: formDataLogo
-          });
-
-          if (!logoResponse.ok) {
-            throw new Error('Failed to upload logo');
-          }
-        }
+        // Logo upload functionality is currently disabled in the backend
+        // TODO: Implement logo upload when backend endpoint is available
       } else {
         // Create new company
         const createData = {
@@ -174,7 +159,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
           logoPath: formData.logoPath
         };
 
-        response = await fetch(`${baseUrl}/api/companies`, {
+        response = await fetch(`${baseUrl}/api/Companies/AddCompany`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -185,23 +170,8 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
 
         const result = await response.json();
         
-        // If there's a logo file and company was created successfully, upload the logo
-        if (formData.logo && formData.logo instanceof File && result.success) {
-          const formDataLogo = new FormData();
-          formDataLogo.append('logo', formData.logo);
-
-          const logoResponse = await fetch(`${baseUrl}/api/companies/${result.result.companyId}/logo`, {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },
-            body: formDataLogo
-          });
-
-          if (!logoResponse.ok) {
-            console.warn('Failed to upload logo, but company was created successfully');
-          }
-        }
+        // Logo upload functionality is currently disabled in the backend
+        // TODO: Implement logo upload when backend endpoint is available
       }
 
       if (!response.ok) {
@@ -209,11 +179,15 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
         throw new Error(result.message || 'Failed to save company');
       }
 
-      const result = await response.json();
-      if (result.success) {
+      // For update operations, we need to get the result from the response
+      let finalResult = result;
+      if (company) {
+        finalResult = await response.json();
+      }
+      if (finalResult.success) {
         onSaved();
       } else {
-        setError(result.message || 'Failed to save company');
+        setError(finalResult.message || 'Failed to save company');
       }
     } catch (error) {
       console.error('Error saving company:', error);
@@ -318,15 +292,15 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
               Company Logo
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Avatar
-                sx={{
-                  width: 80,
-                  height: 80,
-                  bgcolor: '#e0e0e0',
-                  border: '2px dashed #ccc'
-                }}
-                src={logoPreview || (company?.logoPath ? `${import.meta.env.VITE_APP_BASE_URL || 'https://localhost:7084'}/api/companies/${company.companyId}/logo` : null)}
-              >
+                              <Avatar
+                  sx={{
+                    width: 80,
+                    height: 80,
+                    bgcolor: '#e0e0e0',
+                    border: '2px dashed #ccc'
+                  }}
+                  src={logoPreview || (company?.logoPath ? `${import.meta.env.VITE_BACKEND_URL || 'https://localhost:7084'}/api/Companies/${company.companyId}/logo` : null)}
+                >
                 {formData.companyName ? (
                   getCompanyInitials(formData.companyName)
                 ) : (

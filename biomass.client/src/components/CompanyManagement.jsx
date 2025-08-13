@@ -15,7 +15,8 @@ import {
   CircularProgress,
   IconButton,
   InputAdornment,
-  Paper
+  Paper,
+  Snackbar
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -35,6 +36,13 @@ const CompanyManagement = () => {
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isViewMode, setIsViewMode] = useState(false);
+  
+  // Snackbar states
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success'
+  });
   
   // Filter states
   const [filters, setFilters] = useState({
@@ -58,11 +66,26 @@ const CompanyManagement = () => {
     applyFilters();
   }, [companies, filters]);
 
+  const showSnackbar = (message, severity = 'success') => {
+    setSnackbar({
+      open: true,
+      message,
+      severity
+    });
+  };
+
+  const hideSnackbar = () => {
+    setSnackbar(prev => ({
+      ...prev,
+      open: false
+    }));
+  };
+
   const fetchCompanies = async () => {
     try {
       setLoading(true);
-      const baseUrl = import.meta.env.VITE_APP_BASE_URL || 'https://localhost:7084';
-      const response = await fetch(`${baseUrl}/api/companies`, {
+      const baseUrl = import.meta.env.VITE_BACKEND_URL || 'https://localhost:7084';
+      const response = await fetch(`${baseUrl}/api/Companies/GetCompanyList`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json'
@@ -201,6 +224,7 @@ const CompanyManagement = () => {
   const handleCompanySaved = () => {
     handleFormClose();
     fetchCompanies();
+    showSnackbar('Company saved successfully!');
   };
 
   const getCompanyInitials = (companyName) => {
@@ -355,7 +379,7 @@ const CompanyManagement = () => {
                       mr: 1.5,
                       fontSize: '0.9rem'
                     }}
-                    src={company.logoPath ? `${import.meta.env.VITE_APP_BASE_URL || 'https://localhost:7084'}/api/companies/${company.companyId}/logo` : null}
+                    src={company.logoPath ? `${import.meta.env.VITE_BACKEND_URL || 'https://localhost:7084'}/api/Companies/${company.companyId}/logo` : null}
                   >
                     {getCompanyInitials(company.companyName)}
                   </Avatar>
@@ -425,6 +449,22 @@ const CompanyManagement = () => {
           onSaved={handleCompanySaved}
         />
       </Dialog>
+
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={hideSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert 
+          onClose={hideSnackbar} 
+          severity={snackbar.severity} 
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

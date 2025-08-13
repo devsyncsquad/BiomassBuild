@@ -1,0 +1,12 @@
+Biomass.Server/bin/
+.vs/Biomass/CopilotIndices/
+.vs/Biomass/FileContentIndex/
+*.bin
+Biomass.Server/wwwroot/
+/Biomass.Server/App_Data/Migrations
+/Biomass.Server/App_Data
+/Biomass.Server/bin
+/Biomass.Server/obj
+/.vs
+biomass.client/.env
+/biomass.client/obj

@@ -1,0 +1,116 @@
+/* Customer Management Styles */
+.customer-table {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.customer-table .MuiTableHead-root {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.customer-table .MuiTableHead-root .MuiTableCell-root {
+  color: white;
+  font-weight: 600;
+}
+
+.customer-avatar {
+  transition: transform 0.2s ease;
+}
+
+.customer-avatar:hover {
+  transform: scale(1.1);
+}
+
+.status-chip {
+  text-transform: capitalize;
+  font-weight: 500;
+}
+
+.action-button {
+  transition: all 0.2s ease;
+}
+
+.action-button:hover {
+  transform: scale(1.1);
+}
+
+.search-field {
+  border-radius: 8px;
+}
+
+.search-field .MuiOutlinedInput-root {
+  border-radius: 8px;
+}
+
+.filter-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.customer-row {
+  transition: background-color 0.2s ease;
+}
+
+.customer-row:hover {
+  background-color: rgba(102, 126, 234, 0.05);
+}
+
+.registration-dialog .MuiDialog-paper {
+  border-radius: 16px;
+}
+
+.registration-dialog .MuiDialogTitle-root {
+  border-radius: 16px 16px 0 0;
+}
+
+.locations-dialog .MuiDialog-paper {
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .customer-table {
+    font-size: 0.875rem;
+  }
+  
+  .customer-table .MuiTableCell-root {
+    padding: 8px 4px;
+  }
+}
+
+/* Animation for table rows */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.customer-row {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Custom scrollbar for the table */
+.customer-table::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.customer-table::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.customer-table::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.customer-table::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+} 

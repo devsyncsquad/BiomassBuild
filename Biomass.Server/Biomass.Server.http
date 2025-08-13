@@ -1,0 +1,6 @@
+@Biomass.Server_HostAddress = http://localhost:5110
+
+GET {{Biomass.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

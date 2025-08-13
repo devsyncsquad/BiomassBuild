@@ -1,0 +1,231 @@
+/* Vendor Management - Now using global professional theme */
+/* This file is kept for backward compatibility but most styles are now in index.css */
+
+.vendor-management-container {
+  /* Using global app-container class */
+}
+
+.vendor-card {
+  /* Using global professional-card class */
+}
+
+.vendor-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.vendor-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.vendor-card:hover::before {
+  transform: scaleX(1);
+}
+
+.stats-card {
+  /* Using global stats-card class */
+}
+
+.stats-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.stats-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.stats-card:hover::after {
+  opacity: 1;
+}
+
+.search-container {
+  /* Using global search-container class */
+}
+
+.search-input {
+  /* Using global professional-input class */
+}
+
+.search-input .MuiOutlinedInput-root {
+  border-radius: 8px;
+}
+
+.search-input .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: #2563eb;
+}
+
+.search-input .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #7c3aed;
+}
+
+.view-toggle-button {
+  /* Using global professional-button class */
+}
+
+.view-toggle-button:hover {
+  transform: scale(1.05);
+}
+
+.vendor-avatar {
+  /* Using global professional-avatar class */
+}
+
+.vendor-card:hover .vendor-avatar {
+  transform: scale(1.1);
+}
+
+.status-chip {
+  /* Using global professional-chip class */
+}
+
+.status-chip:hover {
+  transform: scale(1.05);
+}
+
+.rating-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rating-stars {
+  color: #ffc107;
+}
+
+.vendor-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.action-button {
+  /* Using global professional-button class */
+}
+
+.action-button:hover {
+  transform: translateY(-2px);
+}
+
+.field-requirements {
+  /* Using global professional-form class */
+}
+
+.requirements-title {
+  /* Using global professional-heading class */
+}
+
+.requirements-list {
+  /* Using global professional-text class */
+}
+
+.requirements-list li {
+  position: relative;
+  padding: 8px 0 8px 24px;
+  color: #666;
+  font-size: 14px;
+}
+
+.requirements-list li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: #2563eb;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.mandatory-list li::before {
+  color: #f44336;
+}
+
+.optional-list li::before {
+  color: #4caf50;
+}
+
+/* Responsive Design - Using global responsive styles */
+@media (max-width: 768px) {
+  /* Using global responsive styles from index.css */
+}
+
+@media (max-width: 480px) {
+  /* Using global responsive styles from index.css */
+}
+
+/* Animation Classes - Using global animations */
+.fade-in {
+  /* Using global fade-in animation */
+}
+
+.slide-up {
+  /* Using global slide-up animation */
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Loading States - Using global loading styles */
+.loading-skeleton {
+  /* Using global loading-skeleton class */
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Custom Scrollbar - Using global scrollbar styles */
+.vendor-management-container::-webkit-scrollbar {
+  /* Using global scrollbar styles */
+}
+
+.vendor-management-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.vendor-management-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.vendor-management-container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+} 

@@ -1,0 +1,409 @@
+.vendor-registration-dialog {
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.vendor-registration-dialog .MuiDialog-paper {
+  border-radius: 16px;
+  min-height: 80vh;
+  max-height: 90vh;
+  overflow: hidden;
+}
+
+.vendor-registration-header {
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  color: white;
+  padding: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.vendor-registration-title {
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+
+.vendor-registration-content {
+  padding: 32px;
+  overflow-y: auto;
+  max-height: calc(90vh - 140px);
+}
+
+.vendor-registration-section {
+  margin-bottom: 32px;
+}
+
+.vendor-registration-section-title {
+  color: #2563eb;
+  font-weight: 700;
+  font-size: 1.25rem;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e3f2fd;
+}
+
+.vendor-registration-subtitle {
+  color: #666;
+  font-size: 0.875rem;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.form-field {
+  margin-bottom: 16px;
+}
+
+.form-field .MuiTextField-root {
+  width: 100%;
+}
+
+.form-field .MuiOutlinedInput-root {
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.form-field .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: #2563eb;
+}
+
+.form-field .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #7c3aed;
+  border-width: 2px;
+}
+
+.form-field .MuiInputLabel-root.Mui-focused {
+  color: #7c3aed;
+}
+
+.form-field .MuiFormHelperText-root {
+  font-size: 0.75rem;
+  margin-top: 4px;
+}
+
+.form-field .MuiFormHelperText-root.Mui-error {
+  color: #f44336;
+}
+
+.form-field .MuiFormHelperText-root:not(.Mui-error) {
+  color: #666;
+}
+
+.file-upload-area {
+  border: 2px dashed #ddd;
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: #fafafa;
+  position: relative;
+  overflow: hidden;
+}
+
+.file-upload-area:hover {
+  border-color: #2563eb;
+  background: #f0f8ff;
+  transform: translateY(-2px);
+}
+
+.file-upload-area.readonly {
+  cursor: default;
+  background: #f5f5f5;
+}
+
+.file-upload-area.readonly:hover {
+  border-color: #ddd;
+  background: #f5f5f5;
+  transform: none;
+}
+
+.file-upload-icon {
+  font-size: 48px;
+  color: #999;
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+}
+
+.file-upload-area:hover .file-upload-icon {
+  color: #2563eb;
+  transform: scale(1.1);
+}
+
+.file-upload-title {
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.file-upload-subtitle {
+  color: #666;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.file-preview {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.file-preview:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.file-preview-label {
+  margin-top: 8px;
+  font-weight: 600;
+  color: #2563eb;
+}
+
+.hidden-file-input {
+  display: none;
+}
+
+.vendor-registration-actions {
+  padding: 24px 32px;
+  background: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.required-fields-note {
+  color: #666;
+  font-size: 0.875rem;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.action-button {
+  border-radius: 8px;
+  text-transform: none;
+  font-weight: 600;
+  padding: 10px 24px;
+  transition: all 0.2s ease;
+}
+
+.action-button:hover {
+  transform: translateY(-2px);
+}
+
+.primary-action-button {
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  color: white;
+  border: none;
+}
+
+.primary-action-button:hover {
+  background: linear-gradient(135deg, #1d4ed8 0%, #6d28d9 100%);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
+}
+
+.secondary-action-button {
+  border: 2px solid #ddd;
+  color: #666;
+  background: white;
+}
+
+.secondary-action-button:hover {
+  border-color: #2563eb;
+  color: #2563eb;
+  background: #f0f8ff;
+}
+
+.outlined-action-button {
+  border: 2px solid #2563eb;
+  color: #2563eb;
+  background: white;
+}
+
+.outlined-action-button:hover {
+  background: #2563eb;
+  color: white;
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
+}
+
+/* Form Validation Styles */
+.field-error {
+  border-color: #f44336;
+}
+
+.field-error .MuiOutlinedInput-notchedOutline {
+  border-color: #f44336;
+}
+
+.field-error .MuiInputLabel-root {
+  color: #f44336;
+}
+
+.field-success {
+  border-color: #4caf50;
+}
+
+.field-success .MuiOutlinedInput-notchedOutline {
+  border-color: #4caf50;
+}
+
+.field-success .MuiInputLabel-root {
+  color: #4caf50;
+}
+
+/* Loading States */
+.upload-loading {
+  position: relative;
+  overflow: hidden;
+}
+
+.upload-loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: loading-shimmer 1.5s infinite;
+}
+
+@keyframes loading-shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .vendor-registration-content {
+    padding: 20px;
+  }
+  
+  .vendor-registration-actions {
+    padding: 20px;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .action-buttons {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .action-button {
+    flex: 1;
+  }
+  
+  .file-upload-area {
+    padding: 16px;
+  }
+  
+  .file-upload-icon {
+    font-size: 36px;
+  }
+}
+
+@media (max-width: 480px) {
+  .vendor-registration-content {
+    padding: 16px;
+  }
+  
+  .vendor-registration-header {
+    padding: 16px;
+  }
+  
+  .vendor-registration-title {
+    font-size: 1.25rem;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .action-button {
+    width: 100%;
+  }
+}
+
+/* Custom Scrollbar for Dialog Content */
+.vendor-registration-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.vendor-registration-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.vendor-registration-content::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.vendor-registration-content::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Animation Classes */
+.fade-in-up {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.slide-in-right {
+  animation: slideInRight 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Focus States */
+.form-field .MuiOutlinedInput-root:focus-within {
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.file-upload-area:focus-within {
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  outline: none;
+}
+
+/* Disabled States */
+.form-field .MuiOutlinedInput-root.Mui-disabled {
+  background-color: #f5f5f5;
+  opacity: 0.7;
+}
+
+.file-upload-area.readonly {
+  opacity: 0.7;
+  cursor: not-allowed;
+} 

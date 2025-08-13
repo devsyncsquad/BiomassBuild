@@ -28,7 +28,7 @@ namespace Biomass.Server.Controllers
             _configuration = configuration;
         }
 
-        [HttpPost("authenticate")]
+        [HttpPost("Authenticate")]
         public async Task<IActionResult> Authenticate(AuthenticateRequest model)
         {
             try

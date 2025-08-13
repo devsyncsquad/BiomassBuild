@@ -19,7 +19,8 @@ namespace Biomass.Server.Controllers.Api
             _fileService = fileService;
         }
 
-        [HttpGet]
+        
+        [HttpGet("GetAllCompanies")]
         public async Task<IActionResult> GetAllCompanies()
         {
             var response = await _companyService.GetAllCompaniesAsync();
@@ -30,7 +31,7 @@ namespace Biomass.Server.Controllers.Api
             return Ok(response);
         }
 
-        [HttpGet("{id}")]
+		[HttpGet("GetCompanyById/{id}")]
         public async Task<IActionResult> GetCompanyById(int id)
         {
             var response = await _companyService.GetCompanyByIdAsync(id);
@@ -41,7 +42,8 @@ namespace Biomass.Server.Controllers.Api
             return Ok(response);
         }
 
-        [HttpPost]
+
+        [HttpPost("CreateCompany")]
         public async Task<IActionResult> CreateCompany([FromBody] CreateCompanyRequest request)
         {
             if (!ModelState.IsValid)
@@ -72,7 +74,7 @@ namespace Biomass.Server.Controllers.Api
         //    return Ok(response);
         //}
 
-        [HttpDelete("{id}")]
+		[HttpDelete("DeleteCompany/{id}")]
         public async Task<IActionResult> DeleteCompany(int id)
         {
             var response = await _companyService.DeleteCompanyAsync(id);
@@ -152,7 +154,7 @@ namespace Biomass.Server.Controllers.Api
         //    }
         //}
 
-        [HttpGet("{id}/logo")]
+		[HttpGet("GetLogo/{id}")]
         public async Task<IActionResult> GetLogo(int id)
         {
             var response = await _companyService.GetCompanyByIdAsync(id);

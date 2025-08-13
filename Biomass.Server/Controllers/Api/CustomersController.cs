@@ -15,14 +15,14 @@ namespace Biomass.Server.Controllers.Api
             _customerService = customerService;
         }
 
-        [HttpGet]
+		[HttpGet("GetAllCustomers")]
         public async Task<IActionResult> GetAllCustomers()
         {
             var response = await _customerService.GetAllCustomersAsync();
             return Ok(response);
         }
 
-        [HttpGet("{id}")]
+		[HttpGet("GetCustomerById/{id}")]
         public async Task<IActionResult> GetCustomerById(int id)
         {
             var response = await _customerService.GetCustomerByIdAsync(id);
@@ -31,7 +31,7 @@ namespace Biomass.Server.Controllers.Api
             return Ok(response);
         }
 
-        [HttpPost]
+		[HttpPost("CreateCustomer")]
         public async Task<IActionResult> CreateCustomer([FromBody] CreateCustomerRequest request)
         {
             var response = await _customerService.CreateCustomerAsync(request);
@@ -40,7 +40,7 @@ namespace Biomass.Server.Controllers.Api
             return CreatedAtAction(nameof(GetCustomerById), new { id = response.Result.CustomerId }, response);
         }
 
-        [HttpPut("{id}")]
+		[HttpPut("UpdateCustomer/{id}")]
         public async Task<IActionResult> UpdateCustomer(int id, [FromBody] UpdateCustomerRequest request)
         {
             var response = await _customerService.UpdateCustomerAsync(id, request);
@@ -49,7 +49,7 @@ namespace Biomass.Server.Controllers.Api
             return Ok(response);
         }
 
-        [HttpDelete("{id}")]
+		[HttpDelete("DeleteCustomer/{id}")]
         public async Task<IActionResult> DeleteCustomer(int id)
         {
             var response = await _customerService.DeleteCustomerAsync(id);
@@ -58,14 +58,14 @@ namespace Biomass.Server.Controllers.Api
             return Ok(response);
         }
 
-        [HttpGet("search")]
+		[HttpGet("SearchCustomers")]
         public async Task<IActionResult> SearchCustomers([FromQuery] string searchTerm, [FromQuery] string status = "all")
         {
             var response = await _customerService.SearchCustomersAsync(searchTerm, status);
             return Ok(response);
         }
 
-        [HttpGet("count")]
+		[HttpGet("GetCustomerCount")]
         public async Task<IActionResult> GetCustomerCount()
         {
             var response = await _customerService.GetCustomerCountAsync();

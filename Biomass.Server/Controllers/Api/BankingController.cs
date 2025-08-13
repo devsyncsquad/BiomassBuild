@@ -20,7 +20,7 @@ namespace Biomass.Server.Controllers.Api
         /// <summary>
         /// Get all bank accounts
         /// </summary>
-        [HttpGet]
+		[HttpGet("GetAllBankAccounts")]
         public async Task<ActionResult<ServiceResponse<List<BankAccountDto>>>> GetAllBankAccounts()
         {
             var response = await _bankingService.GetAllBankAccountsAsync();
@@ -30,7 +30,7 @@ namespace Biomass.Server.Controllers.Api
         /// <summary>
         /// Get bank account by ID
         /// </summary>
-        [HttpGet("{id}")]
+		[HttpGet("GetBankAccountById/{id}")]
         public async Task<ActionResult<ServiceResponse<BankAccountDto>>> GetBankAccountById(int id)
         {
             var response = await _bankingService.GetBankAccountByIdAsync(id);
@@ -42,7 +42,7 @@ namespace Biomass.Server.Controllers.Api
         /// <summary>
         /// Create a new bank account
         /// </summary>
-        [HttpPost]
+		[HttpPost("CreateBankAccount")]
         public async Task<ActionResult<ServiceResponse<BankAccountDto>>> CreateBankAccount([FromBody] CreateBankAccountRequest request)
         {
             if (!ModelState.IsValid)
@@ -57,7 +57,7 @@ namespace Biomass.Server.Controllers.Api
         /// <summary>
         /// Update an existing bank account
         /// </summary>
-        [HttpPut("{id}")]
+		[HttpPut("UpdateBankAccount/{id}")]
         public async Task<ActionResult<ServiceResponse<BankAccountDto>>> UpdateBankAccount(int id, [FromBody] UpdateBankAccountRequest request)
         {
             if (!ModelState.IsValid)
@@ -75,7 +75,7 @@ namespace Biomass.Server.Controllers.Api
         /// <summary>
         /// Delete a bank account
         /// </summary>
-        [HttpDelete("{id}")]
+		[HttpDelete("DeleteBankAccount/{id}")]
         public async Task<ActionResult<ServiceResponse<bool>>> DeleteBankAccount(int id)
         {
             var response = await _bankingService.DeleteBankAccountAsync(id);

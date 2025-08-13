@@ -13,7 +13,7 @@ namespace Biomass.Server.Controllers.Api
             _service = service;
         }
 
-        [HttpGet]
+		[HttpGet("GetAllLookups")]
         public async Task<IActionResult> Get([FromQuery] string? domain, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             var result = await _service.GetAsync(domain, page, pageSize);
@@ -21,7 +21,7 @@ namespace Biomass.Server.Controllers.Api
             return Ok(result);
         }
 
-        [HttpGet("{id}")]
+		[HttpGet("GetLookupById/{id}")]
         public async Task<IActionResult> GetById(int id)
         {
             var result = await _service.GetByIdAsync(id);
@@ -29,7 +29,7 @@ namespace Biomass.Server.Controllers.Api
             return Ok(result);
         }
 
-        [HttpPost]
+		[HttpPost("CreateLookup")]
         public async Task<IActionResult> Create([FromBody] CreateLookupRequest request)
         {
             var createdBy = User?.Identity?.Name ?? "system";
@@ -38,7 +38,7 @@ namespace Biomass.Server.Controllers.Api
             return Ok(result);
         }
 
-        [HttpPut("{id}")]
+		[HttpPut("UpdateLookup/{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateLookupRequest request)
         {
             request.LookUpId = id;
@@ -47,7 +47,7 @@ namespace Biomass.Server.Controllers.Api
             return Ok(result);
         }
 
-        [HttpDelete("{id}")]
+		[HttpDelete("DeleteLookup/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _service.DeleteAsync(id);

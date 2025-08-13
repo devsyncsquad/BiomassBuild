@@ -33,7 +33,7 @@ namespace Biomass.Server.Controllers.Api
         /// <summary>
         /// Get all vendors with pagination and filtering
         /// </summary>
-        [HttpGet]
+        [HttpGet("GetVendors")]
         public async Task<ActionResult<ServiceResponse<List<VendorDto>>>> GetVendors([FromQuery] VendorSearchRequest request)
         {
             try
@@ -59,7 +59,7 @@ namespace Biomass.Server.Controllers.Api
         /// <summary>
         /// Get vendor by ID with all related Result
         /// </summary>
-        [HttpGet("{id}")]
+        [HttpGet("GetVendorById/{id}")]
         public async Task<ActionResult<ServiceResponse<VendorDto>>> GetVendor(int id)
         {
             try
@@ -94,7 +94,7 @@ namespace Biomass.Server.Controllers.Api
         /// <summary>
         /// Create a new vendor
         /// </summary>
-        [HttpPost]
+        [HttpPost("CreateVendor")]
         public async Task<ActionResult<ServiceResponse<VendorDto>>> CreateVendor([FromBody] CreateVendorRequest request)
         {
             try
@@ -133,7 +133,7 @@ namespace Biomass.Server.Controllers.Api
         /// <summary>
         /// Update an existing vendor
         /// </summary>
-        [HttpPut("{id}")]
+        [HttpPut("UpdateVendor/{id}")]
         public async Task<ActionResult<ServiceResponse<VendorDto>>> UpdateVendor(int id, [FromBody] UpdateVendorRequest request)
         {
             try
@@ -176,7 +176,7 @@ namespace Biomass.Server.Controllers.Api
         /// <summary>
         /// Delete a vendor (soft delete)
         /// </summary>
-        [HttpDelete("{id}")]
+        [HttpDelete("DeleteVendor/{id}")]
         public async Task<ActionResult<ServiceResponse<bool>>> DeleteVendor(int id)
         {
             try
@@ -211,7 +211,7 @@ namespace Biomass.Server.Controllers.Api
         /// <summary>
         /// Get vendor statistics
         /// </summary>
-        [HttpGet("statistics")]
+        [HttpGet("GetVendorStatistics")]
         public async Task<ActionResult<ServiceResponse<VendorStatisticsDto>>> GetVendorStatistics()
         {
             try
@@ -237,7 +237,7 @@ namespace Biomass.Server.Controllers.Api
         /// <summary>
         /// Get vendors by status
         /// </summary>
-        [HttpGet("by-status/{status}")]
+        [HttpGet("GetVendorsByStatus/{status}")]
         public async Task<ActionResult<ServiceResponse<List<VendorDto>>>> GetVendorsByStatus(string status)
         {
             try
@@ -263,7 +263,7 @@ namespace Biomass.Server.Controllers.Api
         /// <summary>
         /// Get vendors by category
         /// </summary>
-        [HttpGet("by-category/{category}")]
+        [HttpGet("GetVendorsByCategory/{category}")]
         public async Task<ActionResult<ServiceResponse<List<VendorDto>>>> GetVendorsByCategory(string category)
         {
             try
@@ -289,7 +289,7 @@ namespace Biomass.Server.Controllers.Api
         /// <summary>
         /// Search vendors by name, code, or address
         /// </summary>
-        [HttpGet("search")]
+        [HttpGet("SearchVendors")]
         public async Task<ActionResult<ServiceResponse<List<VendorDto>>>> SearchVendors([FromQuery] string term)
         {
             try
@@ -324,7 +324,7 @@ namespace Biomass.Server.Controllers.Api
         /// <summary>
         /// Upload vendor document
         /// </summary>
-        [HttpPost("{id}/documents")]
+        [HttpPost("UploadDocument/{id}")]
         public async Task<ActionResult<ServiceResponse<VendorDocumentDto>>> UploadDocument(int id, [FromForm] CreateVendorDocumentRequest request)
         {
             try
@@ -358,7 +358,7 @@ namespace Biomass.Server.Controllers.Api
         /// <summary>
         /// Get vendor documents
         /// </summary>
-        [HttpGet("{id}/documents")]
+        [HttpGet("GetVendorDocuments/{id}")]
         public async Task<ActionResult<ServiceResponse<List<VendorDocumentDto>>>> GetVendorDocuments(int id)
         {
             try
@@ -384,7 +384,7 @@ namespace Biomass.Server.Controllers.Api
         /// <summary>
         /// Verify vendor document
         /// </summary>
-        [HttpPut("documents/{documentId}/verify")]
+        [HttpPut("VerifyDocument/{documentId}")]
         public async Task<ActionResult<ServiceResponse<bool>>> VerifyDocument(int documentId)
         {
             try
@@ -418,7 +418,7 @@ namespace Biomass.Server.Controllers.Api
         /// <summary>
         /// Add vendor contact
         /// </summary>
-        [HttpPost("{id}/contacts")]
+        [HttpPost("AddContact/{id}")]
         public async Task<ActionResult<ServiceResponse<VendorContactDto>>> AddContact(int id, [FromBody] CreateVendorContactRequest request)
         {
             try
@@ -452,7 +452,7 @@ namespace Biomass.Server.Controllers.Api
         /// <summary>
         /// Get vendor contacts
         /// </summary>
-        [HttpGet("{id}/contacts")]
+        [HttpGet("GetVendorContacts/{id}")]
         public async Task<ActionResult<ServiceResponse<List<VendorContactDto>>>> GetVendorContacts(int id)
         {
             try
@@ -538,7 +538,7 @@ namespace Biomass.Server.Controllers.Api
         /// <summary>
         /// Add vendor review
         /// </summary>
-        [HttpPost("{id}/reviews")]
+        [HttpPost("AddReview/{id}")]
         public async Task<ActionResult<ServiceResponse<VendorReviewDto>>> AddReview(int id, [FromBody] CreateVendorReviewRequest request)
         {
             try
@@ -572,7 +572,7 @@ namespace Biomass.Server.Controllers.Api
         /// <summary>
         /// Get vendor reviews
         /// </summary>
-        [HttpGet("{id}/reviews")]
+        [HttpGet("GetVendorReviews/{id}")]
         public async Task<ActionResult<ServiceResponse<List<VendorReviewDto>>>> GetVendorReviews(int id)
         {
             try
@@ -598,7 +598,7 @@ namespace Biomass.Server.Controllers.Api
         /// <summary>
         /// Approve vendor review
         /// </summary>
-        [HttpPut("reviews/{reviewId}/approve")]
+        [HttpPut("ApproveReview/{reviewId}")]
         public async Task<ActionResult<ServiceResponse<bool>>> ApproveReview(int reviewId)
         {
             try
@@ -632,7 +632,7 @@ namespace Biomass.Server.Controllers.Api
         /// <summary>
         /// Get vendor history
         /// </summary>
-        [HttpGet("{id}/history")]
+        [HttpGet("GetVendorHistory/{id}")]
         public async Task<ActionResult<ServiceResponse<List<VendorHistoryDto>>>> GetVendorHistory(int id)
         {
             try
@@ -692,7 +692,7 @@ namespace Biomass.Server.Controllers.Api
         /// <summary>
         /// Export vendors
         /// </summary>
-        [HttpPost("export")]
+        [HttpPost("ExportVendors")]
         public async Task<ActionResult> ExportVendors([FromBody] VendorExportRequest request)
         {
             try
@@ -715,7 +715,7 @@ namespace Biomass.Server.Controllers.Api
         /// <summary>
         /// Get vendor categories
         /// </summary>
-        [HttpGet("categories")]
+        [HttpGet("GetVendorCategories")]
         public async Task<ActionResult<ServiceResponse<List<string>>>> GetVendorCategories()
         {
             try
@@ -741,7 +741,7 @@ namespace Biomass.Server.Controllers.Api
         /// <summary>
         /// Get vendor statuses
         /// </summary>
-        [HttpGet("statuses")]
+        [HttpGet("GetVendorStatuses")]
         public ActionResult<ServiceResponse<List<string>>> GetVendorStatuses()
         {
             try

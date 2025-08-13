@@ -16,42 +16,42 @@ namespace Biomass.Server.Controllers.Api
             _materialRateService = materialRateService;
         }
 
-        [HttpGet]
+        [HttpGet("GetAllMaterialRates")]
         public async Task<ActionResult<ServiceResponse<List<MaterialRateDto>>>> GetAllMaterialRates()
         {
             var response = await _materialRateService.GetAllMaterialRatesAsync();
             return Ok(response);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("GetMaterialRateById/{id}")]
         public async Task<ActionResult<ServiceResponse<MaterialRateDto>>> GetMaterialRateById(int id)
         {
             var response = await _materialRateService.GetMaterialRateByIdAsync(id);
             return Ok(response);
         }
 
-        [HttpGet("location/{locationId}")]
+        [HttpGet("GetMaterialRatesByLocationId/{locationId}")]
         public async Task<ActionResult<ServiceResponse<List<MaterialRateDto>>>> GetMaterialRatesByLocationId(int locationId)
         {
             var response = await _materialRateService.GetMaterialRatesByLocationIdAsync(locationId);
             return Ok(response);
         }
 
-        [HttpPost]
+        [HttpPost("CreateMaterialRate")]
         public async Task<ActionResult<ServiceResponse<MaterialRateDto>>> CreateMaterialRate(CreateMaterialRateRequest request)
         {
             var response = await _materialRateService.CreateMaterialRateAsync(request);
             return Ok(response);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("UpdateMaterialRate/{id}")]
         public async Task<ActionResult<ServiceResponse<MaterialRateDto>>> UpdateMaterialRate(int id, UpdateMaterialRateRequest request)
         {
             var response = await _materialRateService.UpdateMaterialRateAsync(id, request);
             return Ok(response);
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("DeleteMaterialRate/{id}")]
         public async Task<ActionResult<ServiceResponse<bool>>> DeleteMaterialRate(int id)
         {
             var response = await _materialRateService.DeleteMaterialRateAsync(id);

@@ -438,168 +438,408 @@ const CustomerManagement = () => {
 
   return (
     <Box sx={{ p: 0 }}>
-      {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, p: 3 }}>
-        <Typography variant="h5" sx={{ fontWeight: 'bold', fontSize: '1.25rem' }}>
-          Registered Customers
-        </Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={handleAddNew}
-          size="small"
-          sx={{
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            '&:hover': {
-              background: 'linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%)',
-            }
-          }}
-        >
-          Add New
-        </Button>
-      </Box>
-
-      {/* Filters */}
-      <Box sx={{ mb: 2, p: 3, bgcolor: 'background.paper', borderRadius: 0, boxShadow: 1, mx: 0 }}>
-        <Grid container spacing={1.5} alignItems="center">
-          <Grid item xs={12} md={6}>
-            <TextField
-              fullWidth
-              placeholder="Search customers..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              size="small"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <FormControl fullWidth size="small">
-              <InputLabel>Status</InputLabel>
-              <Select
-                value={filterStatus}
-                label="Status"
-                onChange={(e) => setFilterStatus(e.target.value)}
-              >
-                <MenuItem value="all">All Status</MenuItem>
-                <MenuItem value="active">Active</MenuItem>
-                <MenuItem value="inactive">Inactive</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
-              Total: {filteredCustomers.length} customers
+      {/* Enhanced Modern Header */}
+      <Box sx={{ 
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        color: 'white',
+        p: 4,
+        mb: 3,
+        borderRadius: '0 0 24px 24px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        {/* Background Pattern */}
+        <Box sx={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          width: '200px',
+          height: '200px',
+          background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)',
+          borderRadius: '50%',
+          transform: 'translate(50%, -50%)'
+        }} />
+        <Box sx={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          width: '150px',
+          height: '150px',
+          background: 'radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%)',
+          borderRadius: '50%',
+          transform: 'translate(-50%, 50%)'
+        }} />
+        
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 1 }}>
+          <Box>
+            <Typography variant="h4" gutterBottom sx={{ fontWeight: 700, mb: 1, textShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+              Customer Management
             </Typography>
-          </Grid>
-        </Grid>
+            <Typography variant="h6" sx={{ opacity: 0.9, fontWeight: 300, textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>
+              Manage your customer database and relationships
+            </Typography>
+          </Box>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleAddNew}
+            size="large"
+            sx={{ 
+              borderRadius: 3,
+              px: 4,
+              py: 1.5,
+              fontSize: '1rem',
+              fontWeight: 600,
+              background: 'rgba(255,255,255,0.2)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255,255,255,0.3)',
+              color: 'white',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
+              '&:hover': {
+                background: 'rgba(255,255,255,0.3)',
+                transform: 'translateY(-2px)',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.3)'
+              },
+              transition: 'all 0.3s ease'
+            }}
+          >
+            Add New Customer
+          </Button>
+        </Box>
       </Box>
 
-      {/* Customers Table */}
-      <Box sx={{ mx: 0 }}>
-        <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 0 }}>
-          <Table size="small">
+      {/* Enhanced Modern Filters */}
+      <Box sx={{ mb: 4, px: 3 }}>
+        <Box sx={{ 
+          background: 'white',
+          borderRadius: 4,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+          p: 3,
+          border: '1px solid rgba(0,0,0,0.05)'
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+            <SearchIcon sx={{ mr: 2, fontSize: '1.5rem', color: '#667eea' }} />
+            <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
+              Search & Filters
+            </Typography>
+          </Box>
+          
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                placeholder="Search customers by name, email, or company..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                size="medium"
+                variant="outlined"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon color="primary" />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                    '&:hover fieldset': {
+                      borderColor: '#667eea',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#667eea',
+                    },
+                  },
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <FormControl fullWidth size="medium">
+                <InputLabel>Status Filter</InputLabel>
+                <Select
+                  value={filterStatus}
+                  label="Status Filter"
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                  sx={{
+                    borderRadius: 2,
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      '&:hover': {
+                        borderColor: '#667eea',
+                      },
+                    },
+                  }}
+                >
+                  <MenuItem value="all">All Status</MenuItem>
+                  <MenuItem value="active">Active</MenuItem>
+                  <MenuItem value="inactive">Inactive</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                height: '100%',
+                minHeight: '56px'
+              }}>
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: 1,
+                  p: 1.5,
+                  borderRadius: 2,
+                  bgcolor: '#f8fafc',
+                  border: '1px solid #e2e8f0'
+                }}>
+                  <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                    Total:
+                  </Typography>
+                  <Box sx={{ 
+                    bgcolor: '#667eea', 
+                    color: 'white', 
+                    px: 2, 
+                    py: 0.5, 
+                    borderRadius: 1,
+                    fontWeight: 600,
+                    fontSize: '0.9rem'
+                  }}>
+                    {filteredCustomers.length} customers
+                  </Box>
+                </Box>
+              </Box>
+            </Grid>
+          </Grid>
+        </Box>
+      </Box>
+
+      {/* Enhanced Modern Customers Table */}
+      <Box sx={{ px: 3, mb: 4 }}>
+        <TableContainer component={Paper} sx={{ 
+          boxShadow: '0 4px 20px rgba(0,0,0,0.08)', 
+          borderRadius: 4,
+          overflow: 'hidden',
+          border: '1px solid rgba(0,0,0,0.05)'
+        }}>
+          <Table size="medium">
             <TableHead>
-              <TableRow sx={{ backgroundColor: '#f8fafc' }}>
-                <TableCell sx={{ fontWeight: 'bold', fontSize: '0.8rem', py: 1 }}>Customer</TableCell>
-                <TableCell sx={{ fontWeight: 'bold', fontSize: '0.8rem', py: 1 }}>Contact</TableCell>
-                <TableCell sx={{ fontWeight: 'bold', fontSize: '0.8rem', py: 1 }}>Company</TableCell>
-                <TableCell sx={{ fontWeight: 'bold', fontSize: '0.8rem', py: 1 }}>Location</TableCell>
-                <TableCell sx={{ fontWeight: 'bold', fontSize: '0.8rem', py: 1 }}>Status</TableCell>
-                <TableCell sx={{ fontWeight: 'bold', fontSize: '0.8rem', py: 1 }}>Registration Date</TableCell>
-                <TableCell sx={{ fontWeight: 'bold', fontSize: '0.8rem', py: 1 }}>Actions</TableCell>
+              <TableRow sx={{ 
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                '& th': { border: 0 }
+              }}>
+                <TableCell sx={{ 
+                  fontWeight: 700, 
+                  fontSize: '0.9rem', 
+                  py: 2, 
+                  color: 'white',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>Customer</TableCell>
+                <TableCell sx={{ 
+                  fontWeight: 700, 
+                  fontSize: '0.9rem', 
+                  py: 2, 
+                  color: 'white',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>Contact</TableCell>
+                <TableCell sx={{ 
+                  fontWeight: 700, 
+                  fontSize: '0.9rem', 
+                  py: 2, 
+                  color: 'white',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>Company</TableCell>
+                <TableCell sx={{ 
+                  fontWeight: 700, 
+                  fontSize: '0.9rem', 
+                  py: 2, 
+                  color: 'white',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>Location</TableCell>
+                <TableCell sx={{ 
+                  fontWeight: 700, 
+                  fontSize: '0.9rem', 
+                  py: 2, 
+                  color: 'white',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>Status</TableCell>
+                <TableCell sx={{ 
+                  fontWeight: 700, 
+                  fontSize: '0.9rem', 
+                  py: 2, 
+                  color: 'white',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>Registration Date</TableCell>
+                <TableCell sx={{ 
+                  fontWeight: 700, 
+                  fontSize: '0.9rem', 
+                  py: 2, 
+                  color: 'white',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredCustomers.map((customer) => (
-                <TableRow key={customer.customerId} hover>
-                  <TableCell sx={{ py: 1 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                      <Avatar sx={{ bgcolor: '#667eea', width: 32, height: 32, fontSize: '0.8rem' }}>
+              {filteredCustomers.map((customer, index) => (
+                <TableRow 
+                  key={customer.customerId} 
+                  hover
+                  sx={{ 
+                    '&:nth-of-type(even)': { bgcolor: '#fafbfc' },
+                    '&:hover': { 
+                      bgcolor: '#f0f4ff',
+                      transform: 'scale(1.001)',
+                      transition: 'all 0.2s ease'
+                    },
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <TableCell sx={{ py: 2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <Avatar sx={{ 
+                        bgcolor: '#667eea', 
+                        width: 40, 
+                        height: 40, 
+                        fontSize: '1rem',
+                        fontWeight: 600,
+                        boxShadow: '0 2px 8px rgba(102, 126, 234, 0.3)'
+                      }}>
                         {customer.firstName.charAt(0)}{customer.lastName.charAt(0)}
                       </Avatar>
                       <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 'bold', fontSize: '0.8rem' }}>
+                        <Typography variant="body1" sx={{ fontWeight: 600, fontSize: '0.9rem', mb: 0.5 }}>
                           {customer.firstName} {customer.lastName}
                         </Typography>
-                        <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+                        <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
                           ID: {customer.customerId}
                         </Typography>
                       </Box>
                     </Box>
                   </TableCell>
-                  <TableCell sx={{ py: 1 }}>
+                  <TableCell sx={{ py: 2 }}>
                     <Box>
-                      <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>{customer.email}</Typography>
-                      <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+                      <Typography variant="body2" sx={{ fontSize: '0.9rem', fontWeight: 500, mb: 0.5 }}>
+                        {customer.email}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
                         {customer.phone}
                       </Typography>
                     </Box>
                   </TableCell>
-                  <TableCell sx={{ py: 1 }}>
-                    <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>
+                  <TableCell sx={{ py: 2 }}>
+                    <Typography variant="body2" sx={{ 
+                      fontSize: '0.9rem',
+                      fontWeight: 500,
+                      color: customer.companyId ? 'text.primary' : 'text.secondary'
+                    }}>
                       {customer.companyId ? getCompanyNameById(customer.companyId) : customer.companyName || 'No Company'}
                     </Typography>
                   </TableCell>
-                  <TableCell sx={{ py: 1 }}>
-                    <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>
+                  <TableCell sx={{ py: 2 }}>
+                    <Typography variant="body2" sx={{ fontSize: '0.9rem', fontWeight: 500, mb: 0.5 }}>
                       {customer.city}, {customer.state}
                     </Typography>
-                    <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
                       {customer.country}
                     </Typography>
                   </TableCell>
-                  <TableCell sx={{ py: 1 }}>
+                  <TableCell sx={{ py: 2 }}>
                     <Chip
                       label={customer.status}
                       color={getStatusColor(customer.status)}
                       size="small"
-                      sx={{ textTransform: 'capitalize', fontSize: '0.7rem', height: 20 }}
+                      sx={{ 
+                        textTransform: 'capitalize', 
+                        fontSize: '0.75rem', 
+                        height: 24,
+                        fontWeight: 600,
+                        '& .MuiChip-label': {
+                          px: 1.5
+                        }
+                      }}
                     />
                   </TableCell>
-                  <TableCell sx={{ py: 1 }}>
-                    <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>
+                  <TableCell sx={{ py: 2 }}>
+                    <Typography variant="body2" sx={{ fontSize: '0.9rem', fontWeight: 500 }}>
                       {new Date(customer.createdDate).toLocaleDateString()}
                     </Typography>
                   </TableCell>
-                  <TableCell sx={{ py: 1 }}>
-                    <Box sx={{ display: 'flex', gap: 0.5 }}>
+                  <TableCell sx={{ py: 2 }}>
+                    <Box sx={{ display: 'flex', gap: 1 }}>
                       <IconButton
                         size="small"
                         onClick={() => handleViewLocations(customer)}
-                        sx={{ color: '#4CAF50', p: 0.5 }}
+                        sx={{ 
+                          color: '#4CAF50', 
+                          p: 1,
+                          bgcolor: 'rgba(76, 175, 80, 0.1)',
+                          '&:hover': { 
+                            bgcolor: 'rgba(76, 175, 80, 0.2)',
+                            transform: 'scale(1.1)'
+                          },
+                          transition: 'all 0.2s ease'
+                        }}
                         title="View Locations"
                       >
-                        <LocationOnIcon sx={{ fontSize: '1rem' }} />
+                        <LocationOnIcon sx={{ fontSize: '1.1rem' }} />
                       </IconButton>
                       <IconButton
                         size="small"
                         onClick={() => handleAddLocation(customer)}
-                        sx={{ color: '#FF9800', p: 0.5 }}
+                        sx={{ 
+                          color: '#FF9800', 
+                          p: 1,
+                          bgcolor: 'rgba(255, 152, 0, 0.1)',
+                          '&:hover': { 
+                            bgcolor: 'rgba(255, 152, 0, 0.2)',
+                            transform: 'scale(1.1)'
+                          },
+                          transition: 'all 0.2s ease'
+                        }}
                         title="Add New Location"
                       >
-                        <AddIcon sx={{ fontSize: '1rem' }} />
+                        <AddIcon sx={{ fontSize: '1.1rem' }} />
                       </IconButton>
                       <IconButton 
                         size="small" 
-                        sx={{ color: '#2196F3', p: 0.5 }} 
+                        sx={{ 
+                          color: '#2196F3', 
+                          p: 1,
+                          bgcolor: 'rgba(33, 150, 243, 0.1)',
+                          '&:hover': { 
+                            bgcolor: 'rgba(33, 150, 243, 0.2)',
+                            transform: 'scale(1.1)'
+                          },
+                          transition: 'all 0.2s ease'
+                        }} 
                         title="Edit"
                         onClick={() => handleEditCustomer(customer)}
                       >
-                        <EditIcon sx={{ fontSize: '1rem' }} />
+                        <EditIcon sx={{ fontSize: '1.1rem' }} />
                       </IconButton>
                       <IconButton 
                         size="small" 
-                        sx={{ color: '#f44336', p: 0.5 }} 
+                        sx={{ 
+                          color: '#f44336', 
+                          p: 1,
+                          bgcolor: 'rgba(244, 67, 54, 0.1)',
+                          '&:hover': { 
+                            bgcolor: 'rgba(244, 67, 54, 0.2)',
+                            transform: 'scale(1.1)'
+                          },
+                          transition: 'all 0.2s ease'
+                        }} 
                         title="Delete"
                         onClick={() => handleDeleteCustomer(customer)}
                       >
-                        <DeleteIcon sx={{ fontSize: '1rem' }} />
+                        <DeleteIcon sx={{ fontSize: '1.1rem' }} />
                       </IconButton>
                     </Box>
                   </TableCell>
@@ -610,19 +850,44 @@ const CustomerManagement = () => {
         </TableContainer>
       </Box>
 
-      {/* Customer Registration Dialog */}
+      {/* Enhanced Modern Customer Registration Dialog */}
       <Dialog 
         open={openRegistration} 
         onClose={() => setOpenRegistration(false)}
         maxWidth="md"
         fullWidth
+        PaperProps={{
+          sx: { 
+            borderRadius: 4, 
+            overflow: 'hidden',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.15)'
+          }
+        }}
       >
         <DialogTitle sx={{ 
           background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
           color: 'white',
-          fontWeight: 'bold'
+          fontWeight: 700,
+          fontSize: '1.25rem',
+          p: 3,
+          position: 'relative',
+          overflow: 'hidden'
         }}>
-          {isEditing ? 'Edit Customer' : 'Customer Registration'}
+          {/* Background Pattern */}
+          <Box sx={{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            width: '100px',
+            height: '100px',
+            background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)',
+            borderRadius: '50%',
+            transform: 'translate(30%, -30%)'
+          }} />
+          
+          <Box sx={{ position: 'relative', zIndex: 1 }}>
+            {isEditing ? 'Edit Customer' : 'Customer Registration'}
+          </Box>
         </DialogTitle>
         <DialogContent sx={{ pt: 3 }}>
           <Grid container spacing={2}>

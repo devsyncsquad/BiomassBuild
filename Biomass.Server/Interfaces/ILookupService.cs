@@ -35,6 +35,7 @@ namespace Biomass.Server.Interfaces
         Task<ServiceResponse<LookupDto>> CreateAsync(CreateLookupRequest request, string? createdBy);
         Task<ServiceResponse<LookupDto>> UpdateAsync(UpdateLookupRequest request);
         Task<ServiceResponse<bool>> DeleteAsync(int id);
+        Task<ServiceResponse<Dictionary<string, List<LookupDto>>>> GetLookupsByDomainsAsync();
     }
 }
 

@@ -47,11 +47,22 @@ namespace Biomass.Server.Controllers.Api
             return Ok(result);
         }
 
-		[HttpDelete("DeleteLookup/{id}")]
+		        [HttpDelete("DeleteLookup/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _service.DeleteAsync(id);
             if (!result.Success) return NotFound(result);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Get all lookups grouped by domain in a single response
+        /// </summary>
+        [HttpGet("GetLookupsByDomains")]
+        public async Task<IActionResult> GetLookupsByDomains()
+        {
+            var result = await _service.GetLookupsByDomainsAsync();
+            if (!result.Success) return BadRequest(result);
             return Ok(result);
         }
     }

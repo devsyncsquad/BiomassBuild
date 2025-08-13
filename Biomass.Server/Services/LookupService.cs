@@ -141,6 +141,34 @@ namespace Biomass.Server.Services
             return response;
         }
 
+        public async Task<ServiceResponse<Dictionary<string, List<LookupDto>>>> GetLookupsByDomainsAsync()
+        {
+            var response = new ServiceResponse<Dictionary<string, List<LookupDto>>>();
+            try
+            {
+                // Get all lookups without domain filter to get all data
+                var (allItems, _) = await _repo.GetAsync(null, 1, int.MaxValue);
+                
+                // Group by domain
+                var result = allItems
+                    .GroupBy(l => l.LookUpDomain ?? "Unknown")
+                    .ToDictionary(
+                        group => group.Key,
+                        group => group.Select(Map).ToList()
+                    );
+                
+                response.Result = result;
+                response.Success = true;
+                response.Message = "All lookups retrieved successfully";
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
         private static LookupDto Map(Lookup l) => new LookupDto
         {
             LookUpId = l.LookUpId,

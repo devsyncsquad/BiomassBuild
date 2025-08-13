@@ -9,7 +9,7 @@ namespace Biomass.Server.Interfaces
     {
         Task<ServiceResponse<List<CompanyDto>>> GetAllCompaniesAsync();
         Task<ServiceResponse<CompanyDto>> GetCompanyByIdAsync(int id);
-        Task<ServiceResponse<CompanyDto>> CreateCompanyAsync(CreateCompanyRequest request);
+        Task<ServiceResponse<CompanyDto>> CreateCompanyAsync(CompanyDto request);
         Task<ServiceResponse<CompanyDto>> UpdateCompanyAsync(int id, UpdateCompanyRequest request);
         Task<ServiceResponse<bool>> DeleteCompanyAsync(int id);
         Task<ServiceResponse<string>> UpdateCompanyLogoAsync(int companyId, string logoPath);

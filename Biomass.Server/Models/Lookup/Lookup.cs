@@ -13,8 +13,8 @@ namespace Biomass.Server.Models.Lookup
         [MaxLength(100)]
         public string? LookUpDomain { get; set; }
         [MaxLength(1)]
-        public string? Enabled { get; set; }
-        [MaxLength(100)]
+        public bool? Enabled { get; set; }
+        
         public string? CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
     }

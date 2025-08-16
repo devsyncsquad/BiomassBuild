@@ -69,7 +69,7 @@ namespace Biomass.Server.Services
                 {
                     LookUpName = request.LookUpName.Trim(),
                     LookUpDomain = request.LookUpDomain?.Trim(),
-                    Enabled = string.IsNullOrWhiteSpace(request.Enabled) ? "Y" : request.Enabled,
+                    Enabled = request.Enabled,
                     CreatedBy = createdBy,
                     CreatedOn = DateTime.UtcNow
                 };
@@ -175,8 +175,7 @@ namespace Biomass.Server.Services
             LookUpName = l.LookUpName,
             LookUpDomain = l.LookUpDomain,
             Enabled = l.Enabled,
-            CreatedBy = l.CreatedBy,
-            CreatedOn = l.CreatedOn
+            Created_at = l.CreatedOn
         };
     }
 }

@@ -12,6 +12,7 @@ import CustomerLocations from './components/CustomerLocations';
 import VendorManagement from './components/VendorManagement';
 import UserManagement from './components/user-management';
 import Banking from './components/Banking';
+import CostCenters from './components/CostCenters';
 import './App.css';
 import { Box, Card, CardContent, Grid, Typography, Button } from '@mui/material';
 import { isAuthenticated, getCurrentUser, logout } from './utils/auth';
@@ -451,6 +452,7 @@ function App() {
             <Route path="/vendor-management" element={<ProtectedRoute><Layout><VendorManagement /></Layout></ProtectedRoute>} />
             <Route path="/user-management" element={<ProtectedRoute><Layout><UserManagement /></Layout></ProtectedRoute>} />
             <Route path="/banking-finance" element={<ProtectedRoute><Layout><Banking /></Layout></ProtectedRoute>} />
+            <Route path="/cost-centers" element={<ProtectedRoute><Layout><CostCenters /></Layout></ProtectedRoute>} />
           </Routes>
         </Router>
       </SnackbarProvider>

@@ -6,6 +6,11 @@ using Biomass.Server.Models.Banking;
 using Biomass.Server.Models.UserManagement;
 using Biomass.Server.Models.Lookup;
 using Biomass.Server.Models.Vendor;
+using Biomass.Server.Models.CostCenter;
+using Biomass.Server.Models.Employee;
+using Biomass.Server.Models.Cashbook;
+using Biomass.Server.Models.Lookup;
+using Biomass.Server.Models.MoneyAccount;
 
 namespace Biomass.Server.Data
 {
@@ -37,6 +42,10 @@ namespace Biomass.Server.Data
         public DbSet<VendorReview> VendorReviews { get; set; }
         public DbSet<VendorHistory> VendorHistory { get; set; }
         public DbSet<VendorContact> VendorContacts { get; set; }
+        public DbSet<CostCenter> CostCenters { get; set; }
+        public DbSet<Employee> Employees { get; set; }
+        public DbSet<Cashbook> Cashbooks { get; set; }
+        public DbSet<MoneyAccount> MoneyAccounts { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Company>(entity =>
@@ -288,6 +297,112 @@ namespace Biomass.Server.Data
                 entity.ToTable("UserCompanies");
                 entity.HasKey(e => e.UserCompanyId);
                 entity.Property(e => e.Enabled).HasMaxLength(1);
+            });
+
+            // Cost Centers
+            modelBuilder.Entity<CostCenter>(entity =>
+            {
+                entity.ToTable("cost_centers");
+                entity.HasKey(e => e.CostCenterId);
+                entity.Property(e => e.CostCenterId).HasColumnName("cost_center_id");
+                entity.Property(e => e.Code).HasColumnName("code").IsRequired();
+                entity.HasIndex(e => e.Code).IsUnique();
+                entity.Property(e => e.Name).HasColumnName("name").IsRequired();
+                entity.Property(e => e.IsActive).HasColumnName("is_active");
+                entity.Property(e => e.ParentCostCenterId).HasColumnName("parent_cost_center_id");
+                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+                entity.Property(e => e.CompanyId).HasColumnName("company_id");
+
+                entity.HasOne(e => e.Parent)
+                      .WithMany(e => e.Children)
+                      .HasForeignKey(e => e.ParentCostCenterId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // Employees
+            modelBuilder.Entity<Employee>(entity =>
+            {
+                entity.ToTable("employees");
+                entity.HasKey(e => e.EmployeeId);
+                entity.Property(e => e.EmployeeId).HasColumnName("employee_id");
+                entity.Property(e => e.FullName).HasColumnName("full_name").IsRequired().HasMaxLength(100);
+                entity.Property(e => e.Designation).HasColumnName("designation").HasMaxLength(100);
+                entity.Property(e => e.Phone).HasColumnName("phone").HasMaxLength(20);
+                entity.Property(e => e.CreatedAt).HasColumnName("created_at").IsRequired();
+            });
+
+            // Lookups
+            modelBuilder.Entity<Lookup>(entity =>
+            {
+                entity.ToTable("lookups");
+                entity.HasKey(e => e.LookUpId);
+                entity.Property(e => e.LookUpId).HasColumnName("lookup_id");
+                entity.Property(e => e.LookUpName).HasColumnName("lookup_name").IsRequired().HasMaxLength(100);
+                entity.Property(e => e.LookUpDomain).HasColumnName("lookup_domain").HasMaxLength(100);
+                entity.Property(e => e.Enabled).HasColumnName("enabled").HasMaxLength(1);
+                //entity.Property(e => e.CreatedBy).HasColumnName("createdby").HasMaxLength(100);
+                entity.Property(e => e.CreatedOn).HasColumnName("created_on").IsRequired();
+            });
+
+            // MoneyAccounts
+            modelBuilder.Entity<MoneyAccount>(entity =>
+            {
+                entity.ToTable("money_accounts");
+                entity.HasKey(e => e.MoneyAccountId);
+                entity.Property(e => e.MoneyAccountId).HasColumnName("money_account_id");
+                entity.Property(e => e.AccountCode).HasColumnName("account_code").HasMaxLength(100);
+                entity.Property(e => e.Name).HasColumnName("name").IsRequired().HasMaxLength(200);
+                entity.Property(e => e.KindLookupId).HasColumnName("kind_lookup_id").IsRequired();
+                entity.Property(e => e.AccountHolder).HasColumnName("account_holder").HasMaxLength(200);
+                entity.Property(e => e.CompanyRegNo).HasColumnName("company_reg_no").HasMaxLength(100);
+                entity.Property(e => e.BankName).HasColumnName("bank_name").HasMaxLength(200);
+                entity.Property(e => e.BranchName).HasColumnName("branch_name").HasMaxLength(200);
+                entity.Property(e => e.BranchCode).HasColumnName("branch_code").HasMaxLength(100);
+                entity.Property(e => e.AccountNumber).HasColumnName("account_number").HasMaxLength(100);
+                entity.Property(e => e.Iban).HasColumnName("iban").HasMaxLength(100);
+                entity.Property(e => e.SwiftBic).HasColumnName("swift_bic").HasMaxLength(100);
+                entity.Property(e => e.WalletProvider).HasColumnName("wallet_provider").HasMaxLength(200);
+                entity.Property(e => e.WalletPhone).HasColumnName("wallet_phone").HasMaxLength(50);
+                entity.Property(e => e.Currency).HasColumnName("currency").IsRequired().HasMaxLength(10);
+                entity.Property(e => e.OpeningBalance).HasColumnName("opening_balance").IsRequired().HasColumnType("numeric(18,2)");
+                entity.Property(e => e.OpeningBalanceAsOf).HasColumnName("opening_balance_as_of");
+                entity.Property(e => e.IsDefault).HasColumnName("is_default").IsRequired();
+                entity.Property(e => e.IsActive).HasColumnName("is_active").IsRequired();
+                entity.Property(e => e.Notes).HasColumnName("notes");
+                entity.Property(e => e.Meta).HasColumnName("meta").HasColumnType("jsonb");
+                entity.Property(e => e.CreatedAt).HasColumnName("created_at").IsRequired();
+                entity.Property(e => e.UpdatedAt).HasColumnName("updated_at").IsRequired();
+                entity.Property(e => e.CreatedBy).HasColumnName("created_by").HasMaxLength(100);
+                entity.Property(e => e.UpdatedBy).HasColumnName("updated_by").HasMaxLength(100);
+
+                // Foreign key relationship with lookups
+                entity.HasOne(e => e.KindLookup)
+                      .WithMany()
+                      .HasForeignKey(e => e.KindLookupId)
+                      .OnDelete(DeleteBehavior.NoAction);
+            });
+
+            // Cashbook
+            modelBuilder.Entity<Cashbook>(entity =>
+            {
+                entity.ToTable("cashbook");
+                entity.HasKey(e => e.CashId);
+                entity.Property(e => e.CashId).HasColumnName("cash_id");
+                entity.Property(e => e.HappenedAt).HasColumnName("happened_at").IsRequired();
+                entity.Property(e => e.CashKindId).HasColumnName("cash_kind_id").IsRequired();
+                entity.Property(e => e.Amount).HasColumnName("amount").IsRequired().HasColumnType("numeric(18,2)");
+                entity.Property(e => e.Currency).HasColumnName("currency").IsRequired().HasMaxLength(10);
+                entity.Property(e => e.MoneyAccountId).HasColumnName("money_account_id");
+                entity.Property(e => e.WalletEmployeeId).HasColumnName("wallet_employee_id");
+                entity.Property(e => e.CategoryId).HasColumnName("category_id").IsRequired();
+                entity.Property(e => e.CostCenterId).HasColumnName("cost_center_id");
+                entity.Property(e => e.PaymentModeId).HasColumnName("payment_mode_id");
+                entity.Property(e => e.ReferenceNo).HasColumnName("reference_no").HasMaxLength(100);
+                entity.Property(e => e.CounterpartyName).HasColumnName("counterparty_name").HasMaxLength(200);
+                entity.Property(e => e.Remarks).HasColumnName("remarks").HasMaxLength(500);
+                entity.Property(e => e.Meta).HasColumnName("meta").HasColumnType("jsonb");
+                entity.Property(e => e.Status).HasColumnName("status").HasMaxLength(20);
+                entity.Property(e => e.ReceiptPath).HasColumnName("receipt_path").HasMaxLength(500);
             });
         }
     }

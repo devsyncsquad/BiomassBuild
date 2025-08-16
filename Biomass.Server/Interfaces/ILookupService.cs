@@ -8,16 +8,15 @@ namespace Biomass.Server.Interfaces
         public int LookUpId { get; set; }
         public string LookUpName { get; set; } = string.Empty;
         public string? LookUpDomain { get; set; }
-        public string? Enabled { get; set; }
-        public string? CreatedBy { get; set; }
-        public DateTime CreatedOn { get; set; }
+        public bool? Enabled { get; set; }
+        public DateTime Created_at { get; set; }
     }
 
     public class CreateLookupRequest
     {
         public string LookUpName { get; set; } = string.Empty;
         public string? LookUpDomain { get; set; }
-        public string? Enabled { get; set; } = "Y";
+        public bool? Enabled { get; set; } 
     }
 
     public class UpdateLookupRequest
@@ -25,7 +24,7 @@ namespace Biomass.Server.Interfaces
         public int LookUpId { get; set; }
         public string LookUpName { get; set; } = string.Empty;
         public string? LookUpDomain { get; set; }
-        public string? Enabled { get; set; }
+        public bool? Enabled { get; set; }
     }
 
     public interface ILookupService

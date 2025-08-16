@@ -40,6 +40,12 @@ builder.Services.AddScoped<IVendorService, VendorService>();
 builder.Services.AddScoped<IBankingService, BankingService>();
 builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<IUserManagement, UserManagmentRepository>();
+builder.Services.AddScoped<ILookupRepository, LookupRepository>();
+builder.Services.AddScoped<ILookupService, LookupService>();
+builder.Services.AddScoped<ICostCenterService, CostCenterService>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<ICashbookService, CashbookService>();
+builder.Services.AddScoped<IMoneyAccountService, MoneyAccountService>();
 //builder.Services.AddScoped<IUserService, Us>();
 //builder.Services.AddScoped<IAuthService, AuthService>();
 

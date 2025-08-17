@@ -9,23 +9,24 @@
 .dashboard-sidebar {
   width: 280px;
   flex-shrink: 0;
-  background: linear-gradient(180deg, #2563eb 0%, #7c3aed 100%);
-  color: white;
+  background: #ffffff;
+  color: #14B8A6;
   display: flex;
   flex-direction: column;
+  border-right: 1px solid #e5e7eb;
 }
 
 .sidebar-header {
   padding: 20px;
   text-align: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .sidebar-title {
   font-size: 1.25rem;
   font-weight: 700;
   margin-bottom: 6px;
-  color: white;
+  color: #14B8A6;
   letter-spacing: -0.025em;
 }
 
@@ -40,7 +41,7 @@
 .user-avatar {
   width: 28px;
   height: 28px;
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: #14B8A6;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -52,7 +53,7 @@
 
 .user-name {
   font-size: 0.8125rem;
-  color: white;
+  color: #14B8A6;
   font-weight: 500;
 }
 
@@ -63,23 +64,23 @@
 
 .menu-item {
   margin: 0 6px 2px 6px;
-  border-radius: 6px;
+  border-radius: 0;
   transition: all 0.15s ease;
 }
 
 .menu-item:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(99, 102, 241, 0.2);
 }
 
 .menu-item.active {
-  background-color: rgba(255, 255, 255, 0.15);
+  background-color: rgba(99, 102, 241, 0.15);
 }
 
 .menu-item-button {
   width: 100%;
   justify-content: flex-start;
   padding: 10px 14px;
-  color: white;
+  color: #14B8A6;
   text-transform: none;
   font-weight: 500;
   font-size: 0.875rem;
@@ -91,36 +92,36 @@
 }
 
 .menu-icon {
-  color: white;
+  color: #14B8A6;
   min-width: 36px;
   font-size: 1.125rem;
 }
 
 .menu-text {
-  color: white;
+  color: #14B8A6;
   font-size: 0.875rem;
 }
 
 .sidebar-footer {
   padding: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-top: 1px solid #e5e7eb;
 }
 
 .logout-button {
   width: 100%;
   justify-content: flex-start;
   padding: 10px 14px;
-  color: white;
+  color: #14B8A6;
   text-transform: none;
   font-weight: 500;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  border-radius: 0;
   transition: all 0.15s ease;
 }
 
 .logout-button:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(99, 102, 241, 0.2);
+  border-color: #6366F1;
 }
 
 .dashboard-main {
@@ -222,7 +223,7 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: #3b82f6;
+  background-color: #6366F1;
   margin-right: 12px;
   flex-shrink: 0;
 }

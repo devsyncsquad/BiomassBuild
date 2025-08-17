@@ -24,4 +24,11 @@ export const lookupApi = {
     }),
 };
 
+// Individual exports for backward compatibility
+export const getLookups = (options = {}) => lookupApi.getLookups(options);
+export const getLookupById = (id) => lookupApi.getById(id);
+export const createLookup = (payload) => lookupApi.create(payload);
+export const updateLookup = (id, payload) => lookupApi.update(id, payload);
+export const deleteLookup = (id) => lookupApi.remove(id);
+
 

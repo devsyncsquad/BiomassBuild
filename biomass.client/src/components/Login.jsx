@@ -56,6 +56,11 @@ const Login = ({ onLoginSuccess }) => {
           empId: response.data.empId
         }));
         
+        // Store customers data if available
+        if (response.data.customers && response.data.customers.length > 0) {
+          localStorage.setItem('customers', JSON.stringify(response.data.customers));
+        }
+        
         // Set token expiration (24 hours from now)
         const expiresAt = new Date().getTime() + (24 * 60 * 60 * 1000);
         localStorage.setItem('tokenExpiresAt', expiresAt.toString());

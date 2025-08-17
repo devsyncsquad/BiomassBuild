@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -10,6 +10,10 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Divider from '@mui/material/Divider';
 import Avatar from '@mui/material/Avatar';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Grid from '@mui/material/Grid';
+import Chip from '@mui/material/Chip';
 import LogoutIcon from '@mui/icons-material/Logout';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import PeopleIcon from '@mui/icons-material/People';
@@ -24,6 +28,19 @@ const DRAWER_WIDTH = 280;
 
 const Dashboard = ({ user, onLogout, children }) => {
   const navigate = useNavigate();
+  const [customers, setCustomers] = useState([]);
+
+  useEffect(() => {
+    // Get customers from localStorage
+    const customersData = localStorage.getItem('customers');
+    if (customersData) {
+      try {
+        setCustomers(JSON.parse(customersData));
+      } catch (error) {
+        console.error('Error parsing customers data:', error);
+      }
+    }
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -106,15 +123,85 @@ const Dashboard = ({ user, onLogout, children }) => {
       return children;
     }
 
-    // If no children, show a simple message
+    // If no children, show dashboard with customers
     return (
-      <Box sx={{ p: 3, textAlign: 'center' }}>
-        <Typography variant="h4" gutterBottom>
+      <Box sx={{ p: 3 }}>
+        <Typography variant="h4" gutterBottom sx={{ mb: 3, color: '#14B8A6' }}>
           Welcome to Biomass Portal
         </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Please select a menu item from the sidebar to get started.
-        </Typography>
+        
+        {/* Customers Section */}
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h5" gutterBottom sx={{ mb: 2, color: '#374151' }}>
+            Your Customers ({customers.length})
+          </Typography>
+          
+          {customers.length > 0 ? (
+            <Grid container spacing={3}>
+              {customers.map((customer) => (
+                <Grid item xs={12} sm={6} md={4} key={customer.customerId}>
+                  <Card 
+                    elevation={2}
+                    sx={{ 
+                      height: '100%',
+                      transition: 'all 0.3s ease-in-out',
+                      '&:hover': {
+                        transform: 'translateY(-4px)',
+                        boxShadow: 4
+                      }
+                    }}
+                  >
+                    <CardContent>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                        <Typography variant="h6" sx={{ fontWeight: 600, color: '#1F2937' }}>
+                          {customer.firstName} {customer.lastName}
+                        </Typography>
+                        <Chip 
+                          label={customer.status} 
+                          size="small"
+                          color={customer.status === 'active' ? 'success' : 'default'}
+                          sx={{ fontSize: '0.75rem' }}
+                        />
+                      </Box>
+                      
+                      {customer.companyName && (
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                          <strong>Company:</strong> {customer.companyName}
+                        </Typography>
+                      )}
+                      
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                        <strong>Email:</strong> {customer.email || 'N/A'}
+                      </Typography>
+                      
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                        <strong>Phone:</strong> {customer.phone || 'N/A'}
+                      </Typography>
+                      
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                        <strong>Location:</strong> {customer.city}, {customer.state}
+                      </Typography>
+                      
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                        <strong>Country:</strong> {customer.country}
+                      </Typography>
+                      
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                        <strong>Locations:</strong> {customer.locationCount || 0}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          ) : (
+            <Card sx={{ p: 3, textAlign: 'center', bgcolor: '#f9fafb' }}>
+              <Typography variant="body1" color="text.secondary">
+                No customers found. Please contact your administrator to assign customers to your account.
+              </Typography>
+            </Card>
+          )}
+        </Box>
       </Box>
     );
   };
@@ -130,26 +217,27 @@ const Dashboard = ({ user, onLogout, children }) => {
           '& .MuiDrawer-paper': {
             width: DRAWER_WIDTH,
             boxSizing: 'border-box',
-            background: 'linear-gradient(180deg, #667eea 0%, #764ba2 100%)',
-            color: 'white',
+            background: '#ffffff',
+            color: '#14B8A6',
+            borderRight: '1px solid #e5e7eb',
           },
         }}
       >
         <Box sx={{ p: 3, textAlign: 'center' }}>
-          <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1 }}>
+          <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1, color: '#14B8A6' }}>
             Biomass Portal
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 2 }}>
-            <Avatar sx={{ width: 32, height: 32, bgcolor: 'rgba(255,255,255,0.2)' }}>
+            <Avatar sx={{ width: 32, height: 32, bgcolor: '#14B8A6' }}>
               {user?.firstName?.charAt(0) || user?.userName?.charAt(0) || 'U'}
             </Avatar>
-            <Typography variant="body2">
+            <Typography variant="body2" sx={{ color: '#14B8A6' }}>
               {user?.firstName || user?.userName || 'User'}
             </Typography>
           </Box>
         </Box>
         
-        <Divider sx={{ borderColor: 'rgba(255,255,255,0.2)' }} />
+        <Divider sx={{ borderColor: '#e5e7eb' }} />
         
         <List sx={{ pt: 1 }}>
           {menuItems.map((item) => (
@@ -158,15 +246,15 @@ const Dashboard = ({ user, onLogout, children }) => {
                 onClick={() => handleMenuClick(item.id)}
                 sx={{
                   mx: 1,
-                  borderRadius: 2,
+                  borderRadius: 0,
                   mb: 0.5,
-                  backgroundColor: 'transparent', // Removed currentView check
+                  backgroundColor: 'transparent',
                   '&:hover': {
-                    backgroundColor: 'rgba(255,255,255,0.1)',
+                    backgroundColor: 'rgba(99, 102, 241, 0.2)',
                   },
                 }}
               >
-                <ListItemIcon sx={{ color: 'white', minWidth: 40 }}>
+                <ListItemIcon sx={{ color: '#14B8A6', minWidth: 40 }}>
                   {item.icon}
                 </ListItemIcon>
                 <ListItemText 
@@ -174,7 +262,7 @@ const Dashboard = ({ user, onLogout, children }) => {
                   sx={{ 
                     '& .MuiListItemText-primary': { 
                       fontWeight: 400,
-                      color: 'white'
+                      color: '#14B8A6'
                     } 
                   }}
                 />
@@ -185,15 +273,15 @@ const Dashboard = ({ user, onLogout, children }) => {
         
         <Box sx={{ flexGrow: 1 }} />
         
-        <Divider sx={{ borderColor: 'rgba(255,255,255,0.2)' }} />
+        <Divider sx={{ borderColor: '#e5e7eb' }} />
         
         <List>
           <ListItem disablePadding>
-            <ListItemButton onClick={handleLogout} sx={{ mx: 1, borderRadius: 2 }}>
-              <ListItemIcon sx={{ color: 'white', minWidth: 40 }}>
+            <ListItemButton onClick={handleLogout} sx={{ mx: 1, borderRadius: 0 }}>
+              <ListItemIcon sx={{ color: '#14B8A6', minWidth: 40 }}>
                 <LogoutIcon />
               </ListItemIcon>
-              <ListItemText primary="Logout" />
+              <ListItemText primary="Logout" sx={{ color: '#14B8A6' }} />
             </ListItemButton>
           </ListItem>
         </List>

@@ -10,6 +10,7 @@ using System.Text;
 using System.Security.Claims;
 using Biomass.Server.Models.UserManagement;
 using Biomass.Server.Interfaces;
+using Biomass.Server.Models.Customer;
 
 namespace Biomass.Server.Controllers
 {
@@ -51,14 +52,56 @@ namespace Biomass.Server.Controllers
                 // Generate JWT token
                 var token = GenerateJwtToken(user);
 
-                // Create response
-                var response = new AuthenticateResponse(user, token);
+                // Create base response
+                var baseResponse = new AuthenticateResponse(user, token);
 
-                return Ok(response);
+                // Get user's customers
+                var customers = await GetUserCustomersAsync(user.UserId);
+
+                // Create enhanced response with customers
+                var enhancedResponse = new EnhancedAuthenticateResponse(baseResponse, customers);
+
+                return Ok(enhancedResponse);
             }
             catch (Exception ex)
             {
                 return BadRequest(new { message = $"Authentication failed: {ex.Message}" });
+            }
+        }
+
+        private async Task<List<CustomerDto>> GetUserCustomersAsync(int userId)
+        {
+            try
+            {
+                var userCustomers = await _context.UserCustomers
+                    .Where(uc => uc.UserId == userId && uc.Enabled)
+                    .Include(uc => uc.Customer)
+                    .Select(uc => new CustomerDto
+                    {
+                        CustomerId = uc.Customer.CustomerId,
+                        FirstName = uc.Customer.FirstName,
+                        LastName = uc.Customer.LastName,
+                        Email = uc.Customer.Email,
+                        Phone = uc.Customer.Phone,
+                        CompanyName = uc.Customer.CompanyName,
+                        Address = uc.Customer.Address,
+                        City = uc.Customer.City,
+                        State = uc.Customer.State,
+                        PostalCode = uc.Customer.PostalCode,
+                        Country = uc.Customer.Country,
+                        Status = uc.Customer.Status,
+                        CreatedDate = uc.Customer.CreatedDate,
+                        LocationCount = 0 // Will be calculated separately if needed
+                    })
+                    .ToListAsync();
+
+                return userCustomers;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception in production
+                // For now, return empty list if there's an error
+                return new List<CustomerDto>();
             }
         }
 

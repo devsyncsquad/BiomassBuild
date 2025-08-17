@@ -192,35 +192,24 @@ const VendorManagement = () => {
   return (
     <Box sx={{ p: 0, width: '100%', backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
       {/* Header */}
-      <Box sx={{ mb: 4, p: 3 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-          <Box>
-            <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#333' }}>
-              Vendor Management
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              Manage and monitor your vendor relationships.
-            </Typography>
-          </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleAddVendor}
-              sx={{
-                background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
-                '&:hover': {
-                  background: 'linear-gradient(135deg, #1d4ed8 0%, #6d28d9 100%)',
-                }
-              }}
-            >
-              Add New Vendor
-            </Button>
-            <Avatar sx={{ bgcolor: '#2563eb' }}>
-              <BusinessIcon />
-            </Avatar>
-          </Box>
-        </Box>
+      <Box sx={{ mb: 4 }}>
+        <Typography 
+          variant="h3" 
+          component="h1" 
+          sx={{ 
+            fontWeight: 700,
+            background: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            mb: 2
+          }}
+        >
+          Vendor Management
+        </Typography>
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+          Manage your vendor relationships, track performance, and streamline procurement processes.
+        </Typography>
       </Box>
 
       {/* Statistics Cards */}

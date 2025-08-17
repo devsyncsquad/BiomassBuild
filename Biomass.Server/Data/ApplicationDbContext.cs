@@ -25,6 +25,7 @@ namespace Biomass.Server.Data
         public DbSet<Customer> Customers { get; set; }
         public DbSet<CustomerLocation> CustomerLocations { get; set; }
         public DbSet<MaterialRate> MaterialRates { get; set; }
+        public DbSet<UserCustomer> UserCustomers { get; set; }
         public DbSet<UserCompanies> UserCompanies { get; set; }
         public DbSet<MainMenus> MainMenus { get; set; }
         public DbSet<SubMenus> SubMenus { get; set; }
@@ -146,6 +147,26 @@ namespace Biomass.Server.Data
                 entity.Property(e => e.Country).HasMaxLength(100);
                 entity.Property(e => e.Status).HasMaxLength(50);
                 entity.Property(e => e.CreatedDate).IsRequired();
+            });
+
+            modelBuilder.Entity<UserCustomer>(entity =>
+            {
+                entity.HasKey(e => e.UcId);
+                entity.Property(e => e.UserId).IsRequired();
+                entity.Property(e => e.CustomerId).IsRequired();
+                entity.Property(e => e.Enabled).IsRequired().HasDefaultValue(true);
+                entity.Property(e => e.CreatedOn).IsRequired().HasDefaultValueSql("NOW()");
+                
+                // Foreign key relationships
+                entity.HasOne(e => e.User)
+                      .WithMany()
+                      .HasForeignKey(e => e.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+                
+                entity.HasOne(e => e.Customer)
+                      .WithMany()
+                      .HasForeignKey(e => e.CustomerId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<CustomerLocation>(entity =>

@@ -44,7 +44,7 @@ const UserManagement = () => {
     <Box sx={{ width: '100%', p: 0 }}>
       {/* Header Section */}
       <Box sx={{ 
-        background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+        background: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
         mb: 2,
         borderRadius: 0,
         p: 3
@@ -87,11 +87,11 @@ const UserManagement = () => {
               minHeight: 48,
               px: 2,
               '&.Mui-selected': {
-                color: '#2563eb',
+                color: '#6366F1',
               },
             },
             '& .MuiTabs-indicator': {
-              background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+              background: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
               height: 2,
             },
           }}

@@ -204,7 +204,7 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave }) => {
       }}
     >
       <DialogTitle sx={{ 
-        background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+        background: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
         color: 'white',
         display: 'flex',
         justifyContent: 'space-between',
@@ -226,7 +226,7 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave }) => {
         <Grid container spacing={3}>
           {/* Basic Information Section */}
           <Grid item xs={12}>
-            <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', color: '#2563eb' }}>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', color: '#6366F1' }}>
               Basic Information
             </Typography>
           </Grid>
@@ -283,7 +283,7 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave }) => {
 
           {/* Contact Information Section */}
           <Grid item xs={12}>
-            <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', color: '#2563eb' }}>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', color: '#6366F1' }}>
               Contact Information
             </Typography>
           </Grid>

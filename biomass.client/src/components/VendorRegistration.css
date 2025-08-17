@@ -11,7 +11,7 @@
 }
 
 .vendor-registration-header {
-  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);
   color: white;
   padding: 24px;
   display: flex;
@@ -35,7 +35,7 @@
 }
 
 .vendor-registration-section-title {
-  color: #2563eb;
+  color: #6366F1;
   font-weight: 700;
   font-size: 1.25rem;
   margin-bottom: 16px;
@@ -64,16 +64,16 @@
 }
 
 .form-field .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
-  border-color: #2563eb;
+  border-color: #6366F1;
 }
 
 .form-field .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
-  border-color: #7c3aed;
+  border-color: #4F46E5;
   border-width: 2px;
 }
 
 .form-field .MuiInputLabel-root.Mui-focused {
-  color: #7c3aed;
+  color: #4F46E5;
 }
 
 .form-field .MuiFormHelperText-root {

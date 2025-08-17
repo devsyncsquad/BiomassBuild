@@ -188,4 +188,34 @@ export const companyApi = {
   deleteCompany: (companyId) => apiRequest(`/api/companies/${companyId}`, {
     method: 'DELETE'
   })
-}; 
+};
+
+// Individual exports for backward compatibility
+export const getCompanies = () => companyApi.getCompanies();
+export const getCompanyById = (companyId) => companyApi.getCompanyById(companyId);
+export const createCompany = (companyData) => companyApi.saveCompany(companyData);
+export const updateCompany = (companyId, companyData) => companyApi.updateCompany({ id: companyId, ...companyData });
+export const deleteCompany = (companyId) => companyApi.deleteCompany(companyId);
+
+// Customer Management API functions
+export const customerApi = {
+  getCustomers: () => apiRequest('/api/customers'),
+  getCustomerById: (customerId) => apiRequest(`/api/customers/${customerId}`),
+  saveCustomer: (customerData) => apiRequest('/api/customers', {
+    method: 'POST',
+    body: JSON.stringify(customerData)
+  }),
+  updateCustomer: (customerData) => apiRequest('/api/customers', {
+    method: 'PUT',
+    body: JSON.stringify(customerData)
+  }),
+  deleteCustomer: (customerId) => apiRequest(`/api/customers/${customerId}`, {
+    method: 'DELETE'
+  })
+};
+
+// Individual customer exports for backward compatibility
+export const getCustomers = () => customerApi.getCustomers();
+export const createCustomer = (customerData) => customerApi.saveCustomer(customerData);
+export const updateCustomer = (customerId, customerData) => customerApi.updateCustomer({ id: customerId, ...customerData });
+export const deleteCustomer = (customerId) => customerApi.deleteCustomer(customerId); 

@@ -7,7 +7,8 @@ import {
   Typography,
   Tabs,
   Tab,
-  Avatar
+  Avatar,
+  Paper
 } from '@mui/material';
 import {
   People as PeopleIcon,
@@ -41,80 +42,137 @@ const UserManagement = () => {
   ];
 
   return (
-    <Box sx={{ width: '100%', p: 0 }}>
+    <Box sx={{ width: '100%', p: 0, minHeight: '100vh', bgcolor: '#f8fafc' }}>
       {/* Header Section */}
       <Box sx={{ 
         background: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
-        mb: 2,
-        borderRadius: 0,
-        p: 3
+        mb: 3,
+        borderRadius: '0 0 24px 24px',
+        p: 4,
+        boxShadow: '0 8px 32px rgba(99, 102, 241, 0.15)',
+        position: 'relative',
+        overflow: 'hidden'
       }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        {/* Background Pattern */}
+        <Box sx={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          width: '200px',
+          height: '200px',
+          background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)',
+          borderRadius: '50%',
+          transform: 'translate(50px, -50px)'
+        }} />
+        
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', zIndex: 1 }}>
           <Box>
-            <Typography variant="h5" sx={{ color: 'white', mb: 0.5, fontWeight: 700, fontSize: '1.25rem' }}>
+            <Typography variant="h4" sx={{ 
+              color: 'white', 
+              mb: 1, 
+              fontWeight: 800, 
+              fontSize: '2rem',
+              textShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            }}>
               User Management
             </Typography>
-            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.8rem' }}>
-              Manage users, roles, menus, and company assignments
+            <Typography variant="body1" sx={{ 
+              color: 'rgba(255,255,255,0.95)', 
+              fontSize: '1rem',
+              fontWeight: 400,
+              maxWidth: '500px'
+            }}>
+              Manage users, roles, menus, and company assignments with advanced security controls
             </Typography>
           </Box>
           <Avatar sx={{ 
-            width: 48, 
-            height: 48, 
-            bgcolor: 'rgba(255,255,255,0.2)',
-            border: '2px solid rgba(255,255,255,0.3)'
+            width: 64, 
+            height: 64, 
+            bgcolor: 'rgba(255,255,255,0.15)',
+            border: '3px solid rgba(255,255,255,0.3)',
+            backdropFilter: 'blur(10px)',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
           }}>
-            <PeopleIcon sx={{ fontSize: 24, color: 'white' }} />
+            <PeopleIcon sx={{ fontSize: 32, color: 'white' }} />
           </Avatar>
         </Box>
       </Box>
 
       {/* Navigation Tabs */}
-      <Box sx={{ mb: 2, borderRadius: 0, bgcolor: 'background.paper', boxShadow: 1, mx: 0 }}>
-        <Tabs
-          value={activeTab}
-          onChange={handleTabChange}
-          variant="scrollable"
-          scrollButtons="auto"
-          sx={{
-            '& .MuiTabs-scrollButtons': {
-              '&.Mui-disabled': { opacity: 0.3 },
-            },
-            '& .MuiTab-root': {
-              fontSize: '0.8rem',
-              fontWeight: 600,
-              textTransform: 'none',
-              minHeight: 48,
-              px: 2,
-              '&.Mui-selected': {
-                color: '#6366F1',
+      <Box sx={{ mb: 3, mx: 2 }}>
+        <Paper elevation={0} sx={{ 
+          borderRadius: '16px', 
+          bgcolor: 'white', 
+          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+          overflow: 'hidden'
+        }}>
+          <Tabs
+            value={activeTab}
+            onChange={handleTabChange}
+            variant="scrollable"
+            scrollButtons="auto"
+            sx={{
+              '& .MuiTabs-scrollButtons': {
+                '&.Mui-disabled': { opacity: 0.3 },
               },
-            },
-            '& .MuiTabs-indicator': {
-              background: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
-              height: 2,
-            },
-          }}
-        >
-          {tabs.map((tab, index) => (
-            <Tab
-              key={index}
-              label={
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-                  {tab.icon}
-                  <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.8rem' }}>
-                    {tab.label}
-                  </Typography>
-                </Box>
-              }
-            />
-          ))}
-        </Tabs>
+              '& .MuiTab-root': {
+                fontSize: '0.9rem',
+                fontWeight: 600,
+                textTransform: 'none',
+                minHeight: 56,
+                px: 3,
+                color: '#64748b',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  color: '#6366F1',
+                  bgcolor: 'rgba(99, 102, 241, 0.04)',
+                },
+                '&.Mui-selected': {
+                  color: '#6366F1',
+                  fontWeight: 700,
+                },
+              },
+              '& .MuiTabs-indicator': {
+                background: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
+                height: 3,
+                borderRadius: '2px',
+              },
+            }}
+          >
+            {tabs.map((tab, index) => (
+              <Tab
+                key={index}
+                label={
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Box sx={{ 
+                      color: 'inherit',
+                      display: 'flex',
+                      alignItems: 'center'
+                    }}>
+                      {tab.icon}
+                    </Box>
+                    <Typography variant="body2" sx={{ fontWeight: 'inherit', fontSize: '0.9rem' }}>
+                      {tab.label}
+                    </Typography>
+                  </Box>
+                }
+              />
+            ))}
+          </Tabs>
+        </Paper>
       </Box>
 
       {/* Content Area */}
-      <Box sx={{ width: '100%', px: 3 }}>
-        {tabs[activeTab].component}
+      <Box sx={{ width: '100%', px: 2, pb: 4 }}>
+        <Box sx={{ 
+          bgcolor: 'white', 
+          borderRadius: '16px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+          overflow: 'hidden',
+          minHeight: '600px'
+        }}>
+          {tabs[activeTab].component}
+        </Box>
       </Box>
     </Box>
   );

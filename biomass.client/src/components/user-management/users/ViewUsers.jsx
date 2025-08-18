@@ -21,7 +21,9 @@ import {
   InputAdornment,
   TextField,
   Alert,
-  CircularProgress
+  CircularProgress,
+  Card,
+  CardContent
 } from '@mui/material';
 import { 
   Edit, 
@@ -29,7 +31,8 @@ import {
   Visibility, 
   Search,
   Person,
-  Refresh
+  Refresh,
+  FilterList
 } from '@mui/icons-material';
 import axios from 'axios';
 import { getAuthHeaders } from '../../../utils/auth';
@@ -127,17 +130,53 @@ const ViewUsers = ({ setUserData }) => {
   };
 
   return (
-    <Box sx={{ width: '100%' }}>
+    <Box sx={{ width: '100%', p: 3 }}>
       {/* Header */}
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
-        <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main' }}>
-          Users List
-        </Typography>
+      <Box sx={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'space-between', 
+        mb: 4,
+        p: 3,
+        background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+        borderRadius: '16px',
+        border: '1px solid #e2e8f0'
+      }}>
+        <Box>
+          <Typography variant="h5" sx={{ 
+            fontWeight: 700, 
+            color: '#1e293b',
+            mb: 0.5,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1
+          }}>
+            <Person sx={{ color: '#6366F1', fontSize: '1.5rem' }} />
+            Users List
+          </Typography>
+          <Typography variant="body2" sx={{ color: '#64748b', fontWeight: 500 }}>
+            {filteredUsers.length} of {users.length} users
+          </Typography>
+        </Box>
         <Button
           variant="outlined"
           startIcon={<Refresh />}
           onClick={fetchUsers}
           disabled={loading}
+          sx={{
+            borderColor: '#6366F1',
+            color: '#6366F1',
+            '&:hover': {
+              borderColor: '#4F46E5',
+              bgcolor: 'rgba(99, 102, 241, 0.04)',
+              transform: 'translateY(-1px)',
+              boxShadow: '0 4px 12px rgba(99, 102, 241, 0.15)'
+            },
+            transition: 'all 0.2s ease',
+            borderRadius: '12px',
+            px: 3,
+            py: 1
+          }}
         >
           Refresh
         </Button>
@@ -145,142 +184,239 @@ const ViewUsers = ({ setUserData }) => {
 
       {/* Error Alert */}
       {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
+        <Alert severity="error" sx={{ mb: 3, borderRadius: '12px' }}>
           {error}
         </Alert>
       )}
 
       {/* Search Bar */}
-      <Box sx={{ mb: 3 }}>
-        <TextField
-          fullWidth
-          placeholder="Search users by name, username, or employee number..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Search />
-              </InputAdornment>
-            ),
-          }}
-          sx={{ maxWidth: 400 }}
-        />
-      </Box>
+      <Card sx={{ mb: 4, borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
+        <CardContent sx={{ p: 3 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <FilterList sx={{ color: '#6366F1', fontSize: '1.5rem' }} />
+            <TextField
+              fullWidth
+              placeholder="Search users by name, username, or employee number..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search sx={{ color: '#6366F1' }} />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{ 
+                maxWidth: 500,
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: '12px',
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#818CF8',
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#6366F1',
+                    borderWidth: '2px',
+                  },
+                },
+              }}
+            />
+          </Box>
+        </CardContent>
+      </Card>
 
       {/* Loading State */}
       {loading && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-          <CircularProgress />
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+          <CircularProgress sx={{ color: '#6366F1' }} size={48} />
         </Box>
       )}
 
       {/* Users Table */}
       {!loading && (
-        <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
-          <Table>
-            <TableHead>
-              <TableRow sx={{ backgroundColor: 'grey.50' }}>
-                <TableCell sx={{ fontWeight: 600 }}>User</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Employee #</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Role ID</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Team Lead</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Phone</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredUsers.map((user) => (
-                <TableRow key={user.userId} hover>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <Avatar sx={{ mr: 2, bgcolor: 'primary.main' }}>
-                        {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
-                      </Avatar>
-                      <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                          {user.firstName} {user.lastName}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          @{user.username}
-                        </Typography>
+        <Card sx={{ borderRadius: '16px', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow sx={{ 
+                  background: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
+                  '& th': {
+                    color: 'white',
+                    fontWeight: 700,
+                    fontSize: '0.9rem',
+                    borderBottom: 'none',
+                    py: 2
+                  }
+                }}>
+                  <TableCell>User</TableCell>
+                  <TableCell>Employee #</TableCell>
+                  <TableCell>Role ID</TableCell>
+                  <TableCell>Team Lead</TableCell>
+                  <TableCell>Status</TableCell>
+                  <TableCell>Phone</TableCell>
+                  <TableCell align="center">Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filteredUsers.map((user, index) => (
+                  <TableRow 
+                    key={user.userId}
+                    hover 
+                    sx={{ 
+                      '&:nth-of-type(even)': { bgcolor: '#f8fafc' },
+                      '&:hover': { 
+                        bgcolor: 'rgba(99, 102, 241, 0.02)',
+                        transform: 'scale(1.01)',
+                        transition: 'all 0.2s ease'
+                      },
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <Avatar sx={{ 
+                          mr: 2, 
+                          bgcolor: '#6366F1',
+                          boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)',
+                          width: 40,
+                          height: 40
+                        }}>
+                          {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
+                        </Avatar>
+                        <Box>
+                          <Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>
+                            {user.firstName} {user.lastName}
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: '#6366F1', fontWeight: 500 }}>
+                            @{user.username}
+                          </Typography>
+                        </Box>
                       </Box>
-                    </Box>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2">{user.empNo}</Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Chip 
-                      label={`Role ${user.roleId}`} 
-                      size="small" 
-                      color="primary" 
-                      variant="outlined"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Chip 
-                      label={user.isTeamLead === 'Y' ? 'Yes' : 'No'} 
-                      size="small" 
-                      color={getTeamLeadColor(user.isTeamLead)}
-                      variant="outlined"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Chip 
-                      label={user.enabled === 'Y' ? 'Active' : 'Inactive'} 
-                      size="small" 
-                      color={getStatusColor(user.enabled)}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2">{user.phoneNumber || 'N/A'}</Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', gap: 1 }}>
-                      <Tooltip title="Edit User">
-                        <IconButton
-                          size="small"
-                          onClick={() => handleEditUser(user)}
-                          sx={{ color: 'warning.main' }}
-                        >
-                          <Edit />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Delete User">
-                        <IconButton
-                          size="small"
-                          onClick={() => handleDeleteUser(user.userId)}
-                          sx={{ color: 'error.main' }}
-                        >
-                          <Delete />
-                        </IconButton>
-                      </Tooltip>
-                      {user.enabled === 'Y' && (
-                        <Tooltip title="Deactivate User">
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" sx={{ color: '#475569', fontWeight: 500 }}>
+                        {user.empNo}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Chip 
+                        label={`Role ${user.roleId}`} 
+                        size="small" 
+                        sx={{ 
+                          bgcolor: 'rgba(99, 102, 241, 0.1)',
+                          color: '#6366F1',
+                          fontWeight: 600,
+                          borderRadius: '8px'
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Chip 
+                        label={user.isTeamLead === 'Y' ? 'Yes' : 'No'} 
+                        size="small" 
+                        sx={{ 
+                          bgcolor: user.isTeamLead === 'Y' 
+                            ? 'rgba(20, 184, 166, 0.1)' 
+                            : 'rgba(148, 163, 184, 0.1)',
+                          color: user.isTeamLead === 'Y' ? '#14B8A6' : '#64748b',
+                          fontWeight: 600,
+                          borderRadius: '8px'
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Chip 
+                        label={user.enabled === 'Y' ? 'Active' : 'Inactive'} 
+                        size="small" 
+                        sx={{ 
+                          bgcolor: user.enabled === 'Y' 
+                            ? 'rgba(34, 197, 94, 0.1)' 
+                            : 'rgba(239, 68, 68, 0.1)',
+                          color: user.enabled === 'Y' ? '#22c55e' : '#ef4444',
+                          fontWeight: 600,
+                          borderRadius: '8px'
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" sx={{ color: '#475569' }}>
+                        {user.phoneNumber || 'N/A'}
+                      </Typography>
+                    </TableCell>
+                    <TableCell align="center">
+                      <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
+                        <Tooltip title="Edit User">
                           <IconButton
                             size="small"
-                            onClick={() => handleDeactivateUser(user.userId)}
-                            sx={{ color: 'info.main' }}
+                            onClick={() => handleEditUser(user)}
+                            sx={{ 
+                              color: '#818CF8',
+                              p: 1,
+                              bgcolor: 'rgba(129, 140, 248, 0.1)',
+                              '&:hover': {
+                                bgcolor: 'rgba(129, 140, 248, 0.2)',
+                                transform: 'scale(1.1)'
+                              },
+                              transition: 'all 0.2s ease'
+                            }}
                           >
-                            <Visibility />
+                            <Edit sx={{ fontSize: '1.1rem' }} />
                           </IconButton>
                         </Tooltip>
-                      )}
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                        <Tooltip title="Delete User">
+                          <IconButton
+                            size="small"
+                            onClick={() => handleDeleteUser(user.userId)}
+                            sx={{ 
+                              color: '#ef4444',
+                              p: 1,
+                              bgcolor: 'rgba(239, 68, 68, 0.1)',
+                              '&:hover': {
+                                bgcolor: 'rgba(239, 68, 68, 0.2)',
+                                transform: 'scale(1.1)'
+                              },
+                              transition: 'all 0.2s ease'
+                            }}
+                          >
+                            <Delete sx={{ fontSize: '1.1rem' }} />
+                          </IconButton>
+                        </Tooltip>
+                        {user.enabled === 'Y' && (
+                          <Tooltip title="Deactivate User">
+                            <IconButton
+                              size="small"
+                              onClick={() => handleDeactivateUser(user.userId)}
+                              sx={{ 
+                                color: '#14B8A6',
+                                p: 1,
+                                bgcolor: 'rgba(20, 184, 166, 0.1)',
+                                '&:hover': {
+                                  bgcolor: 'rgba(20, 184, 166, 0.2)',
+                                  transform: 'scale(1.1)'
+                                },
+                                transition: 'all 0.2s ease'
+                              }}
+                            >
+                              <Visibility sx={{ fontSize: '1.1rem' }} />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Card>
       )}
 
       {!loading && filteredUsers.length === 0 && (
-        <Box sx={{ textAlign: 'center', py: 4 }}>
-          <Typography color="text.secondary">
+        <Box sx={{ textAlign: 'center', py: 6 }}>
+          <Typography variant="h6" sx={{ color: '#64748b', mb: 1 }}>
             {users.length === 0 ? 'No users found.' : 'No users match your search criteria.'}
+          </Typography>
+          <Typography variant="body2" sx={{ color: '#94a3b8' }}>
+            Try adjusting your search terms or add new users to get started.
           </Typography>
         </Box>
       )}

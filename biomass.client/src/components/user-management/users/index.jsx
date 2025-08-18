@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 // MUI Imports
-import { Card, CardContent, Grid, Divider, Box } from '@mui/material';
+import { Card, CardContent, Grid, Box } from '@mui/material';
 
 // Component Imports
 import AddUser from './AddUser';
@@ -11,12 +11,9 @@ const Users = () => {
   const [userData, setUserData] = useState(null);
   return (
     <Box sx={{ width: '100%' }}>
-      <Grid container spacing={0}>
+      <Grid container spacing={3}>
         <Grid item xs={12}>
           <AddUser userData={userData} setUserData={setUserData} />
-        </Grid>
-        <Grid item xs={12}>
-          <Divider color="#7F40A8" sx={{ width: '100%', my: 2 }} />
         </Grid>
         <Grid item xs={12}>
           <ViewUsers setUserData={setUserData} />

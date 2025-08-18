@@ -13,7 +13,11 @@ import {
   Grid,
   InputAdornment,
   Typography,
-  Divider
+  Divider,
+  Card,
+  CardContent,
+  Paper,
+  Chip
 } from '@mui/material';
 import {
   Person,
@@ -21,7 +25,10 @@ import {
   Badge,
   Security,
   Lock,
-  Comment
+  Comment,
+  Save,
+  Clear,
+  Add
 } from '@mui/icons-material';
 import axios from 'axios';
 import { getAuthHeaders } from '../../../utils/auth';
@@ -100,37 +107,14 @@ const AddUser = ({ userData, setUserData }) => {
 
   const validateForm = () => {
     const newErrors = {};
-
-    if (!formData.firstName.trim()) {
-      newErrors.firstName = 'First name is required';
-    }
-
-    if (!formData.lastName.trim()) {
-      newErrors.lastName = 'Last name is required';
-    }
-
-    if (!formData.username.trim()) {
-      newErrors.username = 'Username is required';
-    }
-
-    if (!userData && !formData.passwordHash.trim()) {
-      newErrors.passwordHash = 'Password is required';
-    } else if (formData.passwordHash && formData.passwordHash.length < 6) {
-      newErrors.passwordHash = 'Password must be at least 6 characters';
-    }
-
-    if (!formData.empNo) {
-      newErrors.empNo = 'Employee number is required';
-    }
-
-    if (!formData.roleId) {
-      newErrors.roleId = 'Role is required';
-    }
-
-    if (formData.phoneNumber && !/^\+?[\d\s\-\(\)]+$/.test(formData.phoneNumber)) {
-      newErrors.phoneNumber = 'Please enter a valid phone number';
-    }
-
+    
+    if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
+    if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
+    if (!formData.username.trim()) newErrors.username = 'Username is required';
+    if (!userData && !formData.passwordHash.trim()) newErrors.passwordHash = 'Password is required';
+    if (!formData.empNo.trim()) newErrors.empNo = 'Employee number is required';
+    if (!formData.roleId) newErrors.roleId = 'Role is required';
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -138,57 +122,58 @@ const AddUser = ({ userData, setUserData }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!validateForm()) {
-      return;
-    }
-
+    if (!validateForm()) return;
+    
     setLoading(true);
     setSuccessMessage('');
     
     try {
-      const userDataToSend = {
-        ...formData,
-        empNo: parseInt(formData.empNo),
-        reportingTo: parseInt(formData.reportingTo),
-        roleId: parseInt(formData.roleId),
-        createdBy: 1, // TODO: Get from current user context
-        updatedBy: 1  // TODO: Get from current user context
-      };
-
       let response;
+      
       if (userData) {
         // Update existing user
-        response = await axios.put('https://localhost:7084/api/UserManagement/UpdateUser', userDataToSend, {
+        response = await axios.put(`https://localhost:7084/api/UserManagement/UpdateUserById?userId=${userData.userId}`, formData, {
           headers: getAuthHeaders()
         });
       } else {
         // Create new user
-        response = await axios.post('https://localhost:7084/api/UserManagement/SaveUser', userDataToSend, {
+        response = await axios.post('https://localhost:7084/api/UserManagement/CreateUser', formData, {
           headers: getAuthHeaders()
         });
       }
-
+      
       if (response.data && response.data.success) {
         setSuccessMessage(userData ? 'User updated successfully!' : 'User created successfully!');
-        resetForm();
-        // Trigger refresh of user list
-        if (setUserData) {
-          setUserData(null);
+        if (!userData) {
+          // Reset form for new user creation
+          setFormData({
+            firstName: '',
+            lastName: '',
+            username: '',
+            passwordHash: '',
+            empNo: '',
+            phoneNumber: '',
+            isTeamLead: 'N',
+            enabled: 'Y',
+            comments: 'User created via user management',
+            reportingTo: 0,
+            roleId: ''
+          });
         }
+        setUserData(null); // Clear editing state
       } else {
-        setErrors({ submit: response.data?.message || 'Operation failed' });
+        setErrors({ submit: response.data?.message || 'Failed to save user' });
       }
     } catch (error) {
       console.error('Error saving user:', error);
-      setErrors({ 
-        submit: error.response?.data?.message || 'An error occurred while saving the user' 
-      });
+      setErrors({ submit: 'Failed to save user. Please try again.' });
     } finally {
       setLoading(false);
     }
   };
 
-  const resetForm = () => {
+  const handleCancel = () => {
+    setUserData(null);
     setFormData({
       firstName: '',
       lastName: '',
@@ -206,264 +191,423 @@ const AddUser = ({ userData, setUserData }) => {
     setSuccessMessage('');
   };
 
-  const handleCancel = () => {
-    resetForm();
-    if (setUserData) {
-      setUserData(null);
-    }
-  };
-
   return (
-    <Box sx={{ width: '100%', p: 2 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-        <Person sx={{ mr: 2, color: 'primary.main' }} />
-        <Typography variant="h5" sx={{ fontWeight: 600, color: 'primary.main' }}>
-          Add New User
-        </Typography>
-      </Box>
-      <Divider sx={{ mb: 3 }} />
+    <Box sx={{ width: '100%', p: 3 }}>
+      <Card sx={{ 
+        borderRadius: '16px', 
+        overflow: 'hidden',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
+      }}>
+        {/* Header */}
+        <Box sx={{
+          background: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
+          p: 3,
+          color: 'white'
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Person sx={{ fontSize: '2rem' }} />
+            <Box>
+              <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
+                {userData ? 'Edit User' : 'Add New User'}
+              </Typography>
+              <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                {userData ? 'Update user information and permissions' : 'Create a new user account with role assignments'}
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
 
-      {successMessage && (
-        <Alert severity="success" sx={{ mb: 3 }}>
-          {successMessage}
-        </Alert>
-      )}
+        <CardContent sx={{ p: 4 }}>
+          {/* Success Message */}
+          {successMessage && (
+            <Alert severity="success" sx={{ mb: 3, borderRadius: '12px' }}>
+              {successMessage}
+            </Alert>
+          )}
 
-      <form onSubmit={handleSubmit}>
-        <Grid container spacing={3}>
-          <Grid item xs={12} sm={6} md={3}>
-            <TextField
-              fullWidth
-              label="First Name"
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleChange}
-              error={!!errors.firstName}
-              helperText={errors.firstName}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Person />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Grid>
-          
-          <Grid item xs={12} sm={6} md={3}>
-            <TextField
-              fullWidth
-              label="Last Name"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleChange}
-              error={!!errors.lastName}
-              helperText={errors.lastName}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Person />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Grid>
+          {/* Error Message */}
+          {errors.submit && (
+            <Alert severity="error" sx={{ mb: 3, borderRadius: '12px' }}>
+              {errors.submit}
+            </Alert>
+          )}
 
-          <Grid item xs={12} sm={6} md={3}>
-            <TextField
-              fullWidth
-              label="Username"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              error={!!errors.username}
-              helperText={errors.username}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Badge />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Grid>
+          <form onSubmit={handleSubmit}>
+            <Grid container spacing={3}>
+              {/* Personal Information Section */}
+              <Grid item xs={12}>
+                <Paper sx={{ p: 3, borderRadius: '12px', bgcolor: '#f8fafc' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                    <Person sx={{ color: '#6366F1' }} />
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#1e293b' }}>
+                      Personal Information
+                    </Typography>
+                  </Box>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        label="First Name"
+                        name="firstName"
+                        value={formData.firstName}
+                        onChange={handleChange}
+                        error={!!errors.firstName}
+                        helperText={errors.firstName}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <Person sx={{ color: '#6366F1', fontSize: '1.2rem' }} />
+                            </InputAdornment>
+                          ),
+                        }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: '12px',
+                            '&:hover .MuiOutlinedInput-notchedOutline': {
+                              borderColor: '#818CF8',
+                            },
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                              borderColor: '#6366F1',
+                              borderWidth: '2px',
+                            },
+                          },
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        label="Last Name"
+                        name="lastName"
+                        value={formData.lastName}
+                        onChange={handleChange}
+                        error={!!errors.lastName}
+                        helperText={errors.lastName}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: '12px',
+                            '&:hover .MuiOutlinedInput-notchedOutline': {
+                              borderColor: '#818CF8',
+                            },
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                              borderColor: '#6366F1',
+                              borderWidth: '2px',
+                            },
+                          },
+                        }}
+                      />
+                    </Grid>
+                  </Grid>
+                </Paper>
+              </Grid>
 
-          <Grid item xs={12} sm={6} md={3}>
-            <TextField
-              fullWidth
-              label="Password"
-              name="passwordHash"
-              type="password"
-              value={formData.passwordHash}
-              onChange={handleChange}
-              error={!!errors.passwordHash}
-              helperText={errors.passwordHash}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Lock />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Grid>
+              {/* Account Information Section */}
+              <Grid item xs={12}>
+                <Paper sx={{ p: 3, borderRadius: '12px', bgcolor: '#f8fafc' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                    <Security sx={{ color: '#6366F1' }} />
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#1e293b' }}>
+                      Account Information
+                    </Typography>
+                  </Box>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        label="Username"
+                        name="username"
+                        value={formData.username}
+                        onChange={handleChange}
+                        error={!!errors.username}
+                        helperText={errors.username}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: '12px',
+                            '&:hover .MuiOutlinedInput-notchedOutline': {
+                              borderColor: '#818CF8',
+                            },
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                              borderColor: '#6366F1',
+                              borderWidth: '2px',
+                            },
+                          },
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        label="Password"
+                        name="passwordHash"
+                        type="password"
+                        value={formData.passwordHash}
+                        onChange={handleChange}
+                        error={!!errors.passwordHash}
+                        helperText={errors.passwordHash}
+                        disabled={!!userData}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <Lock sx={{ color: '#6366F1', fontSize: '1.2rem' }} />
+                            </InputAdornment>
+                          ),
+                        }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: '12px',
+                            '&:hover .MuiOutlinedInput-notchedOutline': {
+                              borderColor: '#818CF8',
+                            },
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                              borderColor: '#6366F1',
+                              borderWidth: '2px',
+                            },
+                          },
+                        }}
+                      />
+                    </Grid>
+                  </Grid>
+                </Paper>
+              </Grid>
 
-          <Grid item xs={12} sm={6} md={3}>
-            <TextField
-              fullWidth
-              label="Employee Number"
-              name="empNo"
-              value={formData.empNo}
-              onChange={handleChange}
-              error={!!errors.empNo}
-              helperText={errors.empNo}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Badge />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Grid>
+              {/* Employee Information Section */}
+              <Grid item xs={12}>
+                <Paper sx={{ p: 3, borderRadius: '12px', bgcolor: '#f8fafc' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                    <Badge sx={{ color: '#6366F1' }} />
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#1e293b' }}>
+                      Employee Information
+                    </Typography>
+                  </Box>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        label="Employee Number"
+                        name="empNo"
+                        value={formData.empNo}
+                        onChange={handleChange}
+                        error={!!errors.empNo}
+                        helperText={errors.empNo}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: '12px',
+                            '&:hover .MuiOutlinedInput-notchedOutline': {
+                              borderColor: '#818CF8',
+                            },
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                              borderColor: '#6366F1',
+                              borderWidth: '2px',
+                            },
+                          },
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        label="Phone Number"
+                        name="phoneNumber"
+                        value={formData.phoneNumber}
+                        onChange={handleChange}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <Phone sx={{ color: '#6366F1', fontSize: '1.2rem' }} />
+                            </InputAdornment>
+                          ),
+                        }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: '12px',
+                            '&:hover .MuiOutlinedInput-notchedOutline': {
+                              borderColor: '#818CF8',
+                            },
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                              borderColor: '#6366F1',
+                              borderWidth: '2px',
+                            },
+                          },
+                        }}
+                      />
+                    </Grid>
+                  </Grid>
+                </Paper>
+              </Grid>
 
-          <Grid item xs={12} sm={6} md={3}>
-            <TextField
-              fullWidth
-              label="Phone Number"
-              name="phoneNumber"
-              value={formData.phoneNumber}
-              onChange={handleChange}
-              error={!!errors.phoneNumber}
-              helperText={errors.phoneNumber}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Phone />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Grid>
+              {/* Role and Permissions Section */}
+              <Grid item xs={12}>
+                <Paper sx={{ p: 3, borderRadius: '12px', bgcolor: '#f8fafc' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                    <Security sx={{ color: '#6366F1' }} />
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#1e293b' }}>
+                      Role & Permissions
+                    </Typography>
+                  </Box>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl fullWidth error={!!errors.roleId}>
+                        <InputLabel>Role</InputLabel>
+                        <Select
+                          name="roleId"
+                          value={formData.roleId}
+                          onChange={handleChange}
+                          label="Role"
+                          sx={{
+                            borderRadius: '12px',
+                            '&:hover .MuiOutlinedInput-notchedOutline': {
+                              borderColor: '#818CF8',
+                            },
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                              borderColor: '#6366F1',
+                              borderWidth: '2px',
+                            },
+                          }}
+                        >
+                          {roles.map((role) => (
+                            <MenuItem key={role.roleId} value={role.roleId}>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Chip 
+                                  label={role.roleName} 
+                                  size="small" 
+                                  sx={{ 
+                                    bgcolor: 'rgba(99, 102, 241, 0.1)',
+                                    color: '#6366F1',
+                                    fontWeight: 600
+                                  }}
+                                />
+                              </Box>
+                            </MenuItem>
+                          ))}
+                        </Select>
+                        {errors.roleId && (
+                          <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
+                            {errors.roleId}
+                          </Typography>
+                        )}
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl fullWidth>
+                        <InputLabel>Team Lead</InputLabel>
+                        <Select
+                          name="isTeamLead"
+                          value={formData.isTeamLead}
+                          onChange={handleChange}
+                          label="Team Lead"
+                          sx={{
+                            borderRadius: '12px',
+                            '&:hover .MuiOutlinedInput-notchedOutline': {
+                              borderColor: '#818CF8',
+                            },
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                              borderColor: '#6366F1',
+                              borderWidth: '2px',
+                            },
+                          }}
+                        >
+                          <MenuItem value="Y">Yes</MenuItem>
+                          <MenuItem value="N">No</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                  </Grid>
+                </Paper>
+              </Grid>
 
-                      <Grid item xs={12} sm={6} md={3}>
-              <FormControl fullWidth error={!!errors.roleId}>
-                <InputLabel>Role</InputLabel>
-                <Select
-                  name="roleId"
-                  value={formData.roleId}
-                  onChange={handleChange}
-                  label="Role"
-                >
-                  {roles.map((role) => (
-                    <MenuItem key={role.roleId} value={role.roleId}>
-                      {role.roleName}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {errors.roleId && (
-                  <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
-                    {errors.roleId}
-                  </Typography>
-                )}
-              </FormControl>
+              {/* Additional Information Section */}
+              <Grid item xs={12}>
+                <Paper sx={{ p: 3, borderRadius: '12px', bgcolor: '#f8fafc' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                    <Comment sx={{ color: '#6366F1' }} />
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#1e293b' }}>
+                      Additional Information
+                    </Typography>
+                  </Box>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        label="Comments"
+                        name="comments"
+                        value={formData.comments}
+                        onChange={handleChange}
+                        multiline
+                        rows={3}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: '12px',
+                            '&:hover .MuiOutlinedInput-notchedOutline': {
+                              borderColor: '#818CF8',
+                            },
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                              borderColor: '#6366F1',
+                              borderWidth: '2px',
+                            },
+                          },
+                        }}
+                      />
+                    </Grid>
+                  </Grid>
+                </Paper>
+              </Grid>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
-              <FormControl fullWidth>
-                <InputLabel>Team Lead</InputLabel>
-                <Select
-                  name="isTeamLead"
-                  value={formData.isTeamLead}
-                  onChange={handleChange}
-                  label="Team Lead"
-                >
-                  <MenuItem value="Y">Yes</MenuItem>
-                  <MenuItem value="N">No</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-
-            <Grid item xs={12} sm={6} md={3}>
-              <FormControl fullWidth>
-                <InputLabel>Status</InputLabel>
-                <Select
-                  name="enabled"
-                  value={formData.enabled}
-                  onChange={handleChange}
-                  label="Status"
-                >
-                  <MenuItem value="Y">Active</MenuItem>
-                  <MenuItem value="N">Inactive</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-
-            <Grid item xs={12} sm={6} md={3}>
-              <TextField
-                fullWidth
-                label="Reporting To (User ID)"
-                name="reportingTo"
-                type="number"
-                value={formData.reportingTo}
-                onChange={handleChange}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Person />
-                    </InputAdornment>
-                  ),
+            {/* Action Buttons */}
+            <Box sx={{ 
+              display: 'flex', 
+              gap: 2, 
+              justifyContent: 'flex-end', 
+              mt: 4,
+              pt: 3,
+              borderTop: '1px solid #e2e8f0'
+            }}>
+              <Button
+                variant="outlined"
+                onClick={handleCancel}
+                startIcon={<Clear />}
+                sx={{
+                  borderColor: '#64748b',
+                  color: '#64748b',
+                  '&:hover': {
+                    borderColor: '#475569',
+                    bgcolor: 'rgba(71, 85, 105, 0.04)',
+                  },
+                  borderRadius: '12px',
+                  px: 4,
+                  py: 1.5,
+                  fontWeight: 600
                 }}
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Comments"
-                name="comments"
-                value={formData.comments}
-                onChange={handleChange}
-                multiline
-                rows={3}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Comment />
-                    </InputAdornment>
-                  ),
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={loading}
+                startIcon={loading ? null : <Save />}
+                sx={{
+                  background: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #4F46E5 0%, #3730A3 100%)',
+                    transform: 'translateY(-1px)',
+                    boxShadow: '0 8px 25px rgba(99, 102, 241, 0.3)'
+                  },
+                  borderRadius: '12px',
+                  px: 4,
+                  py: 1.5,
+                  fontWeight: 600,
+                  transition: 'all 0.2s ease'
                 }}
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-                <Button
-                  variant="outlined"
-                  onClick={handleCancel}
-                  disabled={loading}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  disabled={loading}
-                  sx={{
-                    background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
-                    '&:hover': {
-                      background: 'linear-gradient(135deg, #1d4ed8 0%, #6d28d9 100%)',
-                    },
-                  }}
-                >
-                  {loading ? (userData ? 'Updating...' : 'Adding...') : (userData ? 'Update User' : 'Add User')}
-                </Button>
-              </Box>
-            </Grid>
-          </Grid>
-        </form>
-      </Box>
-    );
-  };
+              >
+                {loading ? 'Saving...' : (userData ? 'Update User' : 'Create User')}
+              </Button>
+            </Box>
+          </form>
+        </CardContent>
+      </Card>
+    </Box>
+  );
+};
 
 export default AddUser;

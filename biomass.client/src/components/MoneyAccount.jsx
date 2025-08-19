@@ -472,10 +472,10 @@ const MoneyAccount = () => {
       }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Box>
-            <Typography variant="h4" gutterBottom sx={{ fontWeight: 700, mb: 1 }}>
+            <Typography variant="h4" gutterBottom sx={{color: 'white', fontWeight: 700, mb: 1 }}>
               Money Account Management
             </Typography>
-            <Typography variant="h6" sx={{ opacity: 0.9, fontWeight: 300 }}>
+            <Typography variant="h6" sx={{color: 'white', opacity: 0.9, fontWeight: 300 }}>
               Manage your bank accounts, wallets, and cash accounts
             </Typography>
           </Box>
@@ -781,27 +781,7 @@ const MoneyAccount = () => {
                         >
                           <EditIcon sx={{ fontSize: '1.1rem' }} />
                         </IconButton>
-                      </Tooltip>
-                      
-                      <Tooltip title={account.isDefault ? 'Default Account' : 'Set as Default'}>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleSetDefault(account)}
-                          disabled={account.isDefault}
-                          sx={{ 
-                            color: account.isDefault ? '#FFD700' : '#9C27B0', 
-                            p: 1,
-                            bgcolor: account.isDefault ? 'rgba(255,215,0,0.1)' : 'rgba(156,39,176,0.1)',
-                            '&:hover': { 
-                              bgcolor: account.isDefault ? 'rgba(255,215,0,0.2)' : 'rgba(156,39,176,0.2)',
-                              transform: 'scale(1.1)'
-                            },
-                            transition: 'all 0.2s ease'
-                          }}
-                        >
-                          {account.isDefault ? <StarIcon sx={{ fontSize: '1.1rem' }} /> : <StarBorderIcon sx={{ fontSize: '1.1rem' }} />}
-                        </IconButton>
-                      </Tooltip>
+                      </Tooltip>                     
                       
                       <Tooltip title="Delete">
                         <IconButton

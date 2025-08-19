@@ -164,7 +164,7 @@ const MaterialRateForm = ({ open, onClose, locationId, locationName, customerId,
       }}
     >
       <DialogTitle sx={{ 
-        backgroundColor: '#1976d2', 
+        backgroundColor: '#228B22', 
         color: 'white',
         borderBottom: '1px solid #e0e0e0',
         display: 'flex',
@@ -180,7 +180,7 @@ const MaterialRateForm = ({ open, onClose, locationId, locationName, customerId,
             startIcon={<SaveIcon />}
             onClick={handleSave}
             disabled={loading}
-            sx={{ mr: 1, bgcolor: 'white', color: '#1976d2', '&:hover': { bgcolor: '#f5f5f5' } }}
+            sx={{ mr: 1, bgcolor: 'white', color: '#228B22', '&:hover': { bgcolor: '#f5f5f5' } }}
           >
             {loading ? 'Saving...' : 'Save Rate'}
           </Button>

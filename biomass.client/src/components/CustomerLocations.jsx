@@ -87,7 +87,7 @@ const CustomerLocations = ({ customer, onClose }) => {
         let response;
         if (customer) {
           // Fetch locations for specific customer
-          response = await axios.get(`https://localhost:7084/api/customerlocations/customer/${customer.customerId}`);
+          response = await axios.get(`https://localhost:7084/api/customerlocations/GetLocationsByCustomerId/${customer.customerId}`);
         } else {
           // Fetch all locations
           response = await axios.get('https://localhost:7084/api/customerlocations');
@@ -354,7 +354,7 @@ const CustomerLocations = ({ customer, onClose }) => {
       {/* Header */}
       <Box sx={{ 
         p: 3, 
-        background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+        background: 'linear-gradient(135deg, #228B22 0%, #006400 100%)',
         color: 'white',
         display: 'flex',
         justifyContent: 'space-between',
@@ -600,7 +600,7 @@ const CustomerLocations = ({ customer, onClose }) => {
         fullWidth
       >
         <DialogTitle sx={{ 
-          background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+          background: 'linear-gradient(135deg, #228B22 0%, #006400 100%)',
           color: 'white',
           fontWeight: 'bold'
         }}>
@@ -679,7 +679,7 @@ const CustomerLocations = ({ customer, onClose }) => {
               
               {/* Business Details Section */}
               <Grid item xs={12}>
-                <Typography variant="h6" sx={{ mt: 2, mb: 1, color: '#1976d2', borderBottom: '2px solid #1976d2', pb: 0.5 }}>
+                <Typography variant="h6" sx={{ mt: 2, mb: 1, color: '#228B22', borderBottom: '2px solid #228B22', pb: 0.5 }}>
                   Business Configuration
                 </Typography>
               </Grid>
@@ -732,7 +732,7 @@ const CustomerLocations = ({ customer, onClose }) => {
               
               {/* Dispatch Loading Charges Section */}
               <Grid item xs={12}>
-                <Typography variant="h6" sx={{ mt: 2, mb: 1, color: '#1976d2', borderBottom: '2px solid #1976d2', pb: 0.5 }}>
+                <Typography variant="h6" sx={{ mt: 2, mb: 1, color: '#228B22', borderBottom: '2px solid #228B22', pb: 0.5 }}>
                   Dispatch Loading Charges
                 </Typography>
               </Grid>
@@ -785,7 +785,7 @@ const CustomerLocations = ({ customer, onClose }) => {
               
               {/* Receiving Unloading Charges Section */}
               <Grid item xs={12}>
-                <Typography variant="h6" sx={{ mt: 2, mb: 1, color: '#1976d2', borderBottom: '2px solid #1976d2', pb: 0.5 }}>
+                <Typography variant="h6" sx={{ mt: 2, mb: 1, color: '#228B22', borderBottom: '2px solid #228B22', pb: 0.5 }}>
                   Receiving Unloading Charges
                 </Typography>
               </Grid>
@@ -869,9 +869,9 @@ const CustomerLocations = ({ customer, onClose }) => {
               handleEditLocation(selectedLocation);
             }}
             sx={{
-              background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+              background: 'linear-gradient(135deg, #228B22 0%, #006400 100%)',
               '&:hover': {
-                background: 'linear-gradient(135deg, #1d4ed8 0%, #6d28d9 100%)',
+                background: 'linear-gradient(135deg, #006400 0%, #004d00 100%)',
               }
             }}
           >
@@ -920,7 +920,7 @@ const CustomerLocations = ({ customer, onClose }) => {
         }}
       >
         <DialogTitle sx={{ 
-          background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+          background: 'linear-gradient(135deg, #228B22 0%, #006400 100%)',
           color: 'white',
           fontWeight: 'bold',
           display: 'flex',

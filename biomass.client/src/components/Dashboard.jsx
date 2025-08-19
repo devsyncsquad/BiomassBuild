@@ -134,7 +134,7 @@ const Dashboard = ({ user, onLogout, children }) => {
     // If no children, show dashboard with customers
     return (
       <Box sx={{ p: 3 }}>
-        <Typography variant="h4" gutterBottom sx={{ mb: 3, color: '#14B8A6' }}>
+        <Typography variant="h4" gutterBottom sx={{ mb: 3, color: '#228B22' }}>
           Welcome to Biomass Portal
         </Typography>
         
@@ -142,21 +142,21 @@ const Dashboard = ({ user, onLogout, children }) => {
         <Box sx={{ mb: 4 }}>
           <Grid container spacing={3} sx={{ mb: 3 }}>
             <Grid item xs={12} sm={6} md={3}>
-              <Card sx={{ p: 2, textAlign: 'center', bgcolor: '#f0f9ff', border: '1px solid #0ea5e9' }}>
-                <Typography variant="h6" sx={{ color: '#0ea5e9', fontWeight: 600 }}>
+              <Card sx={{ p: 2, textAlign: 'center', bgcolor: '#f0fff0', border: '1px solid #228B22' }}>
+                <Typography variant="h6" sx={{ color: '#228B22', fontWeight: 600 }}>
                   Role
                 </Typography>
-                <Typography variant="body1" sx={{ color: '#0369a1', fontWeight: 500 }}>
+                <Typography variant="body1" sx={{ color: '#006400', fontWeight: 500 }}>
                   {userRole ? `Role ${userRole}` : 'N/A'}
                 </Typography>
               </Card>
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
-              <Card sx={{ p: 2, textAlign: 'center', bgcolor: '#f0fdf4', border: '1px solid #22c55e' }}>
-                <Typography variant="h6" sx={{ color: '#22c55e', fontWeight: 600 }}>
+              <Card sx={{ p: 2, textAlign: 'center', bgcolor: '#f0fff0', border: '1px solid #228B22' }}>
+                <Typography variant="h6" sx={{ color: '#228B22', fontWeight: 600 }}>
                   Customer Assignment
                 </Typography>
-                <Typography variant="body1" sx={{ color: '#16a34a', fontWeight: 500 }}>
+                <Typography variant="body1" sx={{ color: '#006400', fontWeight: 500 }}>
                   {customerCount > 0 ? `${customerCount} Customer${customerCount > 1 ? 's' : ''}` : 'No Customer Assigned'}
                 </Typography>
               </Card>
@@ -166,7 +166,7 @@ const Dashboard = ({ user, onLogout, children }) => {
 
         {/* Customers Section */}
         <Box sx={{ mb: 4 }}>
-          <Typography variant="h5" gutterBottom sx={{ mb: 2, color: '#374151' }}>
+          <Typography variant="h5" gutterBottom sx={{ mb: 2, color: '#228B22' }}>
             Your Customers ({customers.length})
           </Typography>
           
@@ -179,15 +179,17 @@ const Dashboard = ({ user, onLogout, children }) => {
                     sx={{ 
                       height: '100%',
                       transition: 'all 0.3s ease-in-out',
+                      border: '1px solid #e0e0e0',
                       '&:hover': {
                         transform: 'translateY(-4px)',
-                        boxShadow: 4
+                        boxShadow: 4,
+                        borderColor: '#228B22'
                       }
                     }}
                   >
                     <CardContent>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                        <Typography variant="h6" sx={{ fontWeight: 600, color: '#1F2937' }}>
+                        <Typography variant="h6" sx={{ fontWeight: 600, color: '#228B22' }}>
                           {customer.firstName} {customer.lastName}
                         </Typography>
                         <Chip 
@@ -229,8 +231,8 @@ const Dashboard = ({ user, onLogout, children }) => {
               ))}
             </Grid>
           ) : (
-            <Card sx={{ p: 3, textAlign: 'center', bgcolor: '#f9fafb' }}>
-              <Typography variant="body1" color="text.secondary">
+            <Card sx={{ p: 3, textAlign: 'center', bgcolor: '#f0fff0', border: '1px solid #228B22' }}>
+              <Typography variant="body1" sx={{ color: '#228B22' }}>
                 No customers found. Please contact your administrator to assign customers to your account.
               </Typography>
             </Card>
@@ -252,77 +254,77 @@ const Dashboard = ({ user, onLogout, children }) => {
             width: DRAWER_WIDTH,
             boxSizing: 'border-box',
             background: '#ffffff',
-            color: '#14B8A6',
-            borderRight: '1px solid #e5e7eb',
+            color: '#228B22',
+            borderRight: '1px solid #228B22',
           },
         }}
       >
         <Box sx={{ p: 3, textAlign: 'center' }}>
-          <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1, color: '#14B8A6' }}>
+          <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1, color: '#228B22' }}>
             Biomass Portal
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 2 }}>
-            <Avatar sx={{ width: 32, height: 32, bgcolor: '#14B8A6' }}>
+            <Avatar sx={{ width: 32, height: 32, bgcolor: '#228B22' }}>
               {user?.firstName?.charAt(0) || user?.userName?.charAt(0) || 'U'}
             </Avatar>
-            <Typography variant="body2" sx={{ color: '#14B8A6' }}>
+            <Typography variant="body2" sx={{ color: '#228B22' }}>
               {user?.firstName || user?.userName || 'User'}
             </Typography>
           </Box>
         </Box>
         
-        <Divider sx={{ borderColor: '#e5e7eb' }} />
+        <Divider sx={{ borderColor: '#228B22' }} />
         
         <List sx={{ pt: 1 }}>
           {menuItems.map((item) => (
             <ListItem key={item.id} disablePadding>
-              <ListItemButton
-                onClick={() => handleMenuClick(item.id)}
-                sx={{
-                  mx: 1,
-                  borderRadius: 0,
-                  mb: 0.5,
-                  backgroundColor: 'transparent',
-                  '&:hover': {
-                    backgroundColor: 'rgba(99, 102, 241, 0.2)',
-                  },
-                }}
-              >
-                <ListItemIcon sx={{ color: '#14B8A6', minWidth: 40 }}>
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText 
-                  primary={item.label} 
-                  sx={{ 
-                    '& .MuiListItemText-primary': { 
-                      fontWeight: 400,
-                      color: '#14B8A6'
-                    } 
-                  }}
-                />
-              </ListItemButton>
+                        <ListItemButton
+            onClick={() => handleMenuClick(item.id)}
+            sx={{
+              mx: 1,
+              borderRadius: 0,
+              mb: 0.5,
+              backgroundColor: 'transparent',
+              '&:hover': {
+                backgroundColor: 'rgba(34, 139, 34, 0.2)',
+              },
+            }}
+          >
+            <ListItemIcon sx={{ color: '#228B22', minWidth: 40 }}>
+              {item.icon}
+            </ListItemIcon>
+            <ListItemText 
+              primary={item.label} 
+              sx={{ 
+                '& .MuiListItemText-primary': { 
+                  fontWeight: 400,
+                  color: '#228B22'
+                } 
+              }}
+            />
+          </ListItemButton>
             </ListItem>
           ))}
         </List>
         
         <Box sx={{ flexGrow: 1 }} />
         
-        <Divider sx={{ borderColor: '#e5e7eb' }} />
+        <Divider sx={{ borderColor: '#228B22' }} />
         
         <List>
           <ListItem disablePadding>
             <ListItemButton onClick={handleLogout} sx={{ mx: 1, borderRadius: 0 }}>
-              <ListItemIcon sx={{ color: '#14B8A6', minWidth: 40 }}>
+              <ListItemIcon sx={{ color: '#228B22', minWidth: 40 }}>
                 <LogoutIcon />
               </ListItemIcon>
-              <ListItemText primary="Logout" sx={{ color: '#14B8A6' }} />
+              <ListItemText primary="Logout" sx={{ color: '#228B22' }} />
             </ListItemButton>
           </ListItem>
         </List>
       </Drawer>
 
       {/* Main Content */}
-      <Box component="main" sx={{ flexGrow: 1, bgcolor: '#f8fafc', minHeight: '100vh' }}>
+      <Box component="main" sx={{ flexGrow: 1, bgcolor: '#f8fffa', minHeight: '100vh' }}>
         {renderContent()}
       </Box>
     </Box>

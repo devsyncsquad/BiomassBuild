@@ -314,12 +314,7 @@ const AddUser = ({ userData, setUserData }) => {
 
           {/* Form */}
           <Box component="form" onSubmit={handleSubmit} noValidate>
-            {/* Debug Info */}
-            <Box sx={{ mb: 2, p: 2, bgcolor: '#f0f9ff', borderRadius: 2, border: '1px solid #0ea5e9' }}>
-              <Typography variant="body2" sx={{ color: '#0ea5e9' }}>
-                Debug: userData exists: {userData ? 'YES' : 'NO'}, userData.userId: {userData?.userId || 'N/A'}
-              </Typography>
-            </Box>
+            
             {/* Basic Information Section */}
             <Grid container spacing={3} sx={{ mb: 4 }}>
               <Grid item xs={12}>

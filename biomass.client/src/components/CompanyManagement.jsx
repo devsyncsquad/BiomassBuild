@@ -285,15 +285,15 @@ const CompanyManagement = () => {
   }
 
   return (
-    <Box sx={{ p: 0, backgroundColor: '#f8fafc', minHeight: '100vh' }}>
+    <Box sx={{ p: 0, backgroundColor: '#f8fffa', minHeight: '100vh' }}>
       {/* Enhanced Header */}
       <Box sx={{ 
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: 'linear-gradient(135deg, #228B22 0%, #006400 100%)',
         color: 'white',
         p: 4,
         mb: 3,
         borderRadius: '0 0 24px 24px',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+        boxShadow: '0 8px 32px rgba(34,139,34,0.2)'
       }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Box>
@@ -337,10 +337,10 @@ const CompanyManagement = () => {
         }}>
           <CardContent sx={{ p: 3 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-              <FilterIcon sx={{ mr: 2, fontSize: '1.5rem', color: 'primary.main' }} />
-              <Typography variant="h5" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                Search & Filters
-              </Typography>
+                          <FilterIcon sx={{ mr: 2, fontSize: '1.5rem', color: '#228B22' }} />
+            <Typography variant="h5" sx={{ fontWeight: 600, color: '#228B22' }}>
+              Search & Filters
+            </Typography>
             </Box>
             
             <Grid container spacing={3}>
@@ -356,7 +356,7 @@ const CompanyManagement = () => {
                     '& .MuiOutlinedInput-root': {
                       borderRadius: 2,
                       '&:hover fieldset': {
-                        borderColor: 'primary.main',
+                        borderColor: '#228B22',
                       },
                     },
                   }}
@@ -374,7 +374,7 @@ const CompanyManagement = () => {
                     '& .MuiOutlinedInput-root': {
                       borderRadius: 2,
                       '&:hover fieldset': {
-                        borderColor: 'primary.main',
+                        borderColor: '#228B22',
                       },
                     },
                   }}
@@ -392,7 +392,7 @@ const CompanyManagement = () => {
                     '& .MuiOutlinedInput-root': {
                       borderRadius: 2,
                       '&:hover fieldset': {
-                        borderColor: 'primary.main',
+                        borderColor: '#228B22',
                       },
                     },
                   }}
@@ -410,7 +410,7 @@ const CompanyManagement = () => {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <SearchIcon color="primary" />
+                        <SearchIcon sx={{ color: '#228B22' }} />
                       </InputAdornment>
                     ),
                   }}
@@ -418,7 +418,7 @@ const CompanyManagement = () => {
                     '& .MuiOutlinedInput-root': {
                       borderRadius: 2,
                       '&:hover fieldset': {
-                        borderColor: 'primary.main',
+                        borderColor: '#228B22',
                       },
                     },
                   }}
@@ -461,14 +461,17 @@ const CompanyManagement = () => {
       {/* Enhanced Results Count */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, px: 3 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
+          <Typography variant="h6" sx={{ fontWeight: 600, color: '#228B22' }}>
             Results
           </Typography>
           <Chip 
             label={`${filteredCompanies.length} of ${companies.length} companies`}
-            color="primary"
+            sx={{ 
+              fontWeight: 500,
+              color: '#228B22',
+              borderColor: '#228B22'
+            }}
             variant="outlined"
-            sx={{ fontWeight: 500 }}
           />
         </Box>
       </Box>

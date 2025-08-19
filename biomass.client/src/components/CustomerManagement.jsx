@@ -437,15 +437,15 @@ const CustomerManagement = () => {
   };
 
   return (
-    <Box sx={{ p: 0 }}>
+    <Box sx={{ p: 0, backgroundColor: '#f8fffa', minHeight: '100vh' }}>
       {/* Enhanced Modern Header */}
       <Box sx={{ 
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: 'linear-gradient(135deg, #228B22 0%, #006400 100%)',
         color: 'white',
         p: 4,
         mb: 3,
         borderRadius: '0 0 24px 24px',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+        boxShadow: '0 8px 32px rgba(34,139,34,0.2)',
         position: 'relative',
         overflow: 'hidden'
       }}>
@@ -519,8 +519,8 @@ const CustomerManagement = () => {
           border: '1px solid rgba(0,0,0,0.05)'
         }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-            <SearchIcon sx={{ mr: 2, fontSize: '1.5rem', color: '#667eea' }} />
-            <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
+            <SearchIcon sx={{ mr: 2, fontSize: '1.5rem', color: '#228B22' }} />
+            <Typography variant="h6" sx={{ fontWeight: 600, color: '#228B22' }}>
               Search & Filters
             </Typography>
           </Box>
@@ -534,24 +534,24 @@ const CustomerManagement = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 size="medium"
                 variant="outlined"
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon color="primary" />
-                    </InputAdornment>
-                  ),
-                }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                    '&:hover fieldset': {
-                      borderColor: '#667eea',
+                                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon sx={{ color: '#228B22' }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                      '&:hover fieldset': {
+                        borderColor: '#228B22',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: '#228B22',
+                      },
                     },
-                    '&.Mui-focused fieldset': {
-                      borderColor: '#667eea',
-                    },
-                  },
-                }}
+                  }}
               />
             </Grid>
             <Grid item xs={12} md={3}>
@@ -565,7 +565,7 @@ const CustomerManagement = () => {
                     borderRadius: 2,
                     '& .MuiOutlinedInput-notchedOutline': {
                       '&:hover': {
-                        borderColor: '#667eea',
+                        borderColor: '#228B22',
                       },
                     },
                   }}

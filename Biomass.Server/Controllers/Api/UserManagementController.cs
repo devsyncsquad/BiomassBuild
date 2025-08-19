@@ -1,10 +1,13 @@
+using Biomass.Api.Model;
+using Biomass.Server.Data;
+using Biomass.Server.Interfaces;
+using Biomass.Server.Models;
+using Biomass.Server.Models.Company;
+using Biomass.Server.Models.Customer;
+using Biomass.Server.Models.UserManagement;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Biomass.Server.Models;
-using Biomass.Server.Interfaces;
-using Biomass.Api.Model;
-using Biomass.Server.Models.UserManagement;
-using Biomass.Server.Models.Company;
+using Microsoft.EntityFrameworkCore;
 
 namespace Biomass.Server.Controllers
 {
@@ -14,22 +17,61 @@ namespace Biomass.Server.Controllers
     public class UserManagementController : ControllerBase
     {
         private IUserManagement _interfaceUserManagement;
+        private readonly ApplicationDbContext _context;
 
-        public UserManagementController(IUserManagement interfaceUserManagement)
+        public UserManagementController(IUserManagement interfaceUserManagement, ApplicationDbContext context)
         {
             _interfaceUserManagement = interfaceUserManagement;
+            _context = context;
         }
 
         #region USER
         //[Authorize]
-        [HttpGet("GetUsersList")]
-        public ServiceResponse<List<Users>> GetUsersList()
-        {
-            var data = _interfaceUserManagement.GetUsersList();
-            return data;
-        }
+        //[HttpGet("GetUsersList")]
+
+        //public ServiceResponse<List<Users>> GetUsersList()
+        //{
+        //    var data = _interfaceUserManagement.GetUsersList();
+        //    return data;
+        //}
 
         //[Authorize]
+
+        [HttpGet("GetUsersList")]
+        public ServiceResponse<List<UserWithCustomers>> GetUsersList()
+        {
+            var response = new ServiceResponse<List<UserWithCustomers>>();
+            try
+            {
+                var users = _context.Users.ToList();
+                var userWithCustomers = new List<UserWithCustomers>();
+
+                foreach (var user in users)
+                {
+                    var customerIds = _context.UserCustomers
+                        .Where(uc => uc.UserId == user.UserId && uc.Enabled)
+                        .Select(uc => uc.CustomerId)
+                        .ToList();
+
+                    userWithCustomers.Add(new UserWithCustomers
+                    {
+                        User = user,
+                        CustomerIds = customerIds
+                    });
+                }
+
+                response.Result = userWithCustomers;
+                response.Success = true;
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+      
         [HttpGet("GetUserById")]
         public ServiceResponse<Users> GetUserById(int userId)
         {
@@ -38,19 +80,136 @@ namespace Biomass.Server.Controllers
         }
 
         //[Authorize]
-        [HttpPost("SaveUser")]
-        public ServiceResponse<Users> SaveUser(Users user)
-        {
-            var data = _interfaceUserManagement.SaveUser(user);
-            return data;
-        }
+        //[HttpPost("SaveUser")]
+        //public ServiceResponse<Users> SaveUser(Users user)
+        //{
+        //    var data = _interfaceUserManagement.SaveUser(user);
+        //    return data;
+        //}
 
         //[Authorize]
-        [HttpPut("UpdateUser")]
-        public ServiceResponse<Users> UpdateUser(Users user)
+
+        [HttpPost("SaveUser")]
+        public ServiceResponse<Users> SaveUser([FromBody] SaveUserRequest request)
         {
-            var data = _interfaceUserManagement.UpdateUser(user);
-            return data;
+            var response = new ServiceResponse<Users>();
+            try
+            {
+                // Create user object
+                var user = new Users
+                {
+                    FirstName = request.FirstName,
+                    LastName = request.LastName,
+                    Username = request.Username,
+                    PasswordHash = request.PasswordHash,
+                    EmpNo = request.EmpNo,
+                    PhoneNumber = request.PhoneNumber,
+                    IsTeamLead = request.IsTeamLead,
+                    Enabled = request.Enabled,
+                    Comments = request.Comments,
+                    ReportingTo = request.ReportingTo,
+                    RoleId = request.RoleId,
+                    CreatedBy = request.CreatedBy // or get from current user context
+                };
+
+                // Save user
+                var userResponse = _interfaceUserManagement.SaveUser(user);
+
+                if (userResponse.Success && request.CustomerIds != null && request.CustomerIds.Any())
+                {
+                    // Handle customer assignments
+                    foreach (var customerId in request.CustomerIds)
+                    {
+                        var userCustomer = new UserCustomer
+                        {
+                            UserId = userResponse.Result.UserId,
+                            CustomerId = customerId,
+                            Enabled = true,
+                            CreatedOn = DateTime.UtcNow,
+                            CreatedBy = request.CreatedBy
+                        };
+
+                        _context.UserCustomers.Add(userCustomer);
+                    }
+                    _context.SaveChanges();
+                }
+
+                response.Result = userResponse.Result;
+                response.Success = true;
+                response.Message = "User saved successfully with customer assignments";
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+        [HttpPut("UpdateUser")]
+        public ServiceResponse<Users> UpdateUser([FromBody] UpdateUserRequest request)
+        {
+            var response = new ServiceResponse<Users>();
+            try
+            {
+                // Update user object
+                var user = new Users
+                {
+                    UserId = request.UserId,
+                    FirstName = request.FirstName,
+                    LastName = request.LastName,
+                    Username = request.Username,
+                    PasswordHash = request.PasswordHash,
+                    EmpNo = request.EmpNo,
+                    PhoneNumber = request.PhoneNumber,
+                    IsTeamLead = request.IsTeamLead,
+                    Enabled = request.Enabled,
+                    Comments = request.Comments,
+                    ReportingTo = request.ReportingTo,
+                    RoleId = request.RoleId,
+                    UpdatedBy = request.UpdatedBy
+                };
+
+                // Update user
+                var userResponse = _interfaceUserManagement.UpdateUser(user);
+
+                if (userResponse.Success && request.CustomerIds != null)
+                {
+                    // Remove existing customer assignments
+                    var existingAssignments = _context.UserCustomers
+                        .Where(uc => uc.UserId == request.UserId)
+                        .ToList();
+                    _context.UserCustomers.RemoveRange(existingAssignments);
+
+                    // Add new customer assignments if any
+                    if (request.CustomerIds.Any())
+                    {
+                        foreach (var customerId in request.CustomerIds)
+                        {
+                            var userCustomer = new UserCustomer
+                            {
+                                UserId = request.UserId,
+                                CustomerId = customerId,
+                                Enabled = true,
+                                CreatedOn = DateTime.UtcNow,
+                                CreatedBy = request.UpdatedBy
+                            };
+                            _context.UserCustomers.Add(userCustomer);
+                        }
+                    }
+                    _context.SaveChanges();
+                }
+
+                response.Result = userResponse.Result;
+                response.Success = true;
+                response.Message = "User updated successfully with customer assignments";
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+            }
+            return response;
         }
 
         //[Authorize]

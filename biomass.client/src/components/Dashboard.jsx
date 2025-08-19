@@ -22,24 +22,32 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import './Dashboard.css';
-import { logout } from '../utils/auth';
+import { logout, getUserRole, getUserCustomers } from '../utils/auth';
 
 const DRAWER_WIDTH = 280;
 
 const Dashboard = ({ user, onLogout, children }) => {
   const navigate = useNavigate();
   const [customers, setCustomers] = useState([]);
+  const [userRole, setUserRole] = useState('');
+  const [customerCount, setCustomerCount] = useState(0);
 
   useEffect(() => {
     // Get customers from localStorage
     const customersData = localStorage.getItem('customers');
     if (customersData) {
       try {
-        setCustomers(JSON.parse(customersData));
+        const parsedCustomers = JSON.parse(customersData);
+        setCustomers(parsedCustomers);
+        setCustomerCount(parsedCustomers.length);
       } catch (error) {
         console.error('Error parsing customers data:', error);
       }
     }
+    
+    // Get user role from localStorage
+    const role = getUserRole();
+    setUserRole(role);
   }, []);
 
   const handleLogout = () => {
@@ -130,6 +138,32 @@ const Dashboard = ({ user, onLogout, children }) => {
           Welcome to Biomass Portal
         </Typography>
         
+        {/* User Info Section */}
+        <Box sx={{ mb: 4 }}>
+          <Grid container spacing={3} sx={{ mb: 3 }}>
+            <Grid item xs={12} sm={6} md={3}>
+              <Card sx={{ p: 2, textAlign: 'center', bgcolor: '#f0f9ff', border: '1px solid #0ea5e9' }}>
+                <Typography variant="h6" sx={{ color: '#0ea5e9', fontWeight: 600 }}>
+                  Role
+                </Typography>
+                <Typography variant="body1" sx={{ color: '#0369a1', fontWeight: 500 }}>
+                  {userRole ? `Role ${userRole}` : 'N/A'}
+                </Typography>
+              </Card>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Card sx={{ p: 2, textAlign: 'center', bgcolor: '#f0fdf4', border: '1px solid #22c55e' }}>
+                <Typography variant="h6" sx={{ color: '#22c55e', fontWeight: 600 }}>
+                  Customer Assignment
+                </Typography>
+                <Typography variant="body1" sx={{ color: '#16a34a', fontWeight: 500 }}>
+                  {customerCount > 0 ? `${customerCount} Customer${customerCount > 1 ? 's' : ''}` : 'No Customer Assigned'}
+                </Typography>
+              </Card>
+            </Grid>
+          </Grid>
+        </Box>
+
         {/* Customers Section */}
         <Box sx={{ mb: 4 }}>
           <Typography variant="h5" gutterBottom sx={{ mb: 2, color: '#374151' }}>

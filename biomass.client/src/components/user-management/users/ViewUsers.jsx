@@ -36,27 +36,37 @@ import {
 } from '@mui/icons-material';
 import axios from 'axios';
 import { getAuthHeaders } from '../../../utils/auth';
+import { getBaseUrl } from '../../../utils/api';
 
 const ViewUsers = ({ setUserData }) => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState('');
+  const [customers, setCustomers] = useState([]);
 
   useEffect(() => {
     fetchUsers();
+    fetchCustomers();
   }, []);
 
   const fetchUsers = async () => {
     try {
       setLoading(true);
       setError('');
-      const response = await axios.get('https://localhost:7084/api/UserManagement/GetUsersList', {
+      const response = await axios.get(`${getBaseUrl()}/UserManagement/GetUsersList`, {
         headers: getAuthHeaders()
       });
       
       if (response.data && response.data.success) {
-        setUsers(response.data.result || []);
+        console.log('API Response:', response.data.result);
+        // The API now returns UserWithCustomers objects directly
+        const transformedUsers = (response.data.result || []).map(item => ({
+          ...item.user,
+          customerIds: item.customerIds || []
+        }));
+        console.log('Transformed Users:', transformedUsers);
+        setUsers(transformedUsers);
       } else {
         setError(response.data?.message || 'Failed to fetch users');
       }
@@ -68,6 +78,39 @@ const ViewUsers = ({ setUserData }) => {
     }
   };
 
+  const fetchCustomers = async () => {
+    try {
+      const response = await axios.get(`${getBaseUrl()}/Customers/GetAllCustomers`, {
+        headers: getAuthHeaders()
+      });
+      if (response.data && response.data.success) {
+        setCustomers(response.data.result || []);
+      }
+    } catch (error) {
+      console.error('Error fetching customers:', error);
+    }
+  };
+
+
+
+  // Helper function to get customer assignment display text
+  const getCustomerAssignmentText = (user) => {
+    console.log('Processing user:', user.username, 'customerIds:', user.customerIds);
+    if (!user.customerIds || user.customerIds.length === 0) {
+      return "No Customer Assigned";
+    }
+    const count = user.customerIds.length;
+    return `${count} Customer${count > 1 ? 's' : ''}`;
+  };
+
+  // Helper function to get customer assignment color
+  const getCustomerAssignmentColor = (user) => {
+    if (!user.customerIds || user.customerIds.length === 0) {
+      return '#6B7280'; // Gray for no assignment
+    }
+    return '#10B981'; // Green for assigned
+  };
+
   const handleEditUser = (user) => {
     setUserData(user);
   };
@@ -75,7 +118,7 @@ const ViewUsers = ({ setUserData }) => {
   const handleDeleteUser = async (userId) => {
     if (window.confirm('Are you sure you want to delete this user?')) {
       try {
-        const response = await axios.delete(`https://localhost:7084/api/UserManagement/DeleteUserById?userId=${userId}`, {
+        const response = await axios.delete(`${getBaseUrl()}/UserManagement/DeleteUserById?userId=${userId}`, {
           headers: getAuthHeaders()
         });
         
@@ -94,7 +137,7 @@ const ViewUsers = ({ setUserData }) => {
 
   const handleDeactivateUser = async (userId) => {
     try {
-      const response = await axios.get(`https://localhost:7084/api/UserManagement/DeactivateUserById?userId=${userId}`, {
+      const response = await axios.get(`${getBaseUrl()}/UserManagement/DeactivateUserById?userId=${userId}`, {
         headers: getAuthHeaders()
       });
       
@@ -114,12 +157,18 @@ const ViewUsers = ({ setUserData }) => {
     }
   };
 
-  const filteredUsers = users.filter(user =>
-    user.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.empNo?.toString().includes(searchTerm)
-  );
+  const handleRefresh = async () => {
+    await fetchUsers();
+  };
+
+  const filteredUsers = users.filter(user => {
+    const matches = user.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.empNo?.toString().includes(searchTerm);
+    
+    return matches;
+  });
 
   const getStatusColor = (enabled) => {
     return enabled === 'Y' ? 'success' : 'error';
@@ -145,32 +194,28 @@ const ViewUsers = ({ setUserData }) => {
         <Box>
           <Typography variant="h5" sx={{ 
             fontWeight: 700, 
-            color: '#1e293b',
-            mb: 0.5,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1
+            color: '#228B22',
+            mb: 1
           }}>
-            <Person sx={{ color: '#6366F1', fontSize: '1.5rem' }} />
-            Users List
+            User Management
           </Typography>
-          <Typography variant="body2" sx={{ color: '#64748b', fontWeight: 500 }}>
-            {filteredUsers.length} of {users.length} users
+          <Typography variant="body2" sx={{ color: '#64748b' }}>
+            Manage and monitor all system users, their roles, and permissions
           </Typography>
         </Box>
         <Button
           variant="outlined"
           startIcon={<Refresh />}
-          onClick={fetchUsers}
+          onClick={handleRefresh}
           disabled={loading}
           sx={{
-            borderColor: '#6366F1',
-            color: '#6366F1',
+            borderColor: '#228B22',
+            color: '#228B22',
             '&:hover': {
-              borderColor: '#4F46E5',
-              bgcolor: 'rgba(99, 102, 241, 0.04)',
+              borderColor: '#1B5E20',
+              bgcolor: 'rgba(34, 139, 34, 0.04)',
               transform: 'translateY(-1px)',
-              boxShadow: '0 4px 12px rgba(99, 102, 241, 0.15)'
+              boxShadow: '0 4px 12px rgba(34, 139, 34, 0.15)'
             },
             transition: 'all 0.2s ease',
             borderRadius: '12px',
@@ -190,10 +235,10 @@ const ViewUsers = ({ setUserData }) => {
       )}
 
       {/* Search Bar */}
-      <Card sx={{ mb: 4, borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
+      <Card sx={{ mb: 4, borderRadius: '16px', boxShadow: '0 4px 20px rgba(34, 139, 34, 0.08)' }}>
         <CardContent sx={{ p: 3 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <FilterList sx={{ color: '#6366F1', fontSize: '1.5rem' }} />
+            <FilterList sx={{ color: '#228B22', fontSize: '1.5rem' }} />
             <TextField
               fullWidth
               placeholder="Search users by name, username, or employee number..."
@@ -202,7 +247,7 @@ const ViewUsers = ({ setUserData }) => {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Search sx={{ color: '#6366F1' }} />
+                    <Search sx={{ color: '#228B22' }} />
                   </InputAdornment>
                 ),
               }}
@@ -211,10 +256,10 @@ const ViewUsers = ({ setUserData }) => {
                 '& .MuiOutlinedInput-root': {
                   borderRadius: '12px',
                   '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#818CF8',
+                    borderColor: '#228B22',
                   },
                   '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#6366F1',
+                    borderColor: '#228B22',
                     borderWidth: '2px',
                   },
                 },
@@ -227,18 +272,22 @@ const ViewUsers = ({ setUserData }) => {
       {/* Loading State */}
       {loading && (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-          <CircularProgress sx={{ color: '#6366F1' }} size={48} />
+          <CircularProgress sx={{ color: '#228B22' }} size={48} />
         </Box>
       )}
 
+
+
+
+
       {/* Users Table */}
-      {!loading && (
-        <Card sx={{ borderRadius: '16px', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
+      {!loading && filteredUsers.length > 0 && (
+        <Card sx={{ borderRadius: '16px', overflow: 'hidden', boxShadow: '0 4px 20px rgba(34, 139, 34, 0.08)' }}>
           <TableContainer>
             <Table>
               <TableHead>
                 <TableRow sx={{ 
-                  background: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
+                  background: 'linear-gradient(135deg, #228B22 0%, #32CD32 100%)',
                   '& th': {
                     color: 'white',
                     fontWeight: 700,
@@ -253,6 +302,7 @@ const ViewUsers = ({ setUserData }) => {
                   <TableCell>Team Lead</TableCell>
                   <TableCell>Status</TableCell>
                   <TableCell>Phone</TableCell>
+                  <TableCell>Customer Assignment</TableCell>
                   <TableCell align="center">Actions</TableCell>
                 </TableRow>
               </TableHead>
@@ -264,7 +314,7 @@ const ViewUsers = ({ setUserData }) => {
                     sx={{ 
                       '&:nth-of-type(even)': { bgcolor: '#f8fafc' },
                       '&:hover': { 
-                        bgcolor: 'rgba(99, 102, 241, 0.02)',
+                        bgcolor: 'rgba(34, 139, 34, 0.02)',
                         transform: 'scale(1.01)',
                         transition: 'all 0.2s ease'
                       },
@@ -275,8 +325,8 @@ const ViewUsers = ({ setUserData }) => {
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <Avatar sx={{ 
                           mr: 2, 
-                          bgcolor: '#6366F1',
-                          boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)',
+                          bgcolor: '#228B22',
+                          boxShadow: '0 4px 12px rgba(34, 139, 34, 0.3)',
                           width: 40,
                           height: 40
                         }}>
@@ -286,7 +336,7 @@ const ViewUsers = ({ setUserData }) => {
                           <Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>
                             {user.firstName} {user.lastName}
                           </Typography>
-                          <Typography variant="caption" sx={{ color: '#6366F1', fontWeight: 500 }}>
+                          <Typography variant="caption" sx={{ color: '#228B22', fontWeight: 500 }}>
                             @{user.username}
                           </Typography>
                         </Box>
@@ -302,8 +352,8 @@ const ViewUsers = ({ setUserData }) => {
                         label={`Role ${user.roleId}`} 
                         size="small" 
                         sx={{ 
-                          bgcolor: 'rgba(99, 102, 241, 0.1)',
-                          color: '#6366F1',
+                          bgcolor: 'rgba(34, 139, 34, 0.1)',
+                          color: '#228B22',
                           fontWeight: 600,
                           borderRadius: '8px'
                         }}
@@ -342,6 +392,18 @@ const ViewUsers = ({ setUserData }) => {
                         {user.phoneNumber || 'N/A'}
                       </Typography>
                     </TableCell>
+                    <TableCell>
+                      <Chip 
+                        label={getCustomerAssignmentText(user)} 
+                        size="small" 
+                        sx={{ 
+                          bgcolor: 'rgba(16, 185, 129, 0.1)',
+                          color: getCustomerAssignmentColor(user),
+                          fontWeight: 600,
+                          borderRadius: '8px'
+                        }}
+                      />
+                    </TableCell>
                     <TableCell align="center">
                       <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
                         <Tooltip title="Edit User">
@@ -349,11 +411,11 @@ const ViewUsers = ({ setUserData }) => {
                             size="small"
                             onClick={() => handleEditUser(user)}
                             sx={{ 
-                              color: '#818CF8',
+                              color: '#228B22',
                               p: 1,
-                              bgcolor: 'rgba(129, 140, 248, 0.1)',
+                              bgcolor: 'rgba(34, 139, 34, 0.1)',
                               '&:hover': {
-                                bgcolor: 'rgba(129, 140, 248, 0.2)',
+                                bgcolor: 'rgba(34, 139, 34, 0.2)',
                                 transform: 'scale(1.1)'
                               },
                               transition: 'all 0.2s ease'
@@ -380,26 +442,7 @@ const ViewUsers = ({ setUserData }) => {
                             <Delete sx={{ fontSize: '1.1rem' }} />
                           </IconButton>
                         </Tooltip>
-                        {user.enabled === 'Y' && (
-                          <Tooltip title="Deactivate User">
-                            <IconButton
-                              size="small"
-                              onClick={() => handleDeactivateUser(user.userId)}
-                              sx={{ 
-                                color: '#14B8A6',
-                                p: 1,
-                                bgcolor: 'rgba(20, 184, 166, 0.1)',
-                                '&:hover': {
-                                  bgcolor: 'rgba(20, 184, 166, 0.2)',
-                                  transform: 'scale(1.1)'
-                                },
-                                transition: 'all 0.2s ease'
-                              }}
-                            >
-                              <Visibility sx={{ fontSize: '1.1rem' }} />
-                            </IconButton>
-                          </Tooltip>
-                        )}
+                        
                       </Box>
                     </TableCell>
                   </TableRow>
@@ -410,6 +453,7 @@ const ViewUsers = ({ setUserData }) => {
         </Card>
       )}
 
+      {/* No Results Message */}
       {!loading && filteredUsers.length === 0 && (
         <Box sx={{ textAlign: 'center', py: 6 }}>
           <Typography variant="h6" sx={{ color: '#64748b', mb: 1 }}>

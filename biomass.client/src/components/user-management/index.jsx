@@ -45,11 +45,11 @@ const UserManagement = () => {
     <Box sx={{ width: '100%', p: 0, minHeight: '100vh', bgcolor: '#f8fafc' }}>
       {/* Header Section */}
       <Box sx={{ 
-        background: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
+        background: 'linear-gradient(135deg, #228B22 0%, #32CD32 100%)',
         mb: 3,
         borderRadius: '0 0 24px 24px',
         p: 4,
-        boxShadow: '0 8px 32px rgba(99, 102, 241, 0.15)',
+        boxShadow: '0 8px 32px rgba(34, 139, 34, 0.15)',
         position: 'relative',
         overflow: 'hidden'
       }}>
@@ -98,78 +98,70 @@ const UserManagement = () => {
         </Box>
       </Box>
 
-      {/* Navigation Tabs */}
-      <Box sx={{ mb: 3, mx: 2 }}>
-        <Paper elevation={0} sx={{ 
+      {/* Tabs Section */}
+      <Box sx={{ px: 3, mb: 3 }}>
+        <Paper sx={{ 
           borderRadius: '16px', 
-          bgcolor: 'white', 
-          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          boxShadow: '0 4px 20px rgba(34, 139, 34, 0.08)',
+          border: '1px solid rgba(34, 139, 34, 0.1)'
         }}>
-          <Tabs
-            value={activeTab}
+          <Tabs 
+            value={activeTab} 
             onChange={handleTabChange}
             variant="scrollable"
             scrollButtons="auto"
             sx={{
-              '& .MuiTabs-scrollButtons': {
-                '&.Mui-disabled': { opacity: 0.3 },
-              },
               '& .MuiTab-root': {
+                minHeight: 64,
                 fontSize: '0.9rem',
                 fontWeight: 600,
+                color: '#6B7280',
                 textTransform: 'none',
-                minHeight: 56,
-                px: 3,
-                color: '#64748b',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  color: '#6366F1',
-                  bgcolor: 'rgba(99, 102, 241, 0.04)',
-                },
                 '&.Mui-selected': {
-                  color: '#6366F1',
-                  fontWeight: 700,
-                },
+                  color: '#228B22',
+                  fontWeight: 700
+                }
               },
               '& .MuiTabs-indicator': {
-                background: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
-                height: 3,
-                borderRadius: '2px',
-              },
+                backgroundColor: '#228B22',
+                height: 3
+              }
             }}
           >
             {tabs.map((tab, index) => (
-              <Tab
+              <Tab 
                 key={index}
                 label={
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Box sx={{ 
-                      color: 'inherit',
+                      color: activeTab === index ? '#228B22' : '#6B7280',
                       display: 'flex',
                       alignItems: 'center'
                     }}>
                       {tab.icon}
                     </Box>
-                    <Typography variant="body2" sx={{ fontWeight: 'inherit', fontSize: '0.9rem' }}>
-                      {tab.label}
-                    </Typography>
+                    {tab.label}
                   </Box>
                 }
+                sx={{
+                  minHeight: 64,
+                  px: 3
+                }}
               />
             ))}
           </Tabs>
         </Paper>
       </Box>
 
-      {/* Content Area */}
-      <Box sx={{ width: '100%', px: 2, pb: 4 }}>
+      {/* Content Section */}
+      <Box sx={{ px: 3, pb: 6 }}>
         <Box sx={{ 
-          bgcolor: 'white', 
           borderRadius: '16px',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
           overflow: 'hidden',
-          minHeight: '600px'
+          boxShadow: '0 4px 20px rgba(34, 139, 34, 0.08)',
+          border: '1px solid rgba(34, 139, 34, 0.1)',
+          bgcolor: 'white'
         }}>
           {tabs[activeTab].component}
         </Box>

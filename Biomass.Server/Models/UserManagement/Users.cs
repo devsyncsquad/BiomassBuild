@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Biomass.Server.Models.UserManagement
 {
@@ -21,5 +22,8 @@ namespace Biomass.Server.Models.UserManagement
         public DateTime? CreatedAt { get; set; }
         public int? UpdatedBy { get; set; }
         public DateTime? UpdatedAt { get; set; }
+
+        [NotMapped]
+        public List<int> CustomerIds { get; set; } = new List<int>();
     }
 } 

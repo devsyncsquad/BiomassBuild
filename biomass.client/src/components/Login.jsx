@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { getBaseUrl } from '../utils/api';
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -40,7 +41,7 @@ const Login = ({ onLoginSuccess }) => {
     setError('');
 
     try {
-      const response = await axios.post('https://localhost:7084/api/users/authenticate', {
+      const response = await axios.post(`${getBaseUrl()}/users/authenticate`, {
         username: username,
         password: password
       });
@@ -53,12 +54,20 @@ const Login = ({ onLoginSuccess }) => {
           firstName: response.data.firstName,
           lastName: response.data.lastName,
           username: response.data.username,
-          empId: response.data.empId
+          empId: response.data.empId,
+          roleId: response.data.roleId
         }));
         
         // Store customers data if available
         if (response.data.customers && response.data.customers.length > 0) {
           localStorage.setItem('customers', JSON.stringify(response.data.customers));
+        } else {
+          localStorage.setItem('customers', JSON.stringify([]));
+        }
+        
+        // Store role information
+        if (response.data.roleId) {
+          localStorage.setItem('userRole', response.data.roleId.toString());
         }
         
         // Set token expiration (24 hours from now)

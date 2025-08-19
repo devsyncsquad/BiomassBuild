@@ -56,10 +56,10 @@ namespace Biomass.Server.Controllers
                 var baseResponse = new AuthenticateResponse(user, token);
 
                 // Get user's customers
-               // var customers = await GetUserCustomersAsync(user.UserId);
+                var customers = await GetUserCustomersAsync(user.UserId);
 
                 // Create enhanced response with customers
-                //var enhancedResponse = new EnhancedAuthenticateResponse(baseResponse, customers);
+                var enhancedResponse = new EnhancedAuthenticateResponse(baseResponse, customers);
 
                 return Ok(baseResponse);
             }
@@ -69,41 +69,41 @@ namespace Biomass.Server.Controllers
             }
         }
 
-        //private async Task<List<CustomerDto>> GetUserCustomersAsync(int userId)
-        //{
-        //    try
-        //    {
-        //        var userCustomers = await _context.UserCustomers
-        //            .Where(uc => uc.UserId == userId && uc.Enabled)
-        //            .Include(uc => uc.Customer)
-        //            .Select(uc => new CustomerDto
-        //            {
-        //                CustomerId = uc.Customer.CustomerId,
-        //                FirstName = uc.Customer.FirstName,
-        //                LastName = uc.Customer.LastName,
-        //                Email = uc.Customer.Email,
-        //                Phone = uc.Customer.Phone,
-        //                CompanyName = uc.Customer.CompanyName,
-        //                Address = uc.Customer.Address,
-        //                City = uc.Customer.City,
-        //                State = uc.Customer.State,
-        //                PostalCode = uc.Customer.PostalCode,
-        //                Country = uc.Customer.Country,
-        //                Status = uc.Customer.Status,
-        //                CreatedDate = uc.Customer.CreatedDate,
-        //                LocationCount = 0 // Will be calculated separately if needed
-        //            })
-        //            .ToListAsync();
+        private async Task<List<CustomerDto>> GetUserCustomersAsync(int userId)
+        {
+            try
+            {
+                var userCustomers = await _context.UserCustomers
+                    .Where(uc => uc.UserId == userId && uc.Enabled)
+                    .Include(uc => uc.Customer)
+                    .Select(uc => new CustomerDto
+                    {
+                        CustomerId = uc.Customer.CustomerId,
+                        FirstName = uc.Customer.FirstName,
+                        LastName = uc.Customer.LastName,
+                        Email = uc.Customer.Email,
+                        Phone = uc.Customer.Phone,
+                        CompanyName = uc.Customer.CompanyName,
+                        Address = uc.Customer.Address,
+                        City = uc.Customer.City,
+                        State = uc.Customer.State,
+                        PostalCode = uc.Customer.PostalCode,
+                        Country = uc.Customer.Country,
+                        Status = uc.Customer.Status,
+                        CreatedDate = uc.Customer.CreatedDate,
+                        LocationCount = 0 // Will be calculated separately if needed
+                    })
+                    .ToListAsync();
 
-        //        return userCustomers;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Log the exception in production
-        //        // For now, return empty list if there's an error
-        //        return new List<CustomerDto>();
-        //    }
-        //}
+                return userCustomers;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception in production
+                // For now, return empty list if there's an error
+                return new List<CustomerDto>();
+            }
+        }
 
         private bool VerifyPassword(string inputPassword, string storedHash)
         {

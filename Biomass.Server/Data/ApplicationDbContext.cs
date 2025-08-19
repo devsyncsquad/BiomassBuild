@@ -30,7 +30,7 @@ namespace Biomass.Server.Data
         public DbSet<Customer> Customers { get; set; }
         public DbSet<CustomerLocation> CustomerLocations { get; set; }
         public DbSet<MaterialRate> MaterialRates { get; set; }
-        //public DbSet<UserCustomer> UserCustomers { get; set; }
+        public DbSet<UserCustomer> UserCustomers { get; set; }
         public DbSet<UserCompanies> UserCompanies { get; set; }
         public DbSet<MainMenus> MainMenus { get; set; }
         public DbSet<SubMenus> SubMenus { get; set; }

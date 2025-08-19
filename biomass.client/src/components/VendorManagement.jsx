@@ -190,7 +190,7 @@ const VendorManagement = () => {
   };
 
   return (
-    <Box sx={{ p: 0, width: '100%', backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
+    <Box sx={{ p: 0, width: '100%', backgroundColor: '#f8fffa', minHeight: '100vh' }}>
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Typography 
@@ -198,7 +198,7 @@ const VendorManagement = () => {
           component="h1" 
           sx={{ 
             fontWeight: 700,
-            background: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
+            background: 'linear-gradient(135deg, #228B22 0%, #006400 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
@@ -207,7 +207,7 @@ const VendorManagement = () => {
         >
           Vendor Management
         </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+        <Typography variant="body1" sx={{ mb: 3, color: '#228B22' }}>
           Manage your vendor relationships, track performance, and streamline procurement processes.
         </Typography>
       </Box>
@@ -216,7 +216,7 @@ const VendorManagement = () => {
       <Grid container spacing={3} sx={{ mb: 4, px: 3 }}>
         <Grid item xs={12} sm={6} md={3}>
           <Card sx={{ 
-            background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+            background: 'linear-gradient(135deg, #228B22 0%, #006400 100%)',
             color: 'white',
             transition: 'transform 0.2s',
             '&:hover': { transform: 'translateY(-4px)' }
@@ -236,7 +236,7 @@ const VendorManagement = () => {
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <Card sx={{ 
-            background: 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)',
+            background: 'linear-gradient(135deg, #32CD32 0%, #228B22 100%)',
             color: 'white',
             transition: 'transform 0.2s',
             '&:hover': { transform: 'translateY(-4px)' }
@@ -256,7 +256,7 @@ const VendorManagement = () => {
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <Card sx={{ 
-            background: 'linear-gradient(135deg, #FF9800 0%, #F57C00 100%)',
+            background: 'linear-gradient(135deg, #90EE90 0%, #228B22 100%)',
             color: 'white',
             transition: 'transform 0.2s',
             '&:hover': { transform: 'translateY(-4px)' }
@@ -276,7 +276,7 @@ const VendorManagement = () => {
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <Card sx={{ 
-            background: 'linear-gradient(135deg, #F44336 0%, #D32F2F 100%)',
+            background: 'linear-gradient(135deg, #98FB98 0%, #228B22 100%)',
             color: 'white',
             transition: 'transform 0.2s',
             '&:hover': { transform: 'translateY(-4px)' }
@@ -332,7 +332,7 @@ const VendorManagement = () => {
               <IconButton
                 onClick={() => setViewMode('grid')}
                 sx={{ 
-                  bgcolor: viewMode === 'grid' ? '#2563eb' : 'transparent',
+                  bgcolor: viewMode === 'grid' ? '#228B22' : 'transparent',
                   color: viewMode === 'grid' ? 'white' : 'inherit'
                 }}
               >
@@ -341,7 +341,7 @@ const VendorManagement = () => {
               <IconButton
                 onClick={() => setViewMode('list')}
                 sx={{ 
-                  bgcolor: viewMode === 'list' ? '#2563eb' : 'transparent',
+                  bgcolor: viewMode === 'list' ? '#228B22' : 'transparent',
                   color: viewMode === 'list' ? 'white' : 'inherit'
                 }}
               >
@@ -407,9 +407,9 @@ const VendorManagement = () => {
                     fullWidth
                     onClick={() => handleViewDetails(vendor)}
                     sx={{
-                      background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+                      background: 'linear-gradient(135deg, #228B22 0%, #006400 100%)',
                       '&:hover': {
-                        background: 'linear-gradient(135deg, #1d4ed8 0%, #6d28d9 100%)',
+                        background: 'linear-gradient(135deg, #006400 0%, #004d00 100%)',
                       }
                     }}
                   >

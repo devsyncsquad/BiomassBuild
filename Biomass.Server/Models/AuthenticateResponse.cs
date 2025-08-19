@@ -12,6 +12,7 @@ namespace Biomass.Server.Model
         public string? Username { get; set; }
         public string? DefaultUrl { get; set; }
         public string? Token { get; set; }
+        public int? RoleId { get; set; }
         public int? EmpId { get; set; }
         public string? ApplicationVersion { get; set; }
         public string? CanMask { get; set; }
@@ -27,6 +28,7 @@ namespace Biomass.Server.Model
                 LastName = user.LastName;
                 Username = user.Username;
                 EmpId = user.EmpNo;
+                RoleId = user.RoleId;
             }
             Token = token;
         }

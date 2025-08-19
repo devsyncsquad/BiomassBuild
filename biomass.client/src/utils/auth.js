@@ -25,6 +25,29 @@ export const getCurrentUser = () => {
   return userStr ? JSON.parse(userStr) : null;
 };
 
+// Get the current user role
+export const getUserRole = () => {
+  return localStorage.getItem('userRole');
+};
+
+// Get the current user's assigned customers
+export const getUserCustomers = () => {
+  const customersStr = localStorage.getItem('customers');
+  return customersStr ? JSON.parse(customersStr) : [];
+};
+
+// Check if user has any customers assigned
+export const hasCustomerAssignment = () => {
+  const customers = getUserCustomers();
+  return customers && customers.length > 0;
+};
+
+// Get customer assignment count
+export const getCustomerAssignmentCount = () => {
+  const customers = getUserCustomers();
+  return customers ? customers.length : 0;
+};
+
 // Get the authentication token
 export const getToken = () => {
   return localStorage.getItem('token');

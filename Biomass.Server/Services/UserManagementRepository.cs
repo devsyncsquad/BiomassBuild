@@ -1,8 +1,9 @@
 ﻿using Biomass.Api.Model;
-using Biomass.Server.Models.UserManagement;
 using Biomass.Server.Data;
-using Biomass.Server.Models.Company;
 using Biomass.Server.Interfaces;
+using Biomass.Server.Models.Company;
+using Biomass.Server.Models.Customer;
+using Biomass.Server.Models.UserManagement;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Text;
@@ -65,28 +66,78 @@ namespace Biomass.Server.Repository
             return response;
         }
 
+        //public ServiceResponse<Users> SaveUser(Users user)
+        //{
+        //    var response = new ServiceResponse<Users>();
+        //    try
+        //    {
+        //        //user.CreatedAt = DateTime.Now;
+        //        //user.UpdatedAt = DateTime.Now;
+        //        user.CreatedAt = DateTime.UtcNow;
+        //        user.UpdatedAt = DateTime.UtcNow;
+
+
+        //        if (!string.IsNullOrEmpty(user.PasswordHash))
+        //        {
+        //            user.PasswordHash = HashPassword(user.PasswordHash);
+        //        }
+
+        //        _context.Users.Add(user);
+        //        _context.SaveChanges();
+
+        //        response.Result = user;
+        //        response.Success = true;
+        //        response.Message = "User saved successfully";
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        response.Success = false;
+        //        response.Message = ex.Message;
+        //    }
+        //    return response;
+        //}
+
         public ServiceResponse<Users> SaveUser(Users user)
         {
             var response = new ServiceResponse<Users>();
             try
             {
-                //user.CreatedAt = DateTime.Now;
-                //user.UpdatedAt = DateTime.Now;
+                // Set timestamps
                 user.CreatedAt = DateTime.UtcNow;
                 user.UpdatedAt = DateTime.UtcNow;
 
+                // Hash password if provided
+                //if (!string.IsNullOrEmpty(user.PasswordHash))
+                //{
+                //    user.PasswordHash = HashPassword(user.PasswordHash);
+                //}
 
-                if (!string.IsNullOrEmpty(user.PasswordHash))
-                {
-                    user.PasswordHash = HashPassword(user.PasswordHash);
-                }
-
+                // Save user first
                 _context.Users.Add(user);
                 _context.SaveChanges();
 
+                // Handle customer assignments if provided
+                if (user.CustomerIds != null && user.CustomerIds.Any())
+                {
+                    foreach (var customerId in user.CustomerIds)
+                    {
+                        var userCustomer = new UserCustomer
+                        {
+                            UserId = user.UserId,
+                            CustomerId = customerId,
+                            Enabled = true,
+                            CreatedOn = DateTime.UtcNow,
+                            CreatedBy = user.CreatedBy // or get from current user context
+                        };
+
+                        _context.UserCustomers.Add(userCustomer);
+                    }
+                    _context.SaveChanges();
+                }
+
                 response.Result = user;
                 response.Success = true;
-                response.Message = "User saved successfully";
+                response.Message = "User saved successfully with customer assignments";
             }
             catch (Exception ex)
             {
@@ -116,11 +167,12 @@ namespace Biomass.Server.Repository
                     existingUser.ReportingTo = user.ReportingTo;
                     existingUser.UpdatedBy = user.UpdatedBy;
                     existingUser.UpdatedAt = DateTime.UtcNow;
+                    existingUser.PasswordHash = user.PasswordHash;
 
-                    if (!string.IsNullOrEmpty(user.PasswordHash))
-                    {
-                        existingUser.PasswordHash = HashPassword(user.PasswordHash);
-                    }
+                    //if (!string.IsNullOrEmpty(user.PasswordHash))
+                    //{
+                    //    existingUser.PasswordHash = HashPassword(user.PasswordHash);
+                    //}
 
                     _context.SaveChanges();
 

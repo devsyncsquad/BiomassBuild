@@ -29,8 +29,8 @@ namespace Biomass.Server.Interfaces
         public string? Meta { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        public string? CreatedBy { get; set; }
-        public string? UpdatedBy { get; set; }
+        public int? CreatedBy { get; set; }
+        public int? UpdatedBy { get; set; }
     }
 
     public class CreateMoneyAccountRequest
@@ -54,6 +54,8 @@ namespace Biomass.Server.Interfaces
         public bool IsDefault { get; set; } = false;
         public string? Notes { get; set; }
         public string? MetaJson { get; set; }
+        public int? CreatedBy { get; set; }
+        public int? UpdatedBy { get; set; }
     }
 
     public class UpdateMoneyAccountRequest
@@ -78,6 +80,8 @@ namespace Biomass.Server.Interfaces
         public bool IsActive { get; set; } = true;
         public string? Notes { get; set; }
         public string? MetaJson { get; set; }
+        public int? CreatedBy { get; set; }
+        public int? UpdatedBy { get; set; }
     }
 
     public class MoneyAccountListResponse
@@ -92,9 +96,9 @@ namespace Biomass.Server.Interfaces
     public interface IMoneyAccountService
     {
         // Core CRUD operations
-        Task<ServiceResponse<MoneyAccountDto>> CreateAsync(CreateMoneyAccountRequest request, string? createdBy);
-        Task<ServiceResponse<MoneyAccountDto>> UpdateAsync(int id, UpdateMoneyAccountRequest request, string? updatedBy);
-        Task<ServiceResponse<bool>> DeleteAsync(int id, string? deletedBy);
+        Task<ServiceResponse<MoneyAccountDto>> CreateAsync(CreateMoneyAccountRequest request);
+        Task<ServiceResponse<MoneyAccountDto>> UpdateAsync(int id, UpdateMoneyAccountRequest request);
+        Task<ServiceResponse<bool>> DeleteAsync(int id);
         Task<ServiceResponse<MoneyAccountDto>> GetByIdAsync(int id);
         
         // List operations with pagination and filtering

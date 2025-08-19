@@ -16,7 +16,7 @@ namespace Biomass.Server.Services
             _db = db;
         }
 
-        public async Task<ServiceResponse<MoneyAccountDto>> CreateAsync(CreateMoneyAccountRequest request, string? createdBy)
+        public async Task<ServiceResponse<MoneyAccountDto>> CreateAsync(CreateMoneyAccountRequest request)
         {
             var response = new ServiceResponse<MoneyAccountDto>();
             try
@@ -82,8 +82,8 @@ namespace Biomass.Server.Services
                     IsActive = true,
                     Notes = request.Notes?.Trim(),
                     Meta = meta,
-                    CreatedBy = createdBy,
-                    UpdatedBy = createdBy
+                    CreatedBy = request.CreatedBy,
+                    UpdatedBy = request.UpdatedBy,
                 };
 
                 _db.MoneyAccounts.Add(entity);
@@ -103,7 +103,7 @@ namespace Biomass.Server.Services
             return response;
         }
 
-        public async Task<ServiceResponse<MoneyAccountDto>> UpdateAsync(int id, UpdateMoneyAccountRequest request, string? updatedBy)
+        public async Task<ServiceResponse<MoneyAccountDto>> UpdateAsync(int id, UpdateMoneyAccountRequest request)
         {
             var response = new ServiceResponse<MoneyAccountDto>();
             try
@@ -167,7 +167,8 @@ namespace Biomass.Server.Services
                 entity.IsActive = request.IsActive;
                 entity.Notes = request.Notes?.Trim();
                 entity.UpdatedAt = DateTime.UtcNow;
-                entity.UpdatedBy = updatedBy;
+                entity.UpdatedBy = request.UpdatedBy;
+                entity.CreatedBy = request.CreatedBy;
 
                 await _db.SaveChangesAsync();
 
@@ -185,7 +186,7 @@ namespace Biomass.Server.Services
             return response;
         }
 
-        public async Task<ServiceResponse<bool>> DeleteAsync(int id, string? deletedBy)
+        public async Task<ServiceResponse<bool>> DeleteAsync(int id)
         {
             var response = new ServiceResponse<bool>();
             try
@@ -201,7 +202,7 @@ namespace Biomass.Server.Services
                 // Soft delete - set is_active to false
                 entity.IsActive = false;
                 entity.UpdatedAt = DateTime.UtcNow;
-                entity.UpdatedBy = deletedBy;
+               
 
                 // If this was the default account, remove default status
                 if (entity.IsDefault)
@@ -332,7 +333,7 @@ namespace Biomass.Server.Services
                 // Set new default
                 entity.IsDefault = true;
                 entity.UpdatedAt = DateTime.UtcNow;
-                entity.UpdatedBy = updatedBy;
+                
 
                 await _db.SaveChangesAsync();
 

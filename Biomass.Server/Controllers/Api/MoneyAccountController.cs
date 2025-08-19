@@ -17,8 +17,8 @@ namespace Biomass.Server.Controllers.Api
         [HttpPost("CreateMoneyAccount")]
         public async Task<IActionResult> CreateMoneyAccount([FromBody] CreateMoneyAccountRequest request)
         {
-            var createdBy = User?.Identity?.Name ?? "system";
-            var result = await _service.CreateAsync(request, createdBy);
+            //var createdBy = User?.Identity?.Name ?? "system";
+            var result = await _service.CreateAsync(request);
             if (!result.Success) return BadRequest(result);
             return Ok(result);
         }
@@ -26,8 +26,8 @@ namespace Biomass.Server.Controllers.Api
         [HttpPut("UpdateMoneyAccount/{id}")]
         public async Task<IActionResult> UpdateMoneyAccount(int id, [FromBody] UpdateMoneyAccountRequest request)
         {
-            var updatedBy = User?.Identity?.Name ?? "system";
-            var result = await _service.UpdateAsync(id, request, updatedBy);
+            //var updatedBy = User?.Identity?.Name ?? "system";
+            var result = await _service.UpdateAsync(id, request);
             if (!result.Success) return BadRequest(result);
             return Ok(result);
         }
@@ -36,7 +36,7 @@ namespace Biomass.Server.Controllers.Api
         public async Task<IActionResult> DeleteMoneyAccount(int id)
         {
             var deletedBy = User?.Identity?.Name ?? "system";
-            var result = await _service.DeleteAsync(id, deletedBy);
+            var result = await _service.DeleteAsync(id);
             if (!result.Success) return BadRequest(result);
             return Ok(result);
         }

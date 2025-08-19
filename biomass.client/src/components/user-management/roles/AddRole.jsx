@@ -165,11 +165,23 @@ const AddRole = ({ initialData }) => {
 
   return (
     <Box sx={{ width: '100%', p: 2 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-        <Security sx={{ mr: 2, color: 'primary.main' }} />
-        <Typography variant="h5" sx={{ fontWeight: 600, color: 'primary.main' }}>
-          Add Role
-        </Typography>
+      {/* Header */}
+      <Box sx={{
+        background: 'linear-gradient(135deg, #228B22 0%, #32CD32 100%)',
+        p: 3,
+        color: 'white'
+      }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Security sx={{ fontSize: '2rem' }} />
+          <Box>
+            <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
+              {initialData ? 'Edit Role' : 'Add New Role'}
+            </Typography>
+            <Typography variant="body2" sx={{ opacity: 0.9 }}>
+              {initialData ? 'Update role information and permissions' : 'Create a new role with specific permissions'}
+            </Typography>
+          </Box>
+        </Box>
       </Box>
       <Divider sx={{ mb: 3 }} />
       <Grid

@@ -15,7 +15,7 @@ const Roles = () => {
           <AddRole initialData={initialData} />
         </Grid>
         <Grid item xs={12}>
-          <Divider color="#7F40A8" sx={{ width: '100%', my: 2 }} />
+          <Divider color="#228B22" sx={{ width: '100%', my: 2 }} />
         </Grid>
         <Grid item xs={12}>
           <ViewRoles setInitialData={setInitialData} />

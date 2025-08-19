@@ -64,7 +64,7 @@ const CompanyManagement = () => {
 
   // Enhanced company colors with better contrast
   const companyColors = [
-    '#1976d2', '#388e3c', '#f57c00', '#7b1fa2', 
+    '#228B22', '#388e3c', '#f57c00', '#7b1fa2', 
     '#d32f2f', '#0097a7', '#5d4037', '#455a64',
     '#1565c0', '#2e7d32', '#ef6c00', '#6a1b9a'
   ];
@@ -297,10 +297,10 @@ const CompanyManagement = () => {
       }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Box>
-            <Typography variant="h4" gutterBottom sx={{ fontWeight: 700, mb: 1 }}>
+            <Typography variant="h4" gutterBottom sx={{color: 'white', fontWeight: 700, mb: 1 }}>
               Companies Directory
             </Typography>
-            <Typography variant="h6" sx={{ opacity: 0.9, fontWeight: 300 }}>
+            <Typography variant="h6" sx={{color: 'white', opacity: 0.9, fontWeight: 300 }}>
               Discover and explore companies in your industry
             </Typography>
           </Box>
@@ -315,8 +315,10 @@ const CompanyManagement = () => {
               py: 1.5,
               fontSize: '1rem',
               fontWeight: 600,
+              bgcolor: '#228B22',
               boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
               '&:hover': {
+                bgcolor: '#006400',
                 transform: 'translateY(-2px)',
                 boxShadow: '0 8px 24px rgba(0,0,0,0.3)'
               },
@@ -435,7 +437,11 @@ const CompanyManagement = () => {
                   borderRadius: 2,
                   px: 4,
                   py: 1.5,
-                  fontWeight: 600
+                  fontWeight: 600,
+                  bgcolor: '#228B22',
+                  '&:hover': {
+                    bgcolor: '#006400'
+                  }
                 }}
               >
                 Apply Filters
@@ -448,7 +454,14 @@ const CompanyManagement = () => {
                   borderRadius: 2,
                   px: 4,
                   py: 1.5,
-                  fontWeight: 600
+                  fontWeight: 600,
+                  borderColor: '#228B22',
+                  color: '#228B22',
+                  '&:hover': {
+                    borderColor: '#006400',
+                    color: '#006400',
+                    bgcolor: 'rgba(34, 139, 34, 0.04)'
+                  }
                 }}
               >
                 Clear All
@@ -590,8 +603,13 @@ const CompanyManagement = () => {
                         py: 1.5,
                         fontWeight: 600,
                         borderWidth: 2,
+                        borderColor: '#228B22',
+                        color: '#228B22',
                         '&:hover': {
                           borderWidth: 2,
+                          borderColor: '#006400',
+                          color: '#006400',
+                          bgcolor: 'rgba(34, 139, 34, 0.04)',
                           transform: 'scale(1.02)'
                         },
                         transition: 'all 0.2s ease'
@@ -625,7 +643,15 @@ const CompanyManagement = () => {
               startIcon={<AddIcon />}
               onClick={handleAddCompany}
               size="large"
-              sx={{ borderRadius: 2, px: 4, py: 1.5 }}
+              sx={{ 
+                borderRadius: 2, 
+                px: 4, 
+                py: 1.5,
+                bgcolor: '#228B22',
+                '&:hover': {
+                  bgcolor: '#006400'
+                }
+              }}
             >
               Add First Company
             </Button>

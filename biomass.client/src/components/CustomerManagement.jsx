@@ -471,12 +471,12 @@ const CustomerManagement = () => {
           transform: 'translate(-50%, 50%)'
         }} />
         
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 1 }}>
+        <Box sx={{ color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 1 }}>
           <Box>
-            <Typography variant="h4" gutterBottom sx={{ fontWeight: 700, mb: 1, textShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+            <Typography variant="h4" gutterBottom sx={{color: 'white', fontWeight: 700, mb: 1, textShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
               Customer Management
             </Typography>
-            <Typography variant="h6" sx={{ opacity: 0.9, fontWeight: 300, textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>
+            <Typography variant="h6" sx={{ color: 'white', opacity: 0.9, fontWeight: 300, textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>
               Manage your customer database and relationships
             </Typography>
           </Box>
@@ -597,7 +597,7 @@ const CustomerManagement = () => {
                     Total:
                   </Typography>
                   <Box sx={{ 
-                    bgcolor: '#667eea', 
+                    bgcolor: '#228B22', 
                     color: 'white', 
                     px: 2, 
                     py: 0.5, 
@@ -625,7 +625,7 @@ const CustomerManagement = () => {
           <Table size="medium">
             <TableHead>
               <TableRow sx={{ 
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                background: 'linear-gradient(135deg, #228B22 0%, #006400 100%)',
                 '& th': { border: 0 }
               }}>
                 <TableCell sx={{ 
@@ -704,12 +704,12 @@ const CustomerManagement = () => {
                   <TableCell sx={{ py: 2 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                       <Avatar sx={{ 
-                        bgcolor: '#667eea', 
+                        bgcolor: '#228B22', 
                         width: 40, 
                         height: 40, 
                         fontSize: '1rem',
                         fontWeight: 600,
-                        boxShadow: '0 2px 8px rgba(102, 126, 234, 0.3)'
+                        boxShadow: '0 2px 8px rgba(34, 139, 34, 0.3)'
                       }}>
                         {customer.firstName.charAt(0)}{customer.lastName.charAt(0)}
                       </Avatar>
@@ -777,11 +777,11 @@ const CustomerManagement = () => {
                         size="small"
                         onClick={() => handleViewLocations(customer)}
                         sx={{ 
-                          color: '#4CAF50', 
+                          color: '#228B22', 
                           p: 1,
-                          bgcolor: 'rgba(76, 175, 80, 0.1)',
+                          bgcolor: 'rgba(34, 139, 34, 0.1)',
                           '&:hover': { 
-                            bgcolor: 'rgba(76, 175, 80, 0.2)',
+                            bgcolor: 'rgba(34, 139, 34, 0.2)',
                             transform: 'scale(1.1)'
                           },
                           transition: 'all 0.2s ease'
@@ -794,11 +794,11 @@ const CustomerManagement = () => {
                         size="small"
                         onClick={() => handleAddLocation(customer)}
                         sx={{ 
-                          color: '#FF9800', 
+                          color: '#006400', 
                           p: 1,
-                          bgcolor: 'rgba(255, 152, 0, 0.1)',
+                          bgcolor: 'rgba(0, 100, 0, 0.1)',
                           '&:hover': { 
-                            bgcolor: 'rgba(255, 152, 0, 0.2)',
+                            bgcolor: 'rgba(0, 100, 0, 0.2)',
                             transform: 'scale(1.1)'
                           },
                           transition: 'all 0.2s ease'
@@ -810,11 +810,11 @@ const CustomerManagement = () => {
                       <IconButton 
                         size="small" 
                         sx={{ 
-                          color: '#2196F3', 
+                          color: '#228B22', 
                           p: 1,
-                          bgcolor: 'rgba(33, 150, 243, 0.1)',
+                          bgcolor: 'rgba(34, 139, 34, 0.1)',
                           '&:hover': { 
-                            bgcolor: 'rgba(33, 150, 243, 0.2)',
+                            bgcolor: 'rgba(34, 139, 34, 0.2)',
                             transform: 'scale(1.1)'
                           },
                           transition: 'all 0.2s ease'
@@ -827,11 +827,11 @@ const CustomerManagement = () => {
                       <IconButton 
                         size="small" 
                         sx={{ 
-                          color: '#f44336', 
+                          color: '#006400', 
                           p: 1,
-                          bgcolor: 'rgba(244, 67, 54, 0.1)',
+                          bgcolor: 'rgba(0, 100, 0, 0.1)',
                           '&:hover': { 
-                            bgcolor: 'rgba(244, 67, 54, 0.2)',
+                            bgcolor: 'rgba(0, 100, 0, 0.2)',
                             transform: 'scale(1.1)'
                           },
                           transition: 'all 0.2s ease'
@@ -865,7 +865,7 @@ const CustomerManagement = () => {
         }}
       >
         <DialogTitle sx={{ 
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          background: 'linear-gradient(135deg, #228B22 0%, #006400 100%)',
           color: 'white',
           fontWeight: 700,
           fontSize: '1.25rem',
@@ -898,6 +898,16 @@ const CustomerManagement = () => {
                 value={newCustomer.firstName}
                 onChange={(e) => setNewCustomer({...newCustomer, firstName: e.target.value})}
                 margin="normal"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&:hover fieldset': {
+                      borderColor: '#228B22',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#228B22',
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -907,6 +917,16 @@ const CustomerManagement = () => {
                 value={newCustomer.lastName}
                 onChange={(e) => setNewCustomer({...newCustomer, lastName: e.target.value})}
                 margin="normal"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&:hover fieldset': {
+                      borderColor: '#228B22',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#228B22',
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -917,6 +937,16 @@ const CustomerManagement = () => {
                 value={newCustomer.email}
                 onChange={(e) => setNewCustomer({...newCustomer, email: e.target.value})}
                 margin="normal"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&:hover fieldset': {
+                      borderColor: '#228B22',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#228B22',
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -926,6 +956,16 @@ const CustomerManagement = () => {
                 value={newCustomer.phone}
                 onChange={(e) => setNewCustomer({...newCustomer, phone: e.target.value})}
                 margin="normal"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&:hover fieldset': {
+                      borderColor: '#228B22',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#228B22',
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -935,6 +975,13 @@ const CustomerManagement = () => {
                   value={newCustomer.companyId}
                   label="Company"
                   onChange={(e) => handleCompanyChange(e.target.value)}
+                  sx={{
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      '&:hover': {
+                        borderColor: '#228B22',
+                      },
+                    },
+                  }}
                 >
                   <MenuItem value="">
                     <em>Select a company</em>
@@ -954,6 +1001,16 @@ const CustomerManagement = () => {
                 value={newCustomer.address}
                 onChange={(e) => setNewCustomer({...newCustomer, address: e.target.value})}
                 margin="normal"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&:hover fieldset': {
+                      borderColor: '#228B22',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#228B22',
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12} md={4}>
@@ -963,6 +1020,16 @@ const CustomerManagement = () => {
                 value={newCustomer.city}
                 onChange={(e) => setNewCustomer({...newCustomer, city: e.target.value})}
                 margin="normal"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&:hover fieldset': {
+                      borderColor: '#228B22',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#228B22',
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12} md={4}>
@@ -972,6 +1039,16 @@ const CustomerManagement = () => {
                 value={newCustomer.state}
                 onChange={(e) => setNewCustomer({...newCustomer, state: e.target.value})}
                 margin="normal"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&:hover fieldset': {
+                      borderColor: '#228B22',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#228B22',
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12} md={4}>
@@ -981,6 +1058,16 @@ const CustomerManagement = () => {
                 value={newCustomer.postalCode}
                 onChange={(e) => setNewCustomer({...newCustomer, postalCode: e.target.value})}
                 margin="normal"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&:hover fieldset': {
+                      borderColor: '#228B22',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#228B22',
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -990,6 +1077,16 @@ const CustomerManagement = () => {
                 value={newCustomer.country}
                 onChange={(e) => setNewCustomer({...newCustomer, country: e.target.value})}
                 margin="normal"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&:hover fieldset': {
+                      borderColor: '#228B22',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#228B22',
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -999,6 +1096,13 @@ const CustomerManagement = () => {
                   value={newCustomer.status}
                   label="Status"
                   onChange={(e) => setNewCustomer({...newCustomer, status: e.target.value})}
+                  sx={{
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      '&:hover': {
+                        borderColor: '#228B22',
+                      },
+                    },
+                  }}
                 >
                   <MenuItem value="active">Active</MenuItem>
                   <MenuItem value="inactive">Inactive</MenuItem>
@@ -1008,16 +1112,28 @@ const CustomerManagement = () => {
           </Grid>
         </DialogContent>
         <DialogActions sx={{ p: 3 }}>
-          <Button onClick={() => setOpenRegistration(false)}>
+          <Button 
+            onClick={() => setOpenRegistration(false)}
+            variant="outlined"
+            sx={{
+              borderColor: '#228B22',
+              color: '#228B22',
+              '&:hover': {
+                borderColor: '#006400',
+                color: '#006400',
+                bgcolor: 'rgba(34, 139, 34, 0.04)'
+              }
+            }}
+          >
             Cancel
           </Button>
           <Button 
             onClick={handleSaveCustomer}
             variant="contained"
             sx={{
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              background: 'linear-gradient(135deg, #228B22 0%, #006400 100%)',
               '&:hover': {
-                background: 'linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%)',
+                background: 'linear-gradient(135deg, #006400 0%, #004d00 100%)',
               }
             }}
           >

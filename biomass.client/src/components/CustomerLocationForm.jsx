@@ -219,7 +219,7 @@ export const CustomerLocationForm = ({ open, onClose, customerId, locationData =
       }}
     >
       <DialogTitle sx={{ 
-        backgroundColor: '#1976d2', 
+        backgroundColor: '#228B22', 
         color: 'white',
         borderBottom: '1px solid #e0e0e0',
         display: 'flex',
@@ -234,7 +234,7 @@ export const CustomerLocationForm = ({ open, onClose, customerId, locationData =
             variant="contained"
             startIcon={<SaveIcon />}
             onClick={handleSave}
-            sx={{ mr: 1, bgcolor: 'white', color: '#1976d2', '&:hover': { bgcolor: '#f5f5f5' } }}
+            sx={{ mr: 1, bgcolor: 'white', color: '#228B22', '&:hover': { bgcolor: '#f5f5f5' } }}
           >
             Save Customer location
           </Button>
@@ -610,6 +610,12 @@ export const CustomerLocationForm = ({ open, onClose, customerId, locationData =
           startIcon={<SaveIcon />}
           onClick={handleSave}
           size="large"
+          sx={{
+            bgcolor: '#228B22',
+            '&:hover': {
+              bgcolor: '#006400',
+            }
+          }}
         >
           Add This Location
         </Button>

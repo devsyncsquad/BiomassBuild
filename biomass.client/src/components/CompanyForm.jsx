@@ -284,7 +284,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
     >
       {/* Enhanced Header */}
       <Box sx={{ 
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: 'linear-gradient(135deg, #228B22 0%, #006400 100%)',
         color: 'white',
         p: 3
       }}>
@@ -330,7 +330,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
               <Card sx={{ borderRadius: 3, overflow: 'hidden' }}>
                 <CardContent sx={{ p: 3 }}>
                   <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <BusinessIcon color="primary" />
+                    <BusinessIcon sx={{ color: '#228B22' }} />
                     Company Logo & Branding
                   </Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
@@ -370,7 +370,11 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
                             borderRadius: 2,
                             px: 3,
                             py: 1.5,
-                            fontWeight: 600
+                            fontWeight: 600,
+                            bgcolor: '#228B22',
+                            '&:hover': {
+                              bgcolor: '#006400'
+                            }
                           }}
                         >
                           {logoPreview || company?.logoPath ? 'Change Logo' : 'Upload Logo'}
@@ -390,7 +394,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
               <Card sx={{ borderRadius: 3, overflow: 'hidden' }}>
                 <CardContent sx={{ p: 3 }}>
                   <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <BusinessIcon color="primary" />
+                    <BusinessIcon sx={{ color: '#228B22' }} />
                     Basic Information
                   </Typography>
                   <Grid container spacing={3}>
@@ -409,7 +413,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
                           '& .MuiOutlinedInput-root': {
                             borderRadius: 2,
                             '&:hover fieldset': {
-                              borderColor: 'primary.main',
+                              borderColor: '#228B22',
                             },
                           },
                         }}
@@ -432,7 +436,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
                           '& .MuiOutlinedInput-root': {
                             borderRadius: 2,
                             '&:hover fieldset': {
-                              borderColor: 'primary.main',
+                              borderColor: '#228B22',
                             },
                           },
                         }}
@@ -448,7 +452,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
               <Card sx={{ borderRadius: 3, overflow: 'hidden' }}>
                 <CardContent sx={{ p: 3 }}>
                   <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <WorkIcon color="primary" />
+                    <WorkIcon sx={{ color: '#228B22' }} />
                     Tax & Registration Details
                   </Typography>
                   <Grid container spacing={3}>
@@ -466,7 +470,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
                           '& .MuiOutlinedInput-root': {
                             borderRadius: 2,
                             '&:hover fieldset': {
-                              borderColor: 'primary.main',
+                              borderColor: '#228B22',
                             },
                           },
                         }}
@@ -486,7 +490,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
                           '& .MuiOutlinedInput-root': {
                             borderRadius: 2,
                             '&:hover fieldset': {
-                              borderColor: 'primary.main',
+                              borderColor: '#228B22',
                             },
                           },
                         }}
@@ -506,7 +510,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
                           '& .MuiOutlinedInput-root': {
                             borderRadius: 2,
                             '&:hover fieldset': {
-                              borderColor: 'primary.main',
+                              borderColor: '#228B22',
                             },
                           },
                         }}
@@ -522,7 +526,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
               <Card sx={{ borderRadius: 3, overflow: 'hidden' }}>
                 <CardContent sx={{ p: 3 }}>
                   <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <PhoneIcon color="primary" />
+                    <PhoneIcon sx={{ color: '#228B22' }} />
                     Primary Contact Information
                   </Typography>
                   <Grid container spacing={3}>
@@ -540,7 +544,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
                           '& .MuiOutlinedInput-root': {
                             borderRadius: 2,
                             '&:hover fieldset': {
-                              borderColor: 'primary.main',
+                              borderColor: '#228B22',
                             },
                           },
                         }}
@@ -560,7 +564,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
                           '& .MuiOutlinedInput-root': {
                             borderRadius: 2,
                             '&:hover fieldset': {
-                              borderColor: 'primary.main',
+                              borderColor: '#228B22',
                             },
                           },
                         }}
@@ -576,7 +580,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
               <Card sx={{ borderRadius: 3, overflow: 'hidden' }}>
                 <CardContent sx={{ p: 3 }}>
                   <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <PeopleIcon color="primary" />
+                    <PeopleIcon sx={{ color: '#228B22' }} />
                     Additional Information
                   </Typography>
                   <Grid container spacing={3}>
@@ -595,7 +599,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
                           '& .MuiOutlinedInput-root': {
                             borderRadius: 2,
                             '&:hover fieldset': {
-                              borderColor: 'primary.main',
+                              borderColor: '#228B22',
                             },
                           },
                         }}
@@ -612,7 +616,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
                           sx={{
                             borderRadius: 2,
                             '&:hover .MuiOutlinedInput-notchedOutline': {
-                              borderColor: 'primary.main',
+                              borderColor: '#228B22',
                             },
                           }}
                         >
@@ -639,7 +643,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
                           sx={{
                             borderRadius: 2,
                             '&:hover .MuiOutlinedInput-notchedOutline': {
-                              borderColor: 'primary.main',
+                              borderColor: '#228B22',
                             },
                           }}
                         >
@@ -663,7 +667,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
                           '& .MuiOutlinedInput-root': {
                             borderRadius: 2,
                             '&:hover fieldset': {
-                              borderColor: 'primary.main',
+                              borderColor: '#228B22',
                             },
                           },
                         }}
@@ -690,6 +694,10 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
                 color={isViewMode ? 'default' : 'primary'} 
                 size="small" 
                 variant="outlined"
+                sx={{
+                  borderColor: '#228B22',
+                  color: '#228B22'
+                }}
               />
             )}
           </Box>
@@ -700,14 +708,35 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
                 <Button
                   variant="outlined"
                   onClick={onClose}
-                  sx={{ borderRadius: 2, px: 4, py: 1.5, fontWeight: 600 }}
+                  sx={{ 
+                    borderRadius: 2, 
+                    px: 4, 
+                    py: 1.5, 
+                    fontWeight: 600,
+                    borderColor: '#228B22',
+                    color: '#228B22',
+                    '&:hover': {
+                      borderColor: '#006400',
+                      color: '#006400',
+                      bgcolor: 'rgba(34, 139, 34, 0.04)'
+                    }
+                  }}
                 >
                   Close
                 </Button>
                 <Button
                   variant="contained"
                   onClick={handleEditToggle}
-                  sx={{ borderRadius: 2, px: 4, py: 1.5, fontWeight: 600 }}
+                  sx={{ 
+                    borderRadius: 2, 
+                    px: 4, 
+                    py: 1.5, 
+                    fontWeight: 600,
+                    bgcolor: '#228B22',
+                    '&:hover': {
+                      bgcolor: '#006400'
+                    }
+                  }}
                 >
                   Edit Company
                 </Button>
@@ -719,7 +748,19 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
                   variant="outlined"
                   onClick={isViewMode ? handleCancelEdit : onClose}
                   disabled={loading}
-                  sx={{ borderRadius: 2, px: 4, py: 1.5, fontWeight: 600 }}
+                  sx={{ 
+                    borderRadius: 2, 
+                    px: 4, 
+                    py: 1.5, 
+                    fontWeight: 600,
+                    borderColor: '#228B22',
+                    color: '#228B22',
+                    '&:hover': {
+                      borderColor: '#006400',
+                      color: '#006400',
+                      bgcolor: 'rgba(34, 139, 34, 0.04)'
+                    }
+                  }}
                 >
                   {isViewMode ? 'Cancel Edit' : 'Cancel'}
                 </Button>
@@ -727,7 +768,19 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
                   <Button
                     variant="outlined"
                     disabled={loading}
-                    sx={{ borderRadius: 2, px: 4, py: 1.5, fontWeight: 600 }}
+                    sx={{ 
+                      borderRadius: 2, 
+                      px: 4, 
+                      py: 1.5, 
+                      fontWeight: 600,
+                      borderColor: '#228B22',
+                      color: '#228B22',
+                      '&:hover': {
+                        borderColor: '#006400',
+                        color: '#006400',
+                        bgcolor: 'rgba(34, 139, 34, 0.04)'
+                      }
+                    }}
                   >
                     Save as Draft
                   </Button>
@@ -742,7 +795,9 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
                     px: 4, 
                     py: 1.5, 
                     fontWeight: 600,
+                    bgcolor: '#228B22',
                     '&:hover': {
+                      bgcolor: '#006400',
                       transform: 'translateY(-1px)',
                       boxShadow: '0 4px 16px rgba(0,0,0,0.2)'
                     },

@@ -12,15 +12,14 @@ namespace Biomass.Server.Services
             _repo = repo;
         }
 
-        public async Task<ServiceResponse<(IEnumerable<LookupDto> Items, int TotalCount)>> GetAsync(string? domain, int page, int pageSize)
+        public async Task<ServiceResponse<(IEnumerable<Lookup> Items, int TotalCount)>> GetAsync(string? domain, int page, int pageSize)
         {
-            var response = new ServiceResponse<(IEnumerable<LookupDto>, int)>();
+            var response = new ServiceResponse<(IEnumerable<Lookup> Items, int TotalCount)>();
+
             try
             {
-                page = page <= 0 ? 1 : page;
-                pageSize = pageSize <= 0 ? 10 : pageSize;
-                var (items, total) = await _repo.GetAsync(domain, page, pageSize);
-                response.Result = (items.Select(Map).ToList(), total);
+                var result = await _repo.GetAsync(domain, page, pageSize);
+                response.Result = result;
                 response.Success = true;
             }
             catch (Exception ex)
@@ -28,8 +27,27 @@ namespace Biomass.Server.Services
                 response.Success = false;
                 response.Message = ex.Message;
             }
+
             return response;
         }
+        //public async Task<ServiceResponse<(IEnumerable<LookupDto> Items, int TotalCount)>> GetAsync(string? domain, int page, int pageSize)
+        //{
+        //    var response = new ServiceResponse<(IEnumerable<LookupDto>, int)>();
+        //    try
+        //    {
+        //        page = page <= 0 ? 1 : page;
+        //        pageSize = pageSize <= 0 ? 10 : pageSize;
+        //        var (items, total) = await _repo.GetAsync(domain, page, pageSize);
+        //        response.Result = (items.Select(Map).ToList(), total);
+        //        response.Success = true;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        response.Success = false;
+        //        response.Message = ex.Message;
+        //    }
+        //    return response;
+        //}
 
         public async Task<ServiceResponse<LookupDto>> GetByIdAsync(int id)
         {
@@ -54,7 +72,7 @@ namespace Biomass.Server.Services
             return response;
         }
 
-        public async Task<ServiceResponse<LookupDto>> CreateAsync(CreateLookupRequest request, string? createdBy)
+        public async Task<ServiceResponse<LookupDto>> CreateAsync(Lookup request)
         {
             var response = new ServiceResponse<LookupDto>();
             try
@@ -70,7 +88,7 @@ namespace Biomass.Server.Services
                     LookUpName = request.LookUpName.Trim(),
                     LookUpDomain = request.LookUpDomain?.Trim(),
                     Enabled = request.Enabled,
-                    CreatedBy = createdBy,
+                    CreatedBy = request.CreatedBy,
                     CreatedOn = DateTime.UtcNow
                 };
                 var saved = await _repo.CreateAsync(entity);

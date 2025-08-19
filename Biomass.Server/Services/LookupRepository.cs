@@ -1,3 +1,4 @@
+using Biomass.Api.Model;
 using Biomass.Server.Data;
 using Biomass.Server.Interfaces;
 using Biomass.Server.Models.Lookup;
@@ -13,21 +14,41 @@ namespace Biomass.Server.Repository
             _context = context;
         }
 
+        //public async Task<(IEnumerable<Lookup> Items, int TotalCount)> GetAsync(string? domain, int page, int pageSize)
+        //{
+        //    var query = _context.Lookups.AsQueryable();
+        //    if (!string.IsNullOrWhiteSpace(domain))
+        //    {
+        //        query = query.Where(l => l.LookUpDomain == domain);
+        //    }
+        //    var total = await query.CountAsync();
+        //    var items = await query
+        //        .OrderByDescending(l => l.CreatedOn)
+        //        .Skip((page - 1) * pageSize)
+        //        .Take(pageSize)
+        //        .ToListAsync();
+        //    return (items, total);
+        //}
+
         public async Task<(IEnumerable<Lookup> Items, int TotalCount)> GetAsync(string? domain, int page, int pageSize)
         {
             var query = _context.Lookups.AsQueryable();
+
             if (!string.IsNullOrWhiteSpace(domain))
             {
                 query = query.Where(l => l.LookUpDomain == domain);
             }
+
             var total = await query.CountAsync();
             var items = await query
                 .OrderByDescending(l => l.CreatedOn)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
+
             return (items, total);
         }
+
 
         public Task<Lookup?> GetByIdAsync(int id)
         {

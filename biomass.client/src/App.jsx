@@ -11,7 +11,7 @@ import CustomerManagement from './components/CustomerManagement';
 import CustomerLocations from './components/CustomerLocations';
 import VendorManagement from './components/VendorManagement';
 import UserManagement from './components/user-management';
-import Banking from './components/Banking';
+import MoneyAccount from './components/MoneyAccount';
 import CostCenters from './components/CostCenters';
 import './App.css';
 import { Box, Card, CardContent, Grid, Typography, Button } from '@mui/material';
@@ -451,7 +451,7 @@ function App() {
             <Route path="/customer-locations" element={<ProtectedRoute><Layout><CustomerLocations /></Layout></ProtectedRoute>} />
             <Route path="/vendor-management" element={<ProtectedRoute><Layout><VendorManagement /></Layout></ProtectedRoute>} />
             <Route path="/user-management" element={<ProtectedRoute><Layout><UserManagement /></Layout></ProtectedRoute>} />
-            <Route path="/banking-finance" element={<ProtectedRoute><Layout><Banking /></Layout></ProtectedRoute>} />
+            <Route path="/money-account" element={<ProtectedRoute><Layout><MoneyAccount /></Layout></ProtectedRoute>} />
             <Route path="/cost-centers" element={<ProtectedRoute><Layout><CostCenters /></Layout></ProtectedRoute>} />
           </Routes>
         </Router>

@@ -99,12 +99,12 @@ namespace Biomass.Server.Models.MoneyAccount
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         [Column("created_by")]
-        [StringLength(100)]
-        public string? CreatedBy { get; set; }
+        //[StringLength(100)]
+        public int? CreatedBy { get; set; }
 
         [Column("updated_by")]
-        [StringLength(100)]
-        public string? UpdatedBy { get; set; }
+        //[StringLength(100)]
+        public int? UpdatedBy { get; set; }
 
         // Navigation property for lookup
         [ForeignKey("KindLookupId")]

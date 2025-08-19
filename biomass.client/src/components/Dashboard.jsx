@@ -74,8 +74,8 @@ const Dashboard = ({ user, onLogout, children }) => {
         case 'vendor-management':
           navigate('/vendor-management');
           break;
-        case 'banking-finance':
-          navigate('/banking-finance');
+        case 'money-account':
+          navigate('/money-account');
           break;
         default:
           break;
@@ -118,8 +118,8 @@ const Dashboard = ({ user, onLogout, children }) => {
       color: '#9C27B0'
     },
     {
-      id: 'banking-finance',
-      label: 'Banking & Finance',
+      id: 'money-account',
+      label: 'Money Account',
       icon: <AccountBalanceIcon />,
       color: '#FF5722'
     }

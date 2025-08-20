@@ -1,15 +1,18 @@
 using Biomass.Api.Model;
 using Biomass.Server.Interfaces;
 using Biomass.Server.Models.Lookup;
+using Biomass.Server.Data;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Biomass.Server.Services
 {
     public class LookupService : ILookupService
     {
-        private readonly ILookupRepository _repo;
-        public LookupService(ILookupRepository repo)
+        private readonly ApplicationDbContext _dbContext;
+        public LookupService(ApplicationDbContext dbContext)
         {
-            _repo = repo;
+            _dbContext = dbContext;
         }
 
         public async Task<ServiceResponse<(IEnumerable<Lookup> Items, int TotalCount)>> GetAsync(string? domain, int page, int pageSize)
@@ -18,8 +21,23 @@ namespace Biomass.Server.Services
 
             try
             {
-                var result = await _repo.GetAsync(domain, page, pageSize);
-                response.Result = result;
+                page = page <= 0 ? 1 : page;
+                pageSize = pageSize <= 0 ? 10 : pageSize;
+
+                var query = _dbContext.Lookups.AsNoTracking().AsQueryable();
+                if (!string.IsNullOrWhiteSpace(domain))
+                {
+                    query = query.Where(l => l.LookUpDomain == domain);
+                }
+
+                var total = await query.CountAsync();
+                var items = await query
+                    .OrderBy(l => l.LookUpId)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+
+                response.Result = (items, total);
                 response.Success = true;
             }
             catch (Exception ex)
@@ -54,7 +72,7 @@ namespace Biomass.Server.Services
             var response = new ServiceResponse<LookupDto>();
             try
             {
-                var entity = await _repo.GetByIdAsync(id);
+                var entity = await _dbContext.Lookups.AsNoTracking().FirstOrDefaultAsync(l => l.LookUpId == id);
                 if (entity == null)
                 {
                     response.Success = false;
@@ -91,8 +109,9 @@ namespace Biomass.Server.Services
                     CreatedBy = request.CreatedBy,
                     CreatedOn = DateTime.UtcNow
                 };
-                var saved = await _repo.CreateAsync(entity);
-                response.Result = Map(saved);
+                _dbContext.Lookups.Add(entity);
+                await _dbContext.SaveChangesAsync();
+                response.Result = Map(entity);
                 response.Success = true;
                 response.Message = "Created";
             }
@@ -115,21 +134,18 @@ namespace Biomass.Server.Services
                     response.Message = "Name is required";
                     return response;
                 }
-                var toUpdate = new Lookup
-                {
-                    LookUpId = request.LookUpId,
-                    LookUpName = request.LookUpName.Trim(),
-                    LookUpDomain = request.LookUpDomain?.Trim(),
-                    Enabled = request.Enabled
-                };
-                var updated = await _repo.UpdateAsync(toUpdate);
-                if (updated == null)
+                var entity = await _dbContext.Lookups.FirstOrDefaultAsync(l => l.LookUpId == request.LookUpId);
+                if (entity == null)
                 {
                     response.Success = false;
                     response.Message = "Not found";
                     return response;
                 }
-                response.Result = Map(updated);
+                entity.LookUpName = request.LookUpName.Trim();
+                entity.LookUpDomain = request.LookUpDomain?.Trim();
+                entity.Enabled = request.Enabled;
+                await _dbContext.SaveChangesAsync();
+                response.Result = Map(entity);
                 response.Success = true;
                 response.Message = "Updated";
             }
@@ -146,10 +162,19 @@ namespace Biomass.Server.Services
             var response = new ServiceResponse<bool>();
             try
             {
-                var ok = await _repo.DeleteAsync(id);
-                response.Result = ok;
-                response.Success = ok;
-                response.Message = ok ? "Deleted" : "Not found";
+                var entity = await _dbContext.Lookups.FirstOrDefaultAsync(l => l.LookUpId == id);
+                if (entity == null)
+                {
+                    response.Result = false;
+                    response.Success = false;
+                    response.Message = "Not found";
+                    return response;
+                }
+                _dbContext.Lookups.Remove(entity);
+                await _dbContext.SaveChangesAsync();
+                response.Result = true;
+                response.Success = true;
+                response.Message = "Deleted";
             }
             catch (Exception ex)
             {
@@ -164,10 +189,7 @@ namespace Biomass.Server.Services
             var response = new ServiceResponse<Dictionary<string, List<LookupDto>>>();
             try
             {
-                // Get all lookups without domain filter to get all data
-                var (allItems, _) = await _repo.GetAsync(null, 1, int.MaxValue);
-                
-                // Group by domain
+                var allItems = await _dbContext.Lookups.AsNoTracking().ToListAsync();
                 var result = allItems
                     .GroupBy(l => l.LookUpDomain ?? "Unknown")
                     .ToDictionary(

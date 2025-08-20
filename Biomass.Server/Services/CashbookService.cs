@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Hosting;
 using System.Text.Json;
+using Npgsql;
 
 namespace Biomass.Server.Services
 {
@@ -121,19 +122,27 @@ namespace Biomass.Server.Services
 				_db.Cashbooks.Add(entity);
 				await _db.SaveChangesAsync();
 
-				// Get the created entry from view
-				var createdEntry = await GetCashbookFromViewAsync(entity.CashId);
-				if (createdEntry != null)
+				// Create a basic response with the created entity
+				response.Result = new CashbookDto
 				{
-					response.Result = createdEntry;
-					response.Success = true;
-					response.Message = "Cashbook entry created successfully";
-				}
-				else
-				{
-					response.Success = false;
-					response.Message = "Entry created but could not retrieve details";
-				}
+					CashId = entity.CashId,
+					HappenedAt = entity.HappenedAt,
+					CashKind = entity.CashKindId,
+					Amount = entity.Amount,
+					Currency = entity.Currency,
+					MoneyAccountId = entity.MoneyAccountId,
+					WalletEmployeeId = entity.WalletEmployeeId,
+					CategoryId = entity.CategoryId,
+					CostCenterId = entity.CostCenterId,
+					PaymentModeId = entity.PaymentModeId,
+					ReferenceNo = entity.ReferenceNo,
+					CounterpartyName = entity.CounterpartyName,
+					Remarks = entity.Remarks,
+					Status = entity.Status,
+					ReceiptPath = entity.ReceiptPath
+				};
+				response.Success = true;
+				response.Message = "Cashbook entry created successfully";
 			}
 			catch (Exception ex)
 			{
@@ -148,15 +157,35 @@ namespace Biomass.Server.Services
 			var response = new ServiceResponse<CashbookDto>();
 			try
 			{
-				var entry = await GetCashbookFromViewAsync(cashId);
-				if (entry == null)
+				var entity = await _db.Cashbooks.AsNoTracking()
+					.FirstOrDefaultAsync(c => c.CashId == cashId);
+
+				if (entity == null)
 				{
 					response.Success = false;
 					response.Message = "Cashbook entry not found";
 					return response;
 				}
 
-				response.Result = entry;
+				response.Result = new CashbookDto
+				{
+					CashId = entity.CashId,
+					HappenedAt = entity.HappenedAt,
+					CashKind = entity.CashKindId,
+					Amount = entity.Amount,
+					Currency = entity.Currency,
+					MoneyAccountId = entity.MoneyAccountId,
+					WalletEmployeeId = entity.WalletEmployeeId,
+					CategoryId = entity.CategoryId,
+					CostCenterId = entity.CostCenterId,
+					PaymentModeId = entity.PaymentModeId,
+					ReferenceNo = entity.ReferenceNo,
+					CounterpartyName = entity.CounterpartyName,
+					Remarks = entity.Remarks,
+					Meta = entity.Meta,
+					Status = entity.Status,
+					ReceiptPath = entity.ReceiptPath
+				};
 				response.Success = true;
 			}
 			catch (Exception ex)
@@ -214,17 +243,21 @@ namespace Biomass.Server.Services
 				// Try to call the function fn_wallet_balance first
 				try
 				{
-					// The function returns: employee_id, wallet_balance, currency
-					var result = await _db.Database.SqlQueryRaw<dynamic>(
-						"SELECT * FROM public.fn_wallet_balance({0})", employeeId).FirstOrDefaultAsync();
+					// Use ExecuteSqlRaw to avoid EF materialization issues
+					var command = _db.Database.GetDbConnection().CreateCommand();
+					command.CommandText = "SELECT * FROM public.fn_wallet_balance(@employeeId)";
+					command.Parameters.Add(new Npgsql.NpgsqlParameter("@employeeId", employeeId));
 					
-					if (result != null)
+					_db.Database.OpenConnection();
+					using var reader = await command.ExecuteReaderAsync();
+					
+					if (await reader.ReadAsync())
 					{
 						response.Result = new WalletBalanceResponse
 						{
-							EmployeeId = result.employee_id ?? employeeId,
-							Balance = result.wallet_balance ?? 0,
-							Currency = result.currency ?? "PKR"
+							EmployeeId = reader["employee_id"] != DBNull.Value ? Convert.ToInt32(reader["employee_id"]) : employeeId,
+							Balance = reader["wallet_balance"] != DBNull.Value ? Convert.ToDecimal(reader["wallet_balance"]) : 0,
+							Currency = reader["currency"] != DBNull.Value ? reader["currency"].ToString() : "PKR"
 						};
 						response.Success = true;
 						return response;
@@ -237,15 +270,15 @@ namespace Biomass.Server.Services
 				}
 
 				// Fallback: Calculate balance directly from cashbook table
-				var balance = await CalculateWalletBalanceFromTableAsync(employeeId);
+				//var balance = await CalculateWalletBalanceFromTableAsync(employeeId);
 				
-				response.Result = new WalletBalanceResponse
-				{
-					EmployeeId = employeeId,
-					Balance = balance,
-					Currency = "PKR" // Default currency
-				};
-				response.Success = true;
+				//response.Result = new WalletBalanceResponse
+				//{
+				//	EmployeeId = employeeId,
+				//	Balance = balance,
+				//	Currency = "PKR" // Default currency
+				//};
+				//response.Success = true;
 			}
 			catch (Exception ex)
 			{
@@ -255,22 +288,22 @@ namespace Biomass.Server.Services
 			return response;
 		}
 
-		private async Task<decimal> CalculateWalletBalanceFromTableAsync(int employeeId)
-		{
-			// Calculate balance from cashbook table
-			// Cash In (positive) - Cash Out (negative)
-			var cashIn = await _db.Cashbooks
-				.Where(c => c.WalletEmployeeId == employeeId && c.Status != "Cancelled")
-				.Where(c => c.CashKindId == 1) // Assuming 1 = Cash In
-				.SumAsync(c => c.Amount);
+		//private async Task<decimal> CalculateWalletBalanceFromTableAsync(int employeeId)
+		//{
+		//	// Calculate balance from cashbook table
+		//	// Cash In (positive) - Cash Out (negative)
+		//	var cashIn = await _db.Cashbooks
+		//		.Where(c => c.WalletEmployeeId == employeeId && c.Status != "Cancelled")
+		//		//.Where(c => c.CashKindId == 1) // Assuming 1 = Cash In
+		//		.SumAsync(c => c.Amount);
 
-			var cashOut = await _db.Cashbooks
-				.Where(c => c.WalletEmployeeId == employeeId && c.Status != "Cancelled")
-				.Where(c => c.CashKindId == 2) // Assuming 2 = Cash Out
-				.SumAsync(c => c.Amount);
+		//	var cashOut = await _db.Cashbooks
+		//		.Where(c => c.WalletEmployeeId == employeeId && c.Status != "Cancelled")
+		//		//.Where(c => c.CashKindId == 2) // Assuming 2 = Cash Out
+		//		.SumAsync(c => c.Amount);
 
-			return (decimal)(cashIn - cashOut);
-		}
+		//	return (decimal)(cashIn - cashOut);
+		//}
 
 		public async Task<ServiceResponse<EmployeeTransactionResponse>> GetEmployeeTransactionsAsync(
 			int employeeId, int days, int page = 1, int pageSize = 20)
@@ -283,35 +316,50 @@ namespace Biomass.Server.Services
 
 				var cutoffDate = DateTime.UtcNow.AddDays(-days);
 
-				var query = _db.Cashbooks.AsNoTracking()
-					.Where(c => c.WalletEmployeeId == employeeId)
-					.Where(c => c.Status != "Cancelled")
-					.Where(c => c.HappenedAt >= cutoffDate)
-					.OrderByDescending(c => c.HappenedAt);
+				// Raw SQL query using v_cashbook_effects view
+				var sql = @"
+					SELECT 
+						cash_id, happened_at, cash_kind, amount, currency,
+						money_account_id, money_account_name, wallet_employee_id, employee_wallet_name,
+						category_id, category_name, cost_center_id, costcenter_name, cost_center_sub_id, costcenter_sub_name,
+						payment_mode_id, payment_mode_name, reference_no, counterparty_name, remarks, meta,
+						bank_delta, wallet_delta, status
+					FROM v_cashbook_effects 
+					WHERE wallet_employee_id = {0} 
+						AND status != 'Cancelled' 
+						AND happened_at >= {1}
+					ORDER BY happened_at DESC
+					OFFSET {2} ROWS 
+					FETCH NEXT {3} ROWS ONLY";
 
-				var total = await query.CountAsync();
-				var entities = await query
-					.Skip((page - 1) * pageSize)
-					.Take(pageSize)
-					.ToListAsync();
+				var offset = (page - 1) * pageSize;
 
-				var items = new List<CashbookDto>();
-				foreach (var entity in entities)
-				{
-					var dto = await GetCashbookFromViewAsync(entity.CashId);
-					if (dto != null)
-					{
-						items.Add(dto);
-					}
-				}
+				// Get paginated results
+				var items = await _db.Database.SqlQueryRaw<CashTransactionDetailed>(
+					sql, employeeId, cutoffDate, offset, pageSize
+				).ToListAsync();
+
+				// Get total count for pagination
+				var countSql = @"
+					SELECT COUNT(*) as count_value
+					FROM v_cashbook_effects 
+					WHERE wallet_employee_id = {0} 
+						AND status != 'Cancelled' 
+						AND happened_at >= {1}";
+
+				var total = await _db.Database.SqlQueryRaw<CountResult>(
+					countSql, employeeId, cutoffDate
+				).FirstOrDefaultAsync();
+
+				var totalCount = total?.count_value ?? 0;
 
 				response.Result = new EmployeeTransactionResponse
 				{
 					Items = items,
-					TotalCount = total,
+					TotalCount = totalCount,
 					Page = page,
 					PageSize = pageSize,
-					TotalPages = (int)Math.Ceiling((double)total / pageSize)
+					TotalPages = (int)Math.Ceiling((double)totalCount / pageSize)
 				};
 				response.Success = true;
 			}
@@ -341,37 +389,7 @@ namespace Biomass.Server.Services
 			return await GetEmployeeTransactionsAsync(employeeId, 30, page, pageSize);
 		}
 
-		private async Task<CashbookDto?> GetCashbookFromViewAsync(long cashId)
-		{
-			// This would map from v_cashbook_effects view
-			// For now, we'll map from the main table and add placeholder values for bank_delta and wallet_delta
-			var entity = await _db.Cashbooks.AsNoTracking()
-				.FirstOrDefaultAsync(c => c.CashId == cashId);
 
-			if (entity == null) return null;
-
-			return new CashbookDto
-			{
-				CashId = entity.CashId,
-				HappenedAt = entity.HappenedAt,
-				CashKind =entity.CashKindId, // This should come from lookup
-				Amount = entity.Amount,
-				Currency = entity.Currency,
-				MoneyAccountId = entity.MoneyAccountId,
-				WalletEmployeeId = entity.WalletEmployeeId,
-				CategoryId = entity.CategoryId,
-				CostCenterId = entity.CostCenterId,
-				PaymentModeId = entity.PaymentModeId,
-				ReferenceNo = entity.ReferenceNo,
-				CounterpartyName = entity.CounterpartyName,
-				Remarks = entity.Remarks,
-				Meta = entity.Meta,
-				Status = entity.Status,
-				ReceiptPath = entity.ReceiptPath,
-				BankDelta = entity.Amount, // Placeholder - should come from view
-				WalletDelta = entity.Amount // Placeholder - should come from view
-			};
-		}
 
 		private async Task<string> SaveReceiptFileAsync(IFormFile receipt)
 		{

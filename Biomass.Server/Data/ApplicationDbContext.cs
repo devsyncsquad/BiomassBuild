@@ -206,25 +206,17 @@ namespace Biomass.Server.Data
                 entity.Property(e => e.EffectiveDate).HasColumnName("effectivedate").IsRequired();
                 entity.Property(e => e.CompanyRate).HasColumnName("company_rate").IsRequired().HasColumnType("decimal(10,2)");
                 entity.Property(e => e.TransporterRate).HasColumnName("transporter_rate").IsRequired().HasColumnType("decimal(10,2)");
+               // entity.Property(e => e.DispatchWeight).HasColumnName("dispatchweight").HasColumnType("decimal(10,2)");
+               // entity.Property(e => e.ReceivingWeight).HasColumnName("receivingweight").HasColumnType("decimal(10,2)");
                 entity.Property(e => e.Route).HasColumnName("route").HasMaxLength(100);
                 entity.Property(e => e.MaterialType).HasColumnName("materialtype").HasMaxLength(100);
-                entity.Property(e => e.DispatchWeight).HasColumnName("dispatchweight").HasColumnType("decimal(10,2)");
-                entity.Property(e => e.ReceivingWeight).HasColumnName("receivingweight").HasColumnType("decimal(10,2)");
                 entity.Property(e => e.Status).HasColumnName("status").IsRequired().HasMaxLength(20);
                 entity.Property(e => e.CreatedBy).HasColumnName("createdby");
                 entity.Property(e => e.CreatedOn).HasColumnName("createdon").IsRequired();
                 entity.Property(e => e.LocationId).HasColumnName("location_id");
 
-                // Foreign key relationships
-                entity.HasOne(e => e.Customer)
-                      .WithMany(e => e.MaterialRates)
-                      .HasForeignKey(e => e.CustomerId)
-                      .OnDelete(DeleteBehavior.Cascade);
-
-                entity.HasOne(e => e.CustomerLocation)
-                      .WithMany()
-                      .HasForeignKey(e => e.LocationId)
-                      .OnDelete(DeleteBehavior.NoAction); // Using NoAction to avoid circular cascade
+                // Remove foreign key constraints to avoid database schema issues
+                // These will be handled at the application level
             });
 
             modelBuilder.Entity<MainMenus>(entity =>

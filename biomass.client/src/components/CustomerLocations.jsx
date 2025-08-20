@@ -38,7 +38,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import MapComponent from './MapComponent';
 import { CustomerLocationForm } from './CustomerLocationForm';
-import MaterialRateForm from './MaterialRateForm';
+import RatePopup from './RatePopup';
 import './CustomerLocations.css';
 
 const CustomerLocations = ({ customer, onClose }) => {
@@ -54,7 +54,7 @@ const CustomerLocations = ({ customer, onClose }) => {
   const [filterStatus, setFilterStatus] = useState('all');
   const [openMapDialog, setOpenMapDialog] = useState(false);
   const [mapLocation, setMapLocation] = useState(null);
-  const [openMaterialRateForm, setOpenMaterialRateForm] = useState(false);
+  const [openRatePopup, setOpenRatePopup] = useState(false);
   const [selectedLocationForRate, setSelectedLocationForRate] = useState(null);
   const [materialRates, setMaterialRates] = useState([]);
 
@@ -220,7 +220,7 @@ const CustomerLocations = ({ customer, onClose }) => {
 
   const handleAddRate = (location) => {
     setSelectedLocationForRate(location);
-    setOpenMaterialRateForm(true);
+    setOpenRatePopup(true);
   };
 
   const handleSaveMaterialRate = (materialRate) => {
@@ -361,8 +361,8 @@ const CustomerLocations = ({ customer, onClose }) => {
         alignItems: 'center'
       }}>
         <Box>
-          <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1 }}>
-            {isStandalone ? 'All Customer Locations' : 'Customer Locations'}
+          <Typography variant="h4" component="h1" gutterBottom sx={{ color: 'white', fontWeight: 'bold' }}>
+            Customer Management
           </Typography>
           <Typography variant="body1">
             {isStandalone 
@@ -892,17 +892,17 @@ const CustomerLocations = ({ customer, onClose }) => {
         onSave={handleSaveLocation}
       />
 
-      {/* Material Rate Form Dialog */}
-      <MaterialRateForm
-        open={openMaterialRateForm}
+      {/* Rate Popup Dialog */}
+      <RatePopup
+        open={openRatePopup}
         onClose={() => {
-          setOpenMaterialRateForm(false);
+          setOpenRatePopup(false);
           setSelectedLocationForRate(null);
         }}
         locationId={selectedLocationForRate?.locationId || selectedLocationForRate?.LocationId}
         locationName={selectedLocationForRate?.locationName || selectedLocationForRate?.LocationName}
         customerId={selectedLocationForRate?.customerId || selectedLocationForRate?.CustomerId}
-        materialRateData={null}
+        customerName={selectedLocationForRate?.customerName || selectedLocationForRate?.CustomerName || (customer ? `${customer.firstName} ${customer.lastName}` : '')}
         onSave={handleSaveMaterialRate}
       />
 

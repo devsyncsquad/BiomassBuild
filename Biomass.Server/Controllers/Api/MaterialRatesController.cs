@@ -37,6 +37,17 @@ namespace Biomass.Server.Controllers.Api
             return Ok(response);
         }
 
+        [HttpGet("CheckExistingActiveRates")]
+        public async Task<ActionResult<ServiceResponse<List<MaterialRateDto>>>> CheckExistingActiveRates(
+            [FromQuery] int customerId, 
+            [FromQuery] int locationId, 
+            [FromQuery] string materialType, 
+            [FromQuery] DateTime effectiveDate)
+        {
+            var response = await _materialRateService.CheckExistingActiveRatesAsync(customerId, locationId, materialType, effectiveDate);
+            return Ok(response);
+        }
+
         [HttpPost("CreateMaterialRate")]
         public async Task<ActionResult<ServiceResponse<MaterialRateDto>>> CreateMaterialRate(CreateMaterialRateRequest request)
         {

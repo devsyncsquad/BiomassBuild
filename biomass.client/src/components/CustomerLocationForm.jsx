@@ -226,7 +226,7 @@ export const CustomerLocationForm = ({ open, onClose, customerId, locationData =
         justifyContent: 'space-between',
         alignItems: 'center'
       }}>
-        <Typography variant="h6" fontWeight="bold">
+        <Typography variant="h6" fontWeight="bold" sx={{ color: 'white' }}>
           Customer Locations Form
         </Typography>
         <Box>

@@ -180,16 +180,38 @@ namespace Biomass.Server.Data
 
             modelBuilder.Entity<CustomerLocation>(entity =>
             {
+                entity.ToTable("locations");
                 entity.HasKey(e => e.LocationId);
-                entity.Property(e => e.LocationName).IsRequired().HasMaxLength(100);
-                entity.Property(e => e.LocationCode).IsRequired().HasMaxLength(50);
-                entity.Property(e => e.Address).HasMaxLength(250);
-                entity.Property(e => e.DispatchChargeType).HasMaxLength(50);
-                entity.Property(e => e.VariableChargeType).HasMaxLength(50);
-                entity.Property(e => e.ReceivingChargeType).HasMaxLength(50);
-                entity.Property(e => e.ReceivingVariableChargeType).HasMaxLength(50);
-                entity.Property(e => e.Status).IsRequired().HasMaxLength(20);
-                entity.Property(e => e.CreatedOn).IsRequired();
+                entity.Property(e => e.LocationId).HasColumnName("locationid");
+                entity.Property(e => e.CustomerId).HasColumnName("customerid").IsRequired();
+                entity.Property(e => e.LocationName).HasColumnName("locationname").IsRequired().HasMaxLength(100);
+                entity.Property(e => e.LocationCode).HasColumnName("locationcode").IsRequired().HasMaxLength(50);
+                entity.Property(e => e.Address).HasColumnName("address").HasMaxLength(250);
+                entity.Property(e => e.Latitude).HasColumnName("latitude").HasColumnType("decimal(10,7)");
+                entity.Property(e => e.Longitude).HasColumnName("longitude").HasColumnType("decimal(10,7)");
+                entity.Property(e => e.CenterDispatchWeightLimit).HasColumnName("center_dispatch_weight_limit").HasColumnType("decimal(10,2)");
+                entity.Property(e => e.AdvancePercentageAllowed).HasColumnName("advance_percentage_allowed").HasColumnType("decimal(5,2)");
+                entity.Property(e => e.ToleranceLimitPercentage).HasColumnName("tolerance_limit_percentage").HasColumnType("decimal(5,2)");
+                entity.Property(e => e.ToleranceLimitKg).HasColumnName("tolerance_limit_kg").HasColumnType("decimal(10,2)");
+                entity.Property(e => e.MaterialPenaltyRatePerKg).HasColumnName("material_penalty_rateperkg").HasColumnType("decimal(10,2)");
+                entity.Property(e => e.DispatchLoadingChargesEnabled).HasColumnName("dispatch_loading_charges_enabled");
+                entity.Property(e => e.DispatchChargeType).HasColumnName("dispatch_charge_type").HasMaxLength(50);
+                entity.Property(e => e.FixedLoaderCost).HasColumnName("fixed_loader_cost").HasColumnType("decimal(10,2)");
+                entity.Property(e => e.VariableChargeType).HasColumnName("variable_charge_type").HasMaxLength(50);
+                entity.Property(e => e.VariableChargeAmount).HasColumnName("variable_charge_amount").HasColumnType("decimal(10,2)");
+                entity.Property(e => e.LaborChargesEnabled).HasColumnName("labor_charges_enabled");
+                entity.Property(e => e.LaborChargeType).HasColumnName("labor_charge_type").HasMaxLength(50);
+                entity.Property(e => e.LaborChargesCost).HasColumnName("labor_charges_cost").HasColumnType("decimal(10,2)");
+                entity.Property(e => e.ReceivingUnloadingCostEnabled).HasColumnName("receiving_unloading_cost_enabled");
+                entity.Property(e => e.ReceivingChargeType).HasColumnName("receiving_charge_type").HasMaxLength(50);
+                entity.Property(e => e.FixedUnloadingCost).HasColumnName("fixed_unloading_cost").HasColumnType("decimal(10,2)");
+                entity.Property(e => e.ReceivingVariableChargeType).HasColumnName("receiving_variable_charge_type").HasMaxLength(50);
+                entity.Property(e => e.ReceivingVariableChargeAmount).HasColumnName("receiving_variable_charge_amount").HasColumnType("decimal(10,2)");
+                entity.Property(e => e.Status).HasColumnName("status").IsRequired().HasMaxLength(20);
+                entity.Property(e => e.CreatedBy).HasColumnName("createdby");
+                entity.Property(e => e.CreatedOn).HasColumnName("createdon").IsRequired();
+                entity.Property(e => e.LastUpdatedBy).HasColumnName("lastupdatedby");
+                entity.Property(e => e.LastUpdatedOn).HasColumnName("lastupdatedon");
 
                 entity.HasOne(e => e.Customer)
                       .WithMany(e => e.Locations)

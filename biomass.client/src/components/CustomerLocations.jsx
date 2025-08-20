@@ -84,57 +84,22 @@ const CustomerLocations = ({ customer, onClose }) => {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        let response;
-        if (customer) {
-          // Fetch locations for specific customer
-          response = await axios.get(`https://localhost:7084/api/customerlocations/GetLocationsByCustomerId/${customer.customerId}`);
-        } else {
-          // Fetch all locations
-          response = await axios.get('https://localhost:7084/api/customerlocations');
-        }
-        
-        console.log('API Response:', response.data);
+        // Fetch locations for the selected customer
+        const response = await axios.get(`https://localhost:7084/api/customerlocations/GetLocationsByCustomerId/${customer.customerId}`);
         if (response.data.success) {
-          console.log('Setting locations:', response.data.result);
-          // Convert PascalCase to camelCase for frontend consistency
-          const convertedLocations = response.data.result.map(location => ({
-            locationId: location.locationId || location.LocationId,
-            customerId: location.customerId || location.CustomerId,
-            locationName: location.locationName || location.LocationName,
-            locationCode: location.locationCode || location.LocationCode,
-            address: location.address || location.Address,
-            latitude: location.latitude || location.Latitude,
-            longitude: location.longitude || location.Longitude,
-            centerDispatchWeightLimit: location.centerDispatchWeightLimit || location.CenterDispatchWeightLimit,
-            advancePercentageAllowed: location.advancePercentageAllowed || location.AdvancePercentageAllowed,
-            toleranceLimitPercentage: location.toleranceLimitPercentage || location.ToleranceLimitPercentage,
-            toleranceLimitKg: location.toleranceLimitKg || location.ToleranceLimitKg,
-            materialPenaltyRatePerKg: location.materialPenaltyRatePerKg || location.MaterialPenaltyRatePerKg,
-            dispatchLoadingChargesEnabled: location.dispatchLoadingChargesEnabled || location.DispatchLoadingChargesEnabled,
-            dispatchChargeType: location.dispatchChargeType || location.DispatchChargeType,
-            fixedLoaderCost: location.fixedLoaderCost || location.FixedLoaderCost,
-            variableChargeType: location.variableChargeType || location.VariableChargeType,
-            variableChargeAmount: location.variableChargeAmount || location.VariableChargeAmount,
-            receivingUnloadingCostEnabled: location.receivingUnloadingCostEnabled || location.ReceivingUnloadingCostEnabled,
-            receivingChargeType: location.receivingChargeType || location.ReceivingChargeType,
-            fixedUnloadingCost: location.fixedUnloadingCost || location.FixedUnloadingCost,
-            receivingVariableChargeType: location.receivingVariableChargeType || location.ReceivingVariableChargeType,
-            receivingVariableChargeAmount: location.receivingVariableChargeAmount || location.ReceivingVariableChargeAmount,
-            status: location.status || location.Status,
-            createdOn: location.createdOn || location.CreatedOn,
-            lastUpdatedOn: location.lastUpdatedOn || location.LastUpdatedOn,
-            customerName: location.customerName || location.CustomerName
-          }));
-          setLocations(convertedLocations);
-        } else {
-          console.error('Error fetching locations:', response.data.message);
-          // Fallback to mock data if API fails
-          setLocations(getMockLocations());
+          setLocations(response.data.result);
         }
       } catch (error) {
         console.error('Error fetching locations:', error);
-        // Fallback to mock data if API fails
-        setLocations(getMockLocations());
+        // Fallback to get all locations if customer-specific fails
+        try {
+          const response = await axios.get('https://localhost:7084/api/customerlocations/GetAllLocations');
+          if (response.data.success) {
+            setLocations(response.data.result);
+          }
+        } catch (fallbackError) {
+          console.error('Error fetching all locations:', fallbackError);
+        }
       }
     };
 
@@ -229,7 +194,17 @@ const CustomerLocations = ({ customer, onClose }) => {
   };
 
   const handleAddLocation = () => {
-    setEditingLocation(null);
+    const newLocationData = {
+      customerName: customer ? `${customer.firstName} ${customer.lastName}` : ''
+    };
+    
+    console.log('handleAddLocation called:', {
+      customer,
+      newLocationData,
+      customerId: customer?.customerId
+    });
+    
+    setEditingLocation(newLocationData);
     setOpenLocationForm(true);
   };
 
@@ -258,19 +233,35 @@ const CustomerLocations = ({ customer, onClose }) => {
       fixedUnloadingCost: savedLocation.fixedUnloadingCost || savedLocation.FixedUnloadingCost,
       receivingVariableChargeType: savedLocation.receivingVariableChargeType || savedLocation.ReceivingVariableChargeType,
       receivingVariableChargeAmount: savedLocation.receivingVariableChargeAmount || savedLocation.ReceivingVariableChargeAmount,
+      laborChargesEnabled: savedLocation.laborChargesEnabled || savedLocation.LaborChargesEnabled,
+      laborChargeType: savedLocation.laborChargeType || savedLocation.LaborChargeType,
+      laborChargesCost: savedLocation.laborChargesCost || savedLocation.LaborChargesCost,
       status: savedLocation.status || savedLocation.Status,
       createdOn: savedLocation.createdOn || savedLocation.CreatedOn,
       lastUpdatedOn: savedLocation.lastUpdatedOn || savedLocation.LastUpdatedOn,
       customerName: savedLocation.customerName || savedLocation.CustomerName
     };
 
-    if (editingLocation) {
+    // Check if we're editing an existing location (has locationId) or adding a new one
+    const isEditingExisting = editingLocation && editingLocation.locationId;
+    
+    console.log('handleSaveLocation:', {
+      savedLocation,
+      convertedLocation,
+      editingLocation,
+      isEditingExisting,
+      hasLocationId: editingLocation?.locationId
+    });
+
+    if (isEditingExisting) {
       // Update existing location
+      console.log('Updating existing location:', convertedLocation.locationId);
       setLocations(prev => prev.map(loc => 
         loc.locationId === convertedLocation.locationId ? convertedLocation : loc
       ));
     } else {
       // Add new location
+      console.log('Adding new location');
       setLocations(prev => [...prev, convertedLocation]);
     }
     setOpenLocationForm(false);
@@ -280,7 +271,7 @@ const CustomerLocations = ({ customer, onClose }) => {
   const handleDeleteLocation = async (locationId) => {
     if (window.confirm('Are you sure you want to delete this location?')) {
       try {
-        await axios.delete(`https://localhost:7084/api/customerlocations/${locationId}`);
+        await axios.delete(`https://localhost:7084/api/customerlocations/DeleteLocation/${locationId}`);
         setLocations(prev => prev.filter(loc => loc.locationId !== locationId));
       } catch (error) {
         console.error('Error deleting location:', error);
@@ -732,55 +723,40 @@ const CustomerLocations = ({ customer, onClose }) => {
               
               {/* Dispatch Loading Charges Section */}
               <Grid item xs={12}>
-                <Typography variant="h6" sx={{ mt: 2, mb: 1, color: '#228B22', borderBottom: '2px solid #228B22', pb: 0.5 }}>
+                <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
                   Dispatch Loading Charges
                 </Typography>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="body2" color="text.secondary">
+                      Enabled: {selectedLocation.dispatchLoadingChargesEnabled || selectedLocation.DispatchLoadingChargesEnabled ? 'Yes' : 'No'}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="body2" color="text.secondary">
+                      Type: {selectedLocation.dispatchChargeType || selectedLocation.DispatchChargeType || 'N/A'}
+                    </Typography>
+                  </Grid>
+                </Grid>
               </Grid>
               
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Loading Charges Enabled"
-                  value={selectedLocation.dispatchLoadingChargesEnabled || selectedLocation.DispatchLoadingChargesEnabled ? 'Yes' : 'No'}
-                  margin="normal"
-                  InputProps={{ readOnly: true }}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Charge Type"
-                  value={selectedLocation.dispatchChargeType || selectedLocation.DispatchChargeType || 'N/A'}
-                  margin="normal"
-                  InputProps={{ readOnly: true }}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Fixed Loader Cost"
-                  value={`Rs. ${(selectedLocation.fixedLoaderCost || selectedLocation.FixedLoaderCost || 0).toLocaleString()}`}
-                  margin="normal"
-                  InputProps={{ readOnly: true }}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Variable Charge Type"
-                  value={selectedLocation.variableChargeType || selectedLocation.VariableChargeType || 'N/A'}
-                  margin="normal"
-                  InputProps={{ readOnly: true }}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Variable Charge Amount"
-                  value={`Rs. ${(selectedLocation.variableChargeAmount || selectedLocation.VariableChargeAmount || 0).toLocaleString()}`}
-                  margin="normal"
-                  InputProps={{ readOnly: true }}
-                />
+              {/* Labour Charges Section */}
+              <Grid item xs={12}>
+                <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                  Labour Charges
+                </Typography>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="body2" color="text.secondary">
+                      Enabled: {selectedLocation.laborChargesEnabled || selectedLocation.LaborChargesEnabled ? 'Yes' : 'No'}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="body2" color="text.secondary">
+                      Type: {selectedLocation.laborChargeType || selectedLocation.LaborChargeType || 'N/A'}
+                    </Typography>
+                  </Grid>
+                </Grid>
               </Grid>
               
               {/* Receiving Unloading Charges Section */}

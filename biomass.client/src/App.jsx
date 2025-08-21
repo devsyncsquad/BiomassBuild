@@ -491,6 +491,13 @@ const DashboardHome = () => {
                 >
                   Manage Vendors
                 </Button>
+                <Button
+                  variant='outlined'
+                  fullWidth
+                  onClick={() => navigate("/cost-centers")}
+                >
+                  Manage Cost Centers
+                </Button>
               </Box>
             </CardContent>
           </Card>

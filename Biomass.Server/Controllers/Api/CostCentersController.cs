@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Biomass.Server.Interfaces;
 using Biomass.Api.Model;
+using Biomass.Server.Models.CostCenter;
 
 namespace Biomass.Server.Controllers.Api
 {
@@ -15,15 +16,16 @@ namespace Biomass.Server.Controllers.Api
 			_service = service;
 		}
 
-		[HttpGet("GetAllCostCenters")]
-		public async Task<IActionResult> GetAllCostCenters([FromQuery] int page = 1, [FromQuery] int pageSize = 20, [FromQuery] int? companyId = null, [FromQuery] bool? isActive = null, [FromQuery] string? term = null)
-		{
-			var result = await _service.GetAllAsync(page, pageSize, companyId, isActive, term);
-			if (!result.Success) return BadRequest(result);
-			return Ok(result);
-		}
+        // Controller
+        [HttpGet("GetAllCostCentersView")]
+        public async Task<ActionResult<ServiceResponse<List<VCostCenter>>>> GetAllCostCentersView()
+        {
+            var result = await _service.GetAllViewAsync();
+            if (!result.Success) return BadRequest(result);
+            return Ok(result);
+        }
 
-		[HttpGet("GetCostCenterTree")]
+        [HttpGet("GetCostCenterTree")]
 		public async Task<IActionResult> GetCostCenterTree([FromQuery] int? companyId = null)
 		{
 			var result = await _service.GetTreeAsync(companyId);

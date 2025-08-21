@@ -21,6 +21,7 @@ import BusinessIcon from "@mui/icons-material/Business";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import StorefrontIcon from "@mui/icons-material/Storefront";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
+import AccountTreeIcon from "@mui/icons-material/AccountTree";
 import "./Dashboard.css";
 import { logout, getUserRole, getUserCustomers } from "../utils/auth";
 
@@ -77,6 +78,9 @@ const Dashboard = ({ user, onLogout, children }) => {
         case "money-account":
           navigate("/money-account");
           break;
+        case "cost-centers":
+          navigate("/cost-centers");
+          break;
         case "lookup-management":
           navigate("/lookup-management");
           break;
@@ -127,10 +131,16 @@ const Dashboard = ({ user, onLogout, children }) => {
       color: "#FF5722",
     },
     {
+      id: "cost-centers",
+      label: "Cost Centers",
+      icon: <AccountTreeIcon />,
+      color: "#795548",
+    },
+    {
       id: "lookup-management",
       label: "LookUp Management",
       icon: <AccountBalanceIcon />,
-      color: "#FF5722",
+      color: "#607D8B",
     },
   ];
 

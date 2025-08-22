@@ -370,13 +370,14 @@ namespace Biomass.Server.Data
             modelBuilder.Entity<Lookup>(entity =>
             {
                 entity.ToTable("lookups");
-                entity.HasKey(e => e.LookUpId);
-                entity.Property(e => e.LookUpId).HasColumnName("lookup_id");
-                entity.Property(e => e.LookUpName).HasColumnName("lookup_name").IsRequired().HasMaxLength(100);
-                entity.Property(e => e.LookUpDomain).HasColumnName("lookup_domain").HasMaxLength(100);
-                entity.Property(e => e.Enabled).HasColumnName("enabled").HasMaxLength(1);
-                //entity.Property(e => e.CreatedBy).HasColumnName("createdby").HasMaxLength(100);
+                entity.HasKey(e => e.LookupId);
+                entity.Property(e => e.LookupId).HasColumnName("lookup_id");
+                entity.Property(e => e.LookupName).HasColumnName("lookup_name").IsRequired().HasMaxLength(100);
+                entity.Property(e => e.LookupDomain).HasColumnName("lookup_domain").IsRequired().HasMaxLength(100);
+                entity.Property(e => e.Enabled).HasColumnName("enabled").IsRequired();
+                entity.Property(e => e.SortOrder).HasColumnName("sort_order").IsRequired();
                 entity.Property(e => e.CreatedOn).HasColumnName("created_on").IsRequired();
+                entity.Property(e => e.CreatedBy).HasColumnName("created_by");
             });
 
             // MoneyAccounts

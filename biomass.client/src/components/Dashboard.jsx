@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
@@ -23,6 +24,34 @@ import StorefrontIcon from '@mui/icons-material/Storefront';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import './Dashboard.css';
 import { logout, getUserRole, getUserCustomers, getUserAssignedMenus } from '../utils/auth';
+=======
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import Drawer from "@mui/material/Drawer";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import Divider from "@mui/material/Divider";
+import Avatar from "@mui/material/Avatar";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Grid from "@mui/material/Grid";
+import Chip from "@mui/material/Chip";
+import LogoutIcon from "@mui/icons-material/Logout";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import PeopleIcon from "@mui/icons-material/People";
+import BusinessIcon from "@mui/icons-material/Business";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import StorefrontIcon from "@mui/icons-material/Storefront";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
+import AccountTreeIcon from "@mui/icons-material/AccountTree";
+import "./Dashboard.css";
+import { logout, getUserRole, getUserCustomers } from "../utils/auth";
+>>>>>>> cost-center
 
 const DRAWER_WIDTH = 280;
 
@@ -80,8 +109,19 @@ const Dashboard = ({ user, onLogout, children }) => {
         case 'vendor-management':
           navigate('/vendor-management');
           break;
+<<<<<<< HEAD
         case 'money-account':
           navigate('/money-account');
+=======
+        case "money-account":
+          navigate("/money-account");
+          break;
+        case "cost-centers":
+          navigate("/cost-centers");
+          break;
+        case "lookup-management":
+          navigate("/lookup-management");
+>>>>>>> cost-center
           break;
         default:
           break;
@@ -133,9 +173,26 @@ const Dashboard = ({ user, onLogout, children }) => {
       id: 6, // Money Account
       label: 'Money Account',
       icon: <AccountBalanceIcon />,
+<<<<<<< HEAD
       color: '#FF5722',
       route: 'money-account'
     }
+=======
+      color: "#FF5722",
+    },
+    {
+      id: "cost-centers",
+      label: "Cost Centers",
+      icon: <AccountTreeIcon />,
+      color: "#795548",
+    },
+    {
+      id: "lookup-management",
+      label: "LookUp Management",
+      icon: <AccountBalanceIcon />,
+      color: "#607D8B",
+    },
+>>>>>>> cost-center
   ];
 
   // Filter menu items based on user's assigned menus

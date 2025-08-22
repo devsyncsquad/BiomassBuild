@@ -15,43 +15,44 @@ namespace Biomass.Server.Services
 			_db = db;
 		}
 
-		public async Task<ServiceResponse<(IEnumerable<CostCenterDto> Items, int TotalCount)>> GetAllAsync(int page, int pageSize, int? companyId, bool? isActive, string? term)
-		{
-			var response = new ServiceResponse<(IEnumerable<CostCenterDto>, int)>();
-			try
-			{
-				page = page <= 0 ? 1 : page;
-				pageSize = pageSize <= 0 ? 20 : Math.Min(pageSize, 100);
+        // Service
+        public async Task<ServiceResponse<List<VCostCenter>>> GetAllViewAsync()
+        {
+            var resp = new ServiceResponse<List<VCostCenter>>();
+            try
+            {
+                var query =
+                    from c in _db.CostCenters.AsNoTracking()
+                    join p in _db.CostCenters.AsNoTracking()
+                        on c.ParentCostCenterId equals p.CostCenterId into gp
+                    from p in gp.DefaultIfEmpty()
+                    select new VCostCenter
+                    {
+                        CostCenterId = c.CostCenterId,
+                        Code = c.Code,
+                        Name = c.Name,
+                        IsActive = c.IsActive,
+                        ParentCostCenterId = c.ParentCostCenterId,
+                        CreatedAt = c.CreatedAt,
+                        IsChild = c.ParentCostCenterId != null,
+                        ParentName = p != null ? p.Name : null
+                    };
 
-				var query = _db.CostCenters.AsNoTracking().AsQueryable();
-				if (companyId.HasValue) query = query.Where(c => c.CompanyId == companyId);
-				if (isActive.HasValue) query = query.Where(c => (c.IsActive ?? true) == isActive.Value);
-				if (!string.IsNullOrWhiteSpace(term))
-				{
-					var t = term.Trim().ToLower();
-					query = query.Where(c => c.Code.ToLower().Contains(t) || c.Name.ToLower().Contains(t));
-				}
-
-				var total = await query.CountAsync();
-				var entities = await query
-					.OrderBy(c => c.Name)
-					.Skip((page - 1) * pageSize)
-					.Take(pageSize)
-					.ToListAsync();
-				var items = entities.Select(Map).ToList();
-
-				response.Result = (items, total);
-				response.Success = true;
-			}
-			catch (Exception ex)
-			{
-				response.Success = false;
-				response.Message = ex.Message;
-			}
-			return response;
-		}
-
-		public async Task<ServiceResponse<List<CostCenterDto>>> GetTreeAsync(int? companyId = null)
+                var items = await query
+                    .OrderBy(x => x.ParentName)   // parents grouped; nulls first
+                    .ThenBy(x => x.Name)
+                    .ToListAsync();
+				resp.Result = items;
+                resp.Success = true;
+            }
+            catch (Exception ex)
+            {
+                resp.Success = false;
+                resp.Message = ex.Message;
+            }
+            return resp;
+        }
+        public async Task<ServiceResponse<List<CostCenterDto>>> GetTreeAsync(int? companyId = null)
 		{
 			var response = new ServiceResponse<List<CostCenterDto>>();
 			try

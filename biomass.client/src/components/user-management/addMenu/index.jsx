@@ -1,51 +1,44 @@
 import React from 'react';
-import { useState } from 'react';
-import { Divider, Grid, Box, Tabs } from '@mui/material';
-import Tab from '@mui/material/Tab';
+import { useState, useCallback } from 'react';
+import { Divider, Grid, Box } from '@mui/material';
 
-import AddMainMenu from './AddMainMenu';
-import AddSubMenu from './AddSubMenu';
-import ViewMainMenus from './ViewMainMenus';
-import ViewSubMenus from './ViewSubMenus';
+import AddMenu from './AddMainMenu';
+import ViewMenus from './ViewMainMenus';
 
-const AddMenu = () => {
-  const [activeTab, setActiveTab] = useState('addMainMenu');
-  const [mainMenuData, setMainMenuData] = useState(null);
-  const [subMenuData, setSubMenuData] = useState(null);
-   const [selectedMainMenu, setSelectedMainMenu] = useState('');
+const MenuManagement = () => {
+  const [menuData, setMenuData] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  const handleTabChange = (event, value) => {
-    setActiveTab(value);
-  };
+  // Function to trigger refresh of menu list
+  const handleRefresh = useCallback(() => {
+    setRefreshKey(prev => prev + 1);
+  }, []);
 
   return (
     <Box sx={{ width: '100%', p: 2 }}>
       <Box sx={{ width: '100%' }}>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-          <Tabs value={activeTab} onChange={handleTabChange} aria-label="Add Menu Tabs">
-            <Tab label="Add Main Menu" value="addMainMenu" />
-            <Tab label="Add Sub Menu" value="addSubMenu" />
-          </Tabs>
+        <Box sx={{ mb: 3 }}>
+          <AddMenu 
+            menuData={menuData} 
+            onMenuSaved={(savedMenu) => {
+              setMenuData(null); // Clear edit mode
+              handleRefresh(); // Refresh the list
+            }}
+            onRefresh={handleRefresh}
+          />
         </Box>
         
+        <Divider color="#228B22" sx={{ height: 2, width: '100%', my: 3 }} />
+        
         <Box sx={{ mt: 2 }}>
-          {activeTab === 'addMainMenu' && (
-            <Box>
-              <AddMainMenu mainMenuData={mainMenuData} />
-              <Divider color="#7F40A8" sx={{ height: 1, width: '100%', my: 5 }} />
-              <ViewMainMenus setMainMenuData={setMainMenuData} />
-            </Box>
-          )}
-          {activeTab === 'addSubMenu' && (
-            <Box>
-              <AddSubMenu subMenuData={subMenuData} selectedMainMenu={selectedMainMenu} />
-              <Divider color="#7F40A8" sx={{ height: 1, width: '100%', my: 5 }} />
-              <ViewSubMenus setSubMenuData={setSubMenuData} selectedMainMenu={selectedMainMenu} setSelectedMainMenu={setSelectedMainMenu} />
-            </Box>
-          )}
+          <ViewMenus 
+            key={refreshKey}
+            setMenuData={setMenuData} 
+          />
         </Box>
       </Box>
     </Box>
   );
 };
-export default AddMenu;
+
+export default MenuManagement;

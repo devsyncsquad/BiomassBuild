@@ -76,6 +76,7 @@ namespace Biomass.Server.Interfaces
         ServiceResponse<UserMenuList> GetUserMenuByUserId(int userId);
         ServiceResponse<List<VUserMainMenu>> GetUserMainMenuByUserId(int userId);
         ServiceResponse<List<VUserSubMenu>> GetUserSubMenuByEmpId(int empId);
+        ServiceResponse<List<UserAssignedMenus>> GetUserAssignedMenusByRoleId(int roleId);
         #endregion
 
         #region LOGIN LOG

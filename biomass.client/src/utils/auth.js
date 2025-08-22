@@ -36,6 +36,12 @@ export const getUserCustomers = () => {
   return customersStr ? JSON.parse(customersStr) : [];
 };
 
+// Get the current user's assigned menus
+export const getUserAssignedMenus = () => {
+  const menusStr = localStorage.getItem('assignedMenus');
+  return menusStr ? JSON.parse(menusStr) : [];
+};
+
 // Check if user has any customers assigned
 export const hasCustomerAssignment = () => {
   const customers = getUserCustomers();
@@ -64,6 +70,9 @@ export const logout = () => {
   localStorage.removeItem('user');
   localStorage.removeItem('token');
   localStorage.removeItem('tokenExpiresAt');
+  localStorage.removeItem('userRole');
+  localStorage.removeItem('customers');
+  localStorage.removeItem('assignedMenus');
   window.location.href = '/login';
 };
 

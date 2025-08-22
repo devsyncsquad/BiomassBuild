@@ -7,7 +7,7 @@ export const userManagementApi = createApi({
     baseUrl: getBaseUrl(),
     prepareHeaders: () => getHeaders(),
   }),
-  tagTypes: ['Users', 'Roles', 'MainMenus', 'SubMenus', 'MenuRoles'],
+  tagTypes: ['Users', 'Roles', 'MainMenus', 'SubMenus', 'MenuRoles', 'Menus'],
   endpoints: (builder) => ({
     // Users
     getUsersList: builder.query({
@@ -80,6 +80,39 @@ export const userManagementApi = createApi({
         method: 'DELETE',
       }),
       invalidatesTags: ['Roles'],
+    }),
+
+    // Regular Menus (not MainMenus)
+    getMenuList: builder.query({
+      query: () => '/api/UserManagement/GetMenuList',
+      providesTags: ['Menus'],
+    }),
+    getMenuById: builder.query({
+      query: (menuId) => `/api/UserManagement/GetMenuById?menuId=${menuId}`,
+      providesTags: ['Menus'],
+    }),
+    saveMenu: builder.mutation({
+      query: (menuData) => ({
+        url: '/api/UserManagement/SaveMenu',
+        method: 'POST',
+        body: menuData,
+      }),
+      invalidatesTags: ['Menus'],
+    }),
+    updateMenu: builder.mutation({
+      query: (menuData) => ({
+        url: '/api/UserManagement/UpdateMenu',
+        method: 'PUT',
+        body: menuData,
+      }),
+      invalidatesTags: ['Menus'],
+    }),
+    deleteMenu: builder.mutation({
+      query: (menuId) => ({
+        url: `/api/UserManagement/DeleteMenuById?menuId=${menuId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Menus'],
     }),
 
     // Main Menus
@@ -208,6 +241,13 @@ export const {
   useSaveRoleMutation,
   useUpdateRoleMutation,
   useDeleteRoleMutation,
+
+  // Regular Menus
+  useGetMenuListQuery,
+  useGetMenuByIdQuery,
+  useSaveMenuMutation,
+  useUpdateMenuMutation,
+  useDeleteMenuMutation,
 
   // Main Menus
   useGetMainMenuListQuery,

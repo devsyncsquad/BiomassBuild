@@ -47,6 +47,12 @@ const Login = ({ onLoginSuccess }) => {
       });
 
       if (response.data && response.data.token) {
+        console.log('=== LOGIN RESPONSE DEBUG ===');
+        console.log('Full response data:', response.data);
+        console.log('Customers data:', response.data.customers);
+        console.log('Assigned menus data:', response.data.assignedMenus);
+        console.log('Role ID:', response.data.roleId);
+        
         // Store JWT token and user data in localStorage
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('user', JSON.stringify({
@@ -60,22 +66,29 @@ const Login = ({ onLoginSuccess }) => {
         
         // Store customers data if available
         if (response.data.customers && response.data.customers.length > 0) {
+          console.log('Storing customers in localStorage:', response.data.customers);
           localStorage.setItem('customers', JSON.stringify(response.data.customers));
         } else {
+          console.log('No customers data, storing empty array');
           localStorage.setItem('customers', JSON.stringify([]));
         }
         
         // Store role information
         if (response.data.roleId) {
+          console.log('Storing role ID in localStorage:', response.data.roleId);
           localStorage.setItem('userRole', response.data.roleId.toString());
         }
         
         // Store assigned menus data if available
         if (response.data.assignedMenus && response.data.assignedMenus.length > 0) {
+          console.log('Storing assigned menus in localStorage:', response.data.assignedMenus);
           localStorage.setItem('assignedMenus', JSON.stringify(response.data.assignedMenus));
         } else {
+          console.log('No assigned menus data, storing empty array');
           localStorage.setItem('assignedMenus', JSON.stringify([]));
         }
+        
+        console.log('=== END LOGIN RESPONSE DEBUG ===');
         
         // Set token expiration (24 hours from now)
         const expiresAt = new Date().getTime() + (24 * 60 * 60 * 1000);

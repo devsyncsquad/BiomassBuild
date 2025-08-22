@@ -790,23 +790,7 @@ const CustomerManagement = () => {
                       >
                         <LocationOnIcon sx={{ fontSize: '1.1rem' }} />
                       </IconButton>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleAddLocation(customer)}
-                        sx={{ 
-                          color: '#006400', 
-                          p: 1,
-                          bgcolor: 'rgba(0, 100, 0, 0.1)',
-                          '&:hover': { 
-                            bgcolor: 'rgba(0, 100, 0, 0.2)',
-                            transform: 'scale(1.1)'
-                          },
-                          transition: 'all 0.2s ease'
-                        }}
-                        title="Add New Location"
-                      >
-                        <AddIcon sx={{ fontSize: '1.1rem' }} />
-                      </IconButton>
+                     
                       <IconButton 
                         size="small" 
                         sx={{ 

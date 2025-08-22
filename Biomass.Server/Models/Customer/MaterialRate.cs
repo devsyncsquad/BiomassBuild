@@ -24,12 +24,6 @@ namespace Biomass.Server.Models.Customer
         
         [Column("transporter_rate", TypeName = "decimal(10,2)")]
         public decimal TransporterRate { get; set; }
-
-        [Column("dispatchweight", TypeName = "decimal(10,2)")]
-        public decimal DispatchWeight { get; set; }
-
-        [Column("receivingweight", TypeName = "decimal(10,2)")]
-        public decimal ReceivingWeight { get; set; }
         
         [Column("route")]
         [StringLength(100)]
@@ -49,7 +43,7 @@ namespace Biomass.Server.Models.Customer
         [Column("createdon")]
         public DateTime CreatedOn { get; set; }
 
-        // Navigation properties
+        // Navigation properties - but don't create foreign key constraints if they don't exist
         [ForeignKey(nameof(CustomerId))]
         public virtual Customer Customer { get; set; } = null!;
 
@@ -65,11 +59,10 @@ namespace Biomass.Server.Models.Customer
         public DateTime EffectiveDate { get; set; }
         public decimal CompanyRate { get; set; }
         public decimal TransporterRate { get; set; }
-        public decimal DispatchWeight { get; set; }
-        public decimal ReceivingWeight { get; set; }
         public string? Route { get; set; }
         public string? MaterialType { get; set; }
         public string Status { get; set; } = string.Empty;
+        public int CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
         public string CustomerName { get; set; } = string.Empty;
         public string LocationName { get; set; } = string.Empty;

@@ -29,9 +29,9 @@ namespace Biomass.Server.Interfaces
 
     public interface ILookupService
     {
-        Task<ServiceResponse<(IEnumerable<LookupDto> Items, int TotalCount)>> GetAsync(string? domain, int page, int pageSize);
+        Task<ServiceResponse<(IEnumerable<Lookup> Items, int TotalCount)>> GetAsync(string? domain, int page, int pageSize);
         Task<ServiceResponse<LookupDto>> GetByIdAsync(int id);
-        Task<ServiceResponse<LookupDto>> CreateAsync(CreateLookupRequest request, string? createdBy);
+        Task<ServiceResponse<LookupDto>> CreateAsync(Lookup request);
         Task<ServiceResponse<LookupDto>> UpdateAsync(UpdateLookupRequest request);
         Task<ServiceResponse<bool>> DeleteAsync(int id);
         Task<ServiceResponse<Dictionary<string, List<LookupDto>>>> GetLookupsByDomainsAsync();

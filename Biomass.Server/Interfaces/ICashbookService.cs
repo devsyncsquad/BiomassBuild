@@ -1,6 +1,7 @@
 using Biomass.Api.Model;
 using Biomass.Server.Models.Cashbook;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Biomass.Server.Interfaces
 {
@@ -24,6 +25,81 @@ namespace Biomass.Server.Interfaces
 		public string? ReceiptPath { get; set; }
 		public decimal? BankDelta { get; set; }
 		public decimal? WalletDelta { get; set; }
+	}
+
+	public class CashTransactionDetailed
+	{
+		[Column("cash_id")]
+		public int CashId { get; set; }
+		
+		[Column("happened_at")]
+		public DateTime HappenedAt { get; set; }
+		
+		[Column("cash_kind")]
+		public string? CashKind { get; set; }
+		
+		[Column("amount")]
+		public decimal Amount { get; set; }
+		
+		[Column("currency")]
+		public string Currency { get; set; } = string.Empty;
+		
+		[Column("money_account_id")]
+		public int? MoneyAccountId { get; set; }
+		
+		[Column("money_account_name")]
+		public string? MoneyAccountName { get; set; }
+		
+		[Column("wallet_employee_id")]
+		public int? WalletEmployeeId { get; set; }
+		
+		[Column("employee_wallet_name")]
+		public string? EmployeeWalletName { get; set; }
+		
+		[Column("category_id")]
+		public int? CategoryId { get; set; }
+		
+		[Column("category_name")]
+		public string? CategoryName { get; set; }
+		
+		[Column("cost_center_id")]
+		public int? CostCenterId { get; set; }
+		
+		[Column("costcenter_name")]
+		public string? CostCenterName { get; set; }
+		
+		[Column("cost_center_sub_id")]
+		public int? CostCenterSubId { get; set; }
+		
+		[Column("costcenter_sub_name")]
+		public string? CostCenterSubName { get; set; }
+		
+		[Column("payment_mode_id")]
+		public int? PaymentModeId { get; set; }
+		
+		[Column("payment_mode_name")]
+		public string? PaymentModeName { get; set; }
+		
+		[Column("reference_no")]
+		public string? ReferenceNo { get; set; }
+		
+		[Column("counterparty_name")]
+		public string? CounterpartyName { get; set; }
+		
+		[Column("remarks")]
+		public string? Remarks { get; set; }
+		
+		[Column("meta")]
+		public string? Meta { get; set; }
+		
+		[Column("bank_delta")]
+		public decimal BankDelta { get; set; }
+		
+		[Column("wallet_delta")]
+		public decimal WalletDelta { get; set; }
+		
+		[Column("status")]
+		public string Status { get; set; } = string.Empty;
 	}
 
 	public class CreateCashbookRequest
@@ -54,10 +130,16 @@ namespace Biomass.Server.Interfaces
 		public string Currency { get; set; } = "PKR";
 	}
 
+	public class CountResult
+	{
+		[Column("count_value")]
+		public long count_value { get; set; }
+	}
+
 	public class EmployeeTransactionResponse
 	{
-		public IEnumerable<CashbookDto> Items { get; set; } = new List<CashbookDto>();
-		public int TotalCount { get; set; }
+		public IEnumerable<CashTransactionDetailed> Items { get; set; } = new List<CashTransactionDetailed>();
+		public long TotalCount { get; set; }
 		public int Page { get; set; }
 		public int PageSize { get; set; }
 		public int TotalPages { get; set; }

@@ -64,6 +64,15 @@ namespace Biomass.Server.Controllers.Api
                 return BadRequest(response);
             return Ok(response);
         }
+        
+        [HttpGet("GetLocationCostsForDispatch/{locationId}")]
+        public async Task<IActionResult> GetLocationCostsForDispatch(int locationId)
+        {
+            var response = await _locationService.GetLocationCostsForDispatchAsync(locationId);
+            if (!response.Success)
+                return NotFound(response);
+            return Ok(response);
+        }
 
 		[HttpGet("SearchLocations")]
         public async Task<IActionResult> SearchLocations([FromQuery] string searchTerm, [FromQuery] string status = "all")

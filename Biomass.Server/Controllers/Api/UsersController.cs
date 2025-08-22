@@ -64,7 +64,7 @@ namespace Biomass.Server.Controllers
                 // Create enhanced response with customers and assigned menus
                 var enhancedResponse = new EnhancedAuthenticateResponse(baseResponse, customers, assignedMenus);
 
-                return Ok(enhancedResponse);
+                return Ok(baseResponse);
             }
             catch (Exception ex)
             {

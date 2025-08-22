@@ -1,4 +1,6 @@
 using Biomass.Server.Interfaces;
+using Biomass.Server.Models.Lookup;
+using Biomass.Server.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Biomass.Server.Controllers.Api
@@ -13,15 +15,38 @@ namespace Biomass.Server.Controllers.Api
             _service = service;
         }
 
-		[HttpGet("GetAllLookups")]
+        //[HttpGet("GetAllLookups")]
+        //      public async Task<IActionResult> Get([FromQuery] string? domain, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        //      {
+        //          var result = await _service.GetAsync(domain, page, pageSize);
+        //          if (!result.Success) return BadRequest(result);
+        //          return Ok(result);
+        //      }
+
+        [HttpGet("GetAllLookups")]
         public async Task<IActionResult> Get([FromQuery] string? domain, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
-            var result = await _service.GetAsync(domain, page, pageSize);
-            if (!result.Success) return BadRequest(result);
-            return Ok(result);
+            var response = await _service.GetAsync(domain, page, pageSize);
+
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+
+            // Explicitly format the response to ensure proper serialization
+            return Ok(new
+            {
+                Result = new
+                {
+                    Items = response.Result.Items,
+                    TotalCount = response.Result.TotalCount
+                },
+                Message = response.Message,
+                Success = response.Success
+            });
         }
 
-		[HttpGet("GetLookupById/{id}")]
+        [HttpGet("GetLookupById/{id}")]
         public async Task<IActionResult> GetById(int id)
         {
             var result = await _service.GetByIdAsync(id);
@@ -30,10 +55,10 @@ namespace Biomass.Server.Controllers.Api
         }
 
 		[HttpPost("CreateLookup")]
-        public async Task<IActionResult> Create([FromBody] CreateLookupRequest request)
+        public async Task<IActionResult> Create([FromBody] Lookup request)
         {
             var createdBy = User?.Identity?.Name ?? "system";
-            var result = await _service.CreateAsync(request, createdBy);
+            var result = await _service.CreateAsync(request);
             if (!result.Success) return BadRequest(result);
             return Ok(result);
         }

@@ -15,7 +15,7 @@ namespace Biomass.Server.Models.Lookup
         [MaxLength(1)]
         public bool? Enabled { get; set; }
         
-        public string? CreatedBy { get; set; }
+        public int? CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
     }
 }

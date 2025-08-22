@@ -14,5 +14,6 @@ namespace Biomass.Server.Interfaces
         Task<ServiceResponse<bool>> DeleteLocationAsync(int locationId);
         Task<ServiceResponse<List<CustomerLocationDto>>> SearchLocationsAsync(string searchTerm, string status = "all");
         Task<ServiceResponse<int>> GetLocationCountAsync(int customerId);
+        Task<ServiceResponse<LocationCostsDto>> GetLocationCostsForDispatchAsync(int locationId);
     }
 }

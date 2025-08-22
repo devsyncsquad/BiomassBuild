@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> develop
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
@@ -25,39 +21,9 @@ import BusinessIcon from '@mui/icons-material/Business';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import './Dashboard.css';
 import { logout, getUserRole, getUserCustomers, getUserAssignedMenus } from '../utils/auth';
-<<<<<<< HEAD
-=======
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
-import Drawer from "@mui/material/Drawer";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import Divider from "@mui/material/Divider";
-import Avatar from "@mui/material/Avatar";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import Grid from "@mui/material/Grid";
-import Chip from "@mui/material/Chip";
-import LogoutIcon from "@mui/icons-material/Logout";
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import PeopleIcon from "@mui/icons-material/People";
-import BusinessIcon from "@mui/icons-material/Business";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
-import StorefrontIcon from "@mui/icons-material/Storefront";
-import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
-import AccountTreeIcon from "@mui/icons-material/AccountTree";
-import "./Dashboard.css";
-import { logout, getUserRole, getUserCustomers } from "../utils/auth";
->>>>>>> cost-center
-=======
->>>>>>> develop
 
 const DRAWER_WIDTH = 280;
 
@@ -102,15 +68,12 @@ const Dashboard = ({ user, onLogout, children }) => {
       switch (route) {
         case 'dashboard':
           navigate('/');
-<<<<<<< HEAD
           break;
         case 'user-management':
           navigate('/user-management');
           break;
         case 'company-management':
           navigate('/company-management');
-=======
->>>>>>> develop
           break;
         case 'customer-management':
           navigate('/customer-management');
@@ -118,19 +81,14 @@ const Dashboard = ({ user, onLogout, children }) => {
         case 'vendor-management':
           navigate('/vendor-management');
           break;
-<<<<<<< HEAD
         case 'money-account':
           navigate('/money-account');
-=======
-        case "money-account":
-          navigate("/money-account");
           break;
-        case "cost-centers":
-          navigate("/cost-centers");
+        case 'cost-centers':
+          navigate('/cost-centers');
           break;
-        case "lookup-management":
-          navigate("/lookup-management");
->>>>>>> cost-center
+        case 'lookup-management':
+          navigate('/lookup-management');
           break;
         default:
           break;
@@ -182,29 +140,23 @@ const Dashboard = ({ user, onLogout, children }) => {
       id: 6, // Money Account
       label: 'Money Account',
       icon: <AccountBalanceIcon />,
-<<<<<<< HEAD
       color: '#FF5722',
       route: 'money-account'
-    }
-<<<<<<< HEAD
-=======
-      color: "#FF5722",
     },
     {
-      id: "cost-centers",
-      label: "Cost Centers",
+      id: 'cost-centers',
+      label: 'Cost Centers',
       icon: <AccountTreeIcon />,
-      color: "#795548",
+      color: '#795548',
+      route: 'cost-centers'
     },
     {
-      id: "lookup-management",
-      label: "LookUp Management",
+      id: 'lookup-management',
+      label: 'LookUp Management',
       icon: <AccountBalanceIcon />,
-      color: "#607D8B",
-    },
->>>>>>> cost-center
-=======
->>>>>>> develop
+      color: '#607D8B',
+      route: 'lookup-management'
+    }
   ];
 
   // Filter menu items based on user's assigned menus
@@ -433,31 +385,31 @@ const Dashboard = ({ user, onLogout, children }) => {
         <List sx={{ pt: 1 }}>
           {menuItems.map((item) => (
             <ListItem key={item.id} disablePadding>
-                        <ListItemButton
-            onClick={() => handleMenuClick(item.route)}
-            sx={{
-              mx: 1,
-              borderRadius: 0,
-              mb: 0.5,
-              backgroundColor: 'transparent',
-              '&:hover': {
-                backgroundColor: 'rgba(34, 139, 34, 0.2)',
-              },
-            }}
-          >
-            <ListItemIcon sx={{ color: '#228B22', minWidth: 40 }}>
-              {item.icon}
-            </ListItemIcon>
-            <ListItemText 
-              primary={item.label} 
-              sx={{ 
-                '& .MuiListItemText-primary': { 
-                  fontWeight: 400,
-                  color: '#228B22'
-                } 
-              }}
-            />
-          </ListItemButton>
+              <ListItemButton
+                onClick={() => handleMenuClick(item.route)}
+                sx={{
+                  mx: 1,
+                  borderRadius: 0,
+                  mb: 0.5,
+                  backgroundColor: 'transparent',
+                  '&:hover': {
+                    backgroundColor: 'rgba(34, 139, 34, 0.2)',
+                  },
+                }}
+              >
+                <ListItemIcon sx={{ color: '#228B22', minWidth: 40 }}>
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText 
+                  primary={item.label} 
+                  sx={{ 
+                    '& .MuiListItemText-primary': { 
+                      fontWeight: 400,
+                      color: '#228B22'
+                    } 
+                  }}
+                />
+              </ListItemButton>
             </ListItem>
           ))}
         </List>

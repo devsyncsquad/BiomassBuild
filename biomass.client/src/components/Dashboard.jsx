@@ -22,7 +22,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import './Dashboard.css';
-import { logout, getUserRole, getUserCustomers } from '../utils/auth';
+import { logout, getUserRole, getUserCustomers, getUserAssignedMenus } from '../utils/auth';
 
 const DRAWER_WIDTH = 280;
 
@@ -31,6 +31,7 @@ const Dashboard = ({ user, onLogout, children }) => {
   const [customers, setCustomers] = useState([]);
   const [userRole, setUserRole] = useState('');
   const [customerCount, setCustomerCount] = useState(0);
+  const [assignedMenus, setAssignedMenus] = useState([]);
 
   useEffect(() => {
     // Get customers from localStorage
@@ -48,6 +49,11 @@ const Dashboard = ({ user, onLogout, children }) => {
     // Get user role from localStorage
     const role = getUserRole();
     setUserRole(role);
+
+    // Get assigned menus from localStorage
+    const assignedMenusData = getUserAssignedMenus();
+    console.log('Assigned menus from localStorage:', assignedMenusData);
+    setAssignedMenus(assignedMenusData);
   }, []);
 
   const handleLogout = () => {
@@ -55,10 +61,10 @@ const Dashboard = ({ user, onLogout, children }) => {
     navigate('/login');
   };
 
-  const handleMenuClick = (menuId) => {
+  const handleMenuClick = (route) => {
     if (children) {
       // If children are provided, navigate to the route
-      switch (menuId) {
+      switch (route) {
         case 'dashboard':
           navigate('/');
           break;
@@ -82,48 +88,104 @@ const Dashboard = ({ user, onLogout, children }) => {
       }
     } else {
       // If no children, use internal state
-      // setCurrentView(menuId); // This line is removed
+      // setCurrentView(route); // This line is removed
     }
   };
 
-  const menuItems = [
+  // Define all possible menu items with their IDs that match the backend menu IDs
+  const allMenuItems = [
     {
-      id: 'dashboard',
+      id: 1, // Dashboard
       label: 'Dashboard',
       icon: <DashboardIcon />,
-      color: '#667eea'
+      color: '#667eea',
+      route: 'dashboard'
     },
     {
-      id: 'user-management',
+      id: 2, // User Management
       label: 'User Management',
       icon: <PeopleIcon />,
-      color: '#2196F3'
+      color: '#2196F3',
+      route: 'user-management'
     },
     {
-      id: 'company-management',
+      id: 3, // Company Management
       label: 'Company Management',
       icon: <BusinessIcon />,
-      color: '#FF9800'
+      color: '#FF9800',
+      route: 'company-management'
     },
     {
-      id: 'customer-management',
+      id: 4, // Customer & Location Management
       label: 'Customer & Location Management',
       icon: <LocationOnIcon />,
-      color: '#4CAF50'
+      color: '#4CAF50',
+      route: 'customer-management'
     },
     {
-      id: 'vendor-management',
+      id: 5, // Vendor Management
       label: 'Vendor Management',
       icon: <StorefrontIcon />,
-      color: '#9C27B0'
+      color: '#9C27B0',
+      route: 'vendor-management'
     },
     {
-      id: 'money-account',
+      id: 6, // Money Account
       label: 'Money Account',
       icon: <AccountBalanceIcon />,
-      color: '#FF5722'
+      color: '#FF5722',
+      route: 'money-account'
     }
   ];
+
+  // Filter menu items based on user's assigned menus
+  const getFilteredMenuItems = () => {
+    console.log('=== MENU FILTERING DEBUG ===');
+    console.log('Filtering menus. Assigned menus:', assignedMenus);
+    console.log('All menu items:', allMenuItems);
+    
+    if (!assignedMenus || assignedMenus.length === 0) {
+      console.log('No assigned menus found, showing only dashboard');
+      return allMenuItems.filter(item => item.route === 'dashboard');
+    }
+
+    // Filter based on assigned menu IDs - use the correct property name from new model
+    const assignedMenuIds = assignedMenus.map(menu => menu.menuId).filter(id => id !== null && id !== undefined);
+    console.log('Assigned menu IDs from backend (filtered):', assignedMenuIds);
+    console.log('Sample menu object structure:', assignedMenus[0]);
+    
+    // Create a map of menu IDs to menu items for easier lookup
+    const menuMap = {};
+    allMenuItems.forEach(item => {
+      menuMap[item.id] = item;
+    });
+    
+    console.log('Menu map:', menuMap);
+    
+    // Filter items based on assigned menu IDs
+    const filteredItems = [];
+    assignedMenuIds.forEach(menuId => {
+      if (menuMap[menuId]) {
+        filteredItems.push(menuMap[menuId]);
+        console.log(`Added menu ${menuId}: ${menuMap[menuId].label}`);
+      } else {
+        console.log(`Menu ID ${menuId} not found in allMenuItems`);
+      }
+    });
+    
+    console.log('Final filtered menu items:', filteredItems);
+    
+    // Always include dashboard
+    if (!filteredItems.find(item => item.route === 'dashboard')) {
+      filteredItems.unshift(allMenuItems.find(item => item.route === 'dashboard'));
+      console.log('Added dashboard to filtered items');
+    }
+    
+    console.log('=== END MENU FILTERING DEBUG ===');
+    return filteredItems;
+  };
+
+  const menuItems = getFilteredMenuItems();
 
   const renderContent = () => {
     // If children are provided, render them instead of the default content
@@ -161,8 +223,32 @@ const Dashboard = ({ user, onLogout, children }) => {
                 </Typography>
               </Card>
             </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Card sx={{ p: 2, textAlign: 'center', bgcolor: '#f0fff0', border: '1px solid #228B22' }}>
+                <Typography variant="h6" sx={{ color: '#228B22', fontWeight: 600 }}>
+                  Assigned Menus
+                </Typography>
+                <Typography variant="body1" sx={{ color: '#006400', fontWeight: 500 }}>
+                  {assignedMenus.length > 0 ? `${assignedMenus.length} Menu${assignedMenus.length > 1 ? 's' : ''}` : 'No Menus Assigned'}
+                </Typography>
+              </Card>
+            </Grid>
           </Grid>
         </Box>
+
+        {/* DEBUG: Show assigned menus data */}
+        {assignedMenus.length > 0 && (
+          <Box sx={{ mb: 4 }}>
+            <Typography variant="h5" gutterBottom sx={{ mb: 2, color: '#228B22' }}>
+              Debug: Assigned Menus Data
+            </Typography>
+            <Card sx={{ p: 3, bgcolor: '#f8f8f8', border: '1px solid #ccc' }}>
+              <Typography variant="body2" sx={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap' }}>
+                {JSON.stringify(assignedMenus, null, 2)}
+              </Typography>
+            </Card>
+          </Box>
+        )}
 
         {/* Customers Section */}
         <Box sx={{ mb: 4 }}>
@@ -279,7 +365,7 @@ const Dashboard = ({ user, onLogout, children }) => {
           {menuItems.map((item) => (
             <ListItem key={item.id} disablePadding>
                         <ListItemButton
-            onClick={() => handleMenuClick(item.id)}
+            onClick={() => handleMenuClick(item.route)}
             sx={{
               mx: 1,
               borderRadius: 0,

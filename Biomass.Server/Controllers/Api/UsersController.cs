@@ -58,8 +58,11 @@ namespace Biomass.Server.Controllers
                 // Get user's customers
                 var customers = await GetUserCustomersAsync(user.UserId);
 
-                // Create enhanced response with customers
-                var enhancedResponse = new EnhancedAuthenticateResponse(baseResponse, customers);
+                // Get user's assigned menus based on their role
+                var assignedMenus = await GetUserAssignedMenusByRoleAsync(user.RoleId ?? 0);
+
+                // Create enhanced response with customers and assigned menus
+                var enhancedResponse = new EnhancedAuthenticateResponse(baseResponse, customers, assignedMenus);
 
                 return Ok(enhancedResponse);
             }
@@ -102,6 +105,85 @@ namespace Biomass.Server.Controllers
                 // Log the exception in production
                 // For now, return empty list if there's an error
                 return new List<CustomerDto>();
+            }
+        }
+
+        private async Task<List<VUserMainMenu>> GetUserAssignedMenusAsync(int userId)
+        {
+            try
+            {
+                // First get the user's role
+                var userRole = await _context.UserRoles
+                    .Where(ur => ur.UserId == userId && ur.Enabled == "Y")
+                    .FirstOrDefaultAsync();
+
+                if (userRole == null)
+                {
+                    return new List<VUserMainMenu>();
+                }
+
+                // Get menus assigned to this role through MenuRoles table
+                var assignedMenuIds = await _context.MenuRoles
+                    .Where(mr => mr.RoleId == userRole.RoleId)
+                    .Select(mr => mr.MenuId)
+                    .ToListAsync();
+
+                // Get the actual menu details for assigned menus
+                var assignedMenus = await _context.Menus
+                    .Where(m => assignedMenuIds.Contains(m.MenuId) && m.IsEnabled == "Y")
+                    .OrderBy(m => m.OrderNo)
+                    .Select(m => new VUserMainMenu
+                    {
+                        MainMenuId = m.MenuId,
+                        MainMenuDesc = m.MenuName,
+                        MainIcon = m.IconUrl,
+                        //Link = m.Link,
+                        //OrderNo = m.OrderNo ?? 0,
+                        //Enabled = m.IsEnabled
+                    })
+                    .ToListAsync();
+
+                return assignedMenus;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception in production
+                // For now, return empty list if there's an error
+                return new List<VUserMainMenu>();
+            }
+        }
+
+        private async Task<List<UserAssignedMenus>> GetUserAssignedMenusByRoleAsync(int roleId)
+        {
+            try
+            {
+                // Use the new API endpoint to get assigned menus
+                var assignedMenus = await _context.MenuRoles
+                    .Where(mr => mr.RoleId == roleId)
+                    .Join(_context.Menus,
+                          mr => mr.MenuId,
+                          m => m.MenuId,
+                          (mr, m) => new UserAssignedMenus
+                          {
+                              MenuId = m.MenuId,
+                              MenuName = m.MenuName,
+                              IconUrl = m.IconUrl,
+                              Link = m.Link,
+                              OrderNo = m.OrderNo,
+                              IsEnabled = m.IsEnabled,
+                              RoleId = mr.RoleId
+                          })
+                    .Where(m => m.IsEnabled == "Y")
+                    .OrderBy(m => m.OrderNo)
+                    .ToListAsync();
+
+                return assignedMenus;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception in production
+                // For now, return empty list if there's an error
+                return new List<UserAssignedMenus>();
             }
         }
 

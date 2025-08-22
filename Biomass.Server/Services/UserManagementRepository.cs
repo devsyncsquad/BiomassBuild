@@ -1221,8 +1221,40 @@ namespace Biomass.Server.Repository
             var response = new ServiceResponse<List<VUserMainMenu>>();
             try
             {
-                var userMainMenus = _context.Menus.Where(umm => umm.MenuId == userId).ToList();
-                //response.Result = userMainMenus;
+                // First get the user's role
+                var userRole = _context.UserRoles
+                    .Where(ur => ur.UserId == userId && ur.Enabled == "Y")
+                    .FirstOrDefault();
+
+                if (userRole == null)
+                {
+                    response.Success = false;
+                    response.Message = "User has no assigned role";
+                    return response;
+                }
+
+                // Get menus assigned to this role through MenuRoles table
+                var assignedMenuIds = _context.MenuRoles
+                    .Where(mr => mr.RoleId == userRole.RoleId)
+                    .Select(mr => mr.MenuId)
+                    .ToList();
+
+                // Get the actual menu details for assigned menus
+                var userMainMenus = _context.Menus
+                    .Where(m => assignedMenuIds.Contains(m.MenuId) && m.IsEnabled == "Y")
+                    .OrderBy(m => m.OrderNo)
+                    .Select(m => new VUserMainMenu
+                    {
+                        MainMenuId = m.MenuId,
+                        MainMenuDesc = m.MenuName,
+                        MainIcon = m.IconUrl,
+                        //Link = m.Link,
+                        //OrderNo = m.OrderNo ?? 0,
+                        //Enabled = m.IsEnabled
+                    })
+                    .ToList();
+
+                response.Result = userMainMenus;
                 response.Success = true;
                 response.Message = "User main menus retrieved successfully";
             }
@@ -1239,10 +1271,89 @@ namespace Biomass.Server.Repository
             var response = new ServiceResponse<List<VUserSubMenu>>();
             try
             {
-                var userSubMenus = _context.Menus.Where(usm => usm.MenuId == empId).ToList();
-                //response.Result = userSubMenus;
+                // First get the user's role by empId
+                var user = _context.Users
+                    .Where(u => u.EmpNo == empId && u.Enabled == "Y")
+                    .FirstOrDefault();
+
+                if (user == null)
+                {
+                    response.Success = false;
+                    response.Message = "User not found";
+                    return response;
+                }
+
+                var userRole = _context.UserRoles
+                    .Where(ur => ur.UserId == user.UserId && ur.Enabled == "Y")
+                    .FirstOrDefault();
+
+                if (userRole == null)
+                {
+                    response.Success = false;
+                    response.Message = "User has no assigned role";
+                    return response;
+                }
+
+                // Get menus assigned to this role through MenuRoles table
+                var assignedMenuIds = _context.MenuRoles
+                    .Where(mr => mr.RoleId == userRole.RoleId)
+                    .Select(mr => mr.MenuId)
+                    .ToList();
+
+                // Get the actual menu details for assigned menus
+                var userSubMenus = _context.Menus
+                    .Where(m => assignedMenuIds.Contains(m.MenuId) && m.IsEnabled == "Y")
+                    .OrderBy(m => m.OrderNo)
+                    .Select(m => new VUserSubMenu
+                    {
+                        SubMenuId = m.MenuId,
+                        SubMenuDesc = m.MenuName,
+                        Icon = m.IconUrl,
+                        Link = m.Link,
+                        MainMenuId = m.MenuId, // This might need adjustment based on your structure
+                        OrderNo = m.OrderNo ?? 0,
+                        Enabled = m.IsEnabled,
+                        EmpId = empId,
+                        UserId = user.UserId
+                    })
+                    .ToList();
+
+                response.Result = userSubMenus;
                 response.Success = true;
                 response.Message = "User sub menus retrieved successfully";
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+        public ServiceResponse<List<UserAssignedMenus>> GetUserAssignedMenusByRoleId(int roleId)
+        {
+            var response = new ServiceResponse<List<UserAssignedMenus>>();
+            try
+            {
+                // Get menus assigned to this role through MenuRoles table and join with Menus table
+                var assignedMenus = (from mr in _context.MenuRoles
+                                   join m in _context.Menus on mr.MenuId equals m.MenuId
+                                   where mr.RoleId == roleId && m.IsEnabled == "Y"
+                                   orderby m.OrderNo
+                                   select new UserAssignedMenus
+                                   {
+                                       MenuId = m.MenuId,
+                                       MenuName = m.MenuName,
+                                       IconUrl = m.IconUrl,
+                                       Link = m.Link,
+                                       OrderNo = m.OrderNo,
+                                       IsEnabled = m.IsEnabled,
+                                       RoleId = mr.RoleId
+                                   }).ToList();
+
+                response.Result = assignedMenus;
+                response.Success = true;
+                response.Message = $"Retrieved {assignedMenus.Count} assigned menus for role {roleId}";
             }
             catch (Exception ex)
             {

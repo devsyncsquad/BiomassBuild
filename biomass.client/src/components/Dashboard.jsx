@@ -1,4 +1,7 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> develop
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
@@ -24,6 +27,7 @@ import StorefrontIcon from '@mui/icons-material/Storefront';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import './Dashboard.css';
 import { logout, getUserRole, getUserCustomers, getUserAssignedMenus } from '../utils/auth';
+<<<<<<< HEAD
 =======
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -52,6 +56,8 @@ import AccountTreeIcon from "@mui/icons-material/AccountTree";
 import "./Dashboard.css";
 import { logout, getUserRole, getUserCustomers } from "../utils/auth";
 >>>>>>> cost-center
+=======
+>>>>>>> develop
 
 const DRAWER_WIDTH = 280;
 
@@ -96,12 +102,15 @@ const Dashboard = ({ user, onLogout, children }) => {
       switch (route) {
         case 'dashboard':
           navigate('/');
+<<<<<<< HEAD
           break;
         case 'user-management':
           navigate('/user-management');
           break;
         case 'company-management':
           navigate('/company-management');
+=======
+>>>>>>> develop
           break;
         case 'customer-management':
           navigate('/customer-management');
@@ -177,6 +186,7 @@ const Dashboard = ({ user, onLogout, children }) => {
       color: '#FF5722',
       route: 'money-account'
     }
+<<<<<<< HEAD
 =======
       color: "#FF5722",
     },
@@ -193,6 +203,8 @@ const Dashboard = ({ user, onLogout, children }) => {
       color: "#607D8B",
     },
 >>>>>>> cost-center
+=======
+>>>>>>> develop
   ];
 
   // Filter menu items based on user's assigned menus

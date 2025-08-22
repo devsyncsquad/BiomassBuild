@@ -163,15 +163,15 @@ const Dashboard = ({ user, onLogout, children }) => {
       route: 'money-account'
     },
     {
-      id: 'cost-centers',
+      id: 7, // Cost Centers
       label: 'Cost Centers',
       icon: <AccountTreeIcon />,
       color: '#795548',
       route: 'cost-centers'
     },
     {
-      id: 'lookup-management',
-      label: 'LookUp Management',
+      id: 8, // Lookup Management
+      label: 'Lookup Management',
       icon: <AccountBalanceIcon />,
       color: '#607D8B',
       route: 'lookup-management'

@@ -168,6 +168,7 @@ export const userManagementApi = {
   getUserMenu: (userId) => apiRequest(`/api/UserManagement/GetUserMenuByUserId?userId=${userId}`),
   getUserMainMenu: (userId) => apiRequest(`/api/UserManagement/GetUserMainMenuByUserId?userId=${userId}`),
   getUserSubMenu: (empId) => apiRequest(`/api/UserManagement/GetUserSubMenuByEmpId?empId=${empId}`),
+  getUserAssignedMenusByRole: (roleId) => apiRequest(`/api/UserManagement/GetUserAssignedMenusByRoleId?roleId=${roleId}`),
 
   // Login Logs
   getUserLoginLogs: (userId, startDate, endDate) => apiRequest(`/api/UserManagement/GetUserLoginLogsByUserId?userId=${userId}&startDate=${startDate}&endDate=${endDate}`),

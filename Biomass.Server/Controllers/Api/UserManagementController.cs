@@ -555,6 +555,14 @@ namespace Biomass.Server.Controllers
             var data = _interfaceUserManagement.GetUserSubMenuByEmpId(empId);
             return data;
         }
+
+        //[Authorize]
+        [HttpGet("GetUserAssignedMenusByRoleId")]
+        public ServiceResponse<List<UserAssignedMenus>> GetUserAssignedMenusByRoleId(int roleId)
+        {
+            var data = _interfaceUserManagement.GetUserAssignedMenusByRoleId(roleId);
+            return data;
+        }
         #endregion
 
         #region LOGIN LOG

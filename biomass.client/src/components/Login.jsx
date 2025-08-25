@@ -473,7 +473,7 @@ const Login = ({ onLoginSuccess }) => {
         }}
       >
         <Typography variant="body2" sx={{ fontWeight: 700, color: '#228B22', mb: 0.5 }}>
-          AI-Driven Safety for Drivers and Vehicles
+          AI-Driven Safety for You
         </Typography>
         <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
           Powered by Biomass

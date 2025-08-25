@@ -21,7 +21,7 @@ namespace Biomass.Server.Models.CostCenter
 		public string Name { get; set; } = string.Empty;
 
 		[Column("is_active")]
-		public bool? IsActive { get; set; } = true;
+		public bool IsActive { get; set; } = true;
 
 		[Column("parent_cost_center_id")]
 		public int? ParentCostCenterId { get; set; }

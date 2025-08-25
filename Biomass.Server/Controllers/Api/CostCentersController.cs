@@ -1,104 +1,119 @@
-using Microsoft.AspNetCore.Mvc;
-using Biomass.Server.Interfaces;
 using Biomass.Api.Model;
+using Biomass.Server.Interfaces;
+using Biomass.Server.Models;
 using Biomass.Server.Models.CostCenter;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Biomass.Server.Controllers.Api
 {
-	[ApiController]
-	[Route("api/[controller]")]
-	public class CostCentersController : ControllerBase
-	{
-		private readonly ICostCenterService _service;
+    [ApiController]
+    [Route("api/cost-centers")]
+    public class CostCentersController : ControllerBase
+    {
+        private readonly ICostCenterService _costCenterService;
 
-		public CostCentersController(ICostCenterService service)
-		{
-			_service = service;
-		}
-
-        // Controller
-        [HttpGet("GetAllCostCentersView")]
-        public async Task<ActionResult<ServiceResponse<List<VCostCenter>>>> GetAllCostCentersView()
+        public CostCentersController(ICostCenterService costCenterService)
         {
-            var result = await _service.GetAllViewAsync();
-            if (!result.Success) return BadRequest(result);
-            return Ok(result);
+            _costCenterService = costCenterService;
         }
 
-        [HttpGet("GetCostCenterTree")]
-		public async Task<IActionResult> GetCostCenterTree([FromQuery] int? companyId = null)
-		{
-			var result = await _service.GetTreeAsync(companyId);
-			if (!result.Success) return BadRequest(result);
-			return Ok(result);
-		}
+        [HttpGet]
+        public async Task<ActionResult<ServiceResponse<List<CostCenterDto>>>> GetAllCostCenters()
+        {
+            var costCenters = await _costCenterService.GetAllCostCentersAsync();
+            return Ok(new ServiceResponse<List<CostCenterDto>>
+            {
+                Result = costCenters,
+                Message = "Cost centers retrieved successfully",
+                Success = true
+            });
+        }
 
-		[HttpGet("GetCostCenterById/{id}")]
-		public async Task<IActionResult> GetCostCenterById(int id)
-		{
-			var result = await _service.GetByIdAsync(id);
-			if (!result.Success) return NotFound(result);
-			return Ok(result);
-		}
+        [HttpGet("active")]
+        public async Task<ActionResult<ServiceResponse<List<CostCenterDto>>>> GetActiveCostCenters()
+        {
+            var costCenters = await _costCenterService.GetActiveCostCentersAsync();
+            return Ok(new ServiceResponse<List<CostCenterDto>>
+            {
+                Result = costCenters,
+                Message = "Active cost centers retrieved successfully",
+                Success = true
+            });
+        }
 
-		[HttpGet("GetSubCostCenters/{parentId}")]
-		public async Task<IActionResult> GetSubCostCenters(int parentId)
-		{
-			var result = await _service.GetChildrenAsync(parentId);
-			if (!result.Success) return BadRequest(result);
-			return Ok(result);
-		}
+        [HttpGet("{id}")]
+        public async Task<ActionResult<ServiceResponse<CostCenterDto>>> GetCostCenter(int id)
+        {
+            var costCenter = await _costCenterService.GetCostCenterByIdAsync(id);
+            if (costCenter == null)
+            {
+                return NotFound(new ServiceResponse<CostCenterDto>
+                {
+                    Message = "Cost center not found",
+                    Success = false
+                });
+            }
 
-		[HttpGet("GetActiveParentCostCentersWithChildren")]
-		public async Task<IActionResult> GetActiveParentCostCentersWithChildren([FromQuery] int? companyId = null)
-		{
-			var result = await _service.GetActiveParentCostCentersAsync(companyId);
-			if (!result.Success) return BadRequest(result);
-			return Ok(result);
-		}
+            return Ok(new ServiceResponse<CostCenterDto>
+            {
+                Result = costCenter,
+                Message = "Cost center retrieved successfully",
+                Success = true
+            });
+        }
 
-		[HttpGet("GetActiveParentCostCenters")]
-		public async Task<IActionResult> GetActiveParentCostCenters([FromQuery] int? companyId = null)
-		{
-			var result = await _service.GetActiveParentCostCentersOnlyAsync(companyId);
-			if (!result.Success) return BadRequest(result);
-			return Ok(result);
-		}
+        [HttpPost]
+        public async Task<ActionResult<ServiceResponse<CostCenterDto>>> CreateCostCenter([FromBody] CostCenter costCenter)
+        {
+            var createdCostCenter = await _costCenterService.CreateCostCenterAsync(costCenter);
+            return Ok(new ServiceResponse<CostCenterDto>
+            {
+                Result = createdCostCenter,
+                Message = "Cost center created successfully",
+                Success = true
+            });
+        }
 
-		[HttpPost("CreateCostCenter")]
-		public async Task<IActionResult> CreateCostCenter([FromBody] CreateCostCenterRequest request)
-		{
-			var result = await _service.CreateAsync(request);
-			if (!result.Success) return BadRequest(result);
-			return CreatedAtAction(nameof(GetCostCenterById), new { id = result.Result?.CostCenterId }, result);
-		}
+        [HttpPut("{id}")]
+        public async Task<ActionResult<ServiceResponse<CostCenterDto>>> UpdateCostCenter(int id, [FromBody] CostCenter costCenter)
+        {
+            var updatedCostCenter = await _costCenterService.UpdateCostCenterAsync(id, costCenter);
+            if (updatedCostCenter == null)
+            {
+                return NotFound(new ServiceResponse<CostCenterDto>
+                {
+                    Message = "Cost center not found",
+                    Success = false
+                });
+            }
 
-		[HttpPut("UpdateCostCenter/{id}")]
-		public async Task<IActionResult> UpdateCostCenter(int id, [FromBody] UpdateCostCenterRequest request)
-		{
-			if (id != request.CostCenterId) return BadRequest(new ServiceResponse<bool> { Success = false, Message = "ID mismatch" });
-			var result = await _service.UpdateAsync(id, request);
-			if (!result.Success) return BadRequest(result);
-			return Ok(result);
-		}
+            return Ok(new ServiceResponse<CostCenterDto>
+            {
+                Result = updatedCostCenter,
+                Message = "Cost center updated successfully",
+                Success = true
+            });
+        }
 
-		[HttpPut("ReparentCostCenter/{id}")]
-		public async Task<IActionResult> ReparentCostCenter(int id, [FromBody] int? newParentId)
-		{
-			var result = await _service.ReparentAsync(id, newParentId);
-			if (!result.Success) return BadRequest(result);
-			return Ok(result);
-		}
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<ServiceResponse<bool>>> DeleteCostCenter(int id)
+        {
+            var result = await _costCenterService.DeleteCostCenterAsync(id);
+            if (!result)
+            {
+                return NotFound(new ServiceResponse<bool>
+                {
+                    Message = "Cost center not found",
+                    Success = false
+                });
+            }
 
-		[HttpDelete("DeleteCostCenter/{id}")]
-		public async Task<IActionResult> DeleteCostCenter(int id)
-		{
-			// Frontend will show warning before calling; backend cascades as configured
-			var result = await _service.DeleteAsync(id, cascade: true);
-			if (!result.Success) return BadRequest(result);
-			return Ok(result);
-		}
-	}
+            return Ok(new ServiceResponse<bool>
+            {
+                Result = true,
+                Message = "Cost center deleted successfully",
+                Success = true
+            });
+        }
+    }
 }
-
-

@@ -15,7 +15,8 @@ import {
   MenuItem,
   Chip,
   Paper,
-  IconButton
+  IconButton,
+  FormHelperText
 } from '@mui/material';
 import {
   Close as CloseIcon,
@@ -24,59 +25,53 @@ import {
 } from '@mui/icons-material';
 import './VendorRegistration.css';
 
-const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave }) => {
+
+const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave, onEdit }) => {
   const [formData, setFormData] = useState({
     vendorName: '',
-    vendorAddress: '',
-    primaryPhone: '',
-    phoneNumber2: '',
-    phoneNumber3: '',
-    category: '',
-    cnicFront: null,
-    cnicBack: null
+    address: '',
+    phone1: '',
+    phone2: '',
+    phone3: '',
+    cnic: '',
+    status: 'Active',
+    vendorCnicFrontPic: null,
+    vendorCnicBackPic: null
   });
   const [errors, setErrors] = useState({});
   const [cnicFrontPreview, setCnicFrontPreview] = useState('');
   const [cnicBackPreview, setCnicBackPreview] = useState('');
 
-  const categories = [
-    'Technology',
-    'Manufacturing',
-    'Design & Marketing',
-    'Logistics',
-    'Raw Materials',
-    'Research & Development',
-    'Services',
-    'Construction',
-    'Healthcare',
-    'Education'
-  ];
+  // Available statuses
+  const statuses = ['Active', 'Pending', 'Inactive'];
 
   useEffect(() => {
     if (vendor && open) {
       setFormData({
-        vendorName: vendor.name || '',
-        vendorAddress: vendor.address || '',
-        primaryPhone: vendor.primaryPhone || '',
-        phoneNumber2: vendor.phoneNumber2 || '',
-        phoneNumber3: vendor.phoneNumber3 || '',
-        category: vendor.category || '',
-        cnicFront: vendor.cnicFront || null,
-        cnicBack: vendor.cnicBack || null
+        vendorName: vendor.vendorName || '',
+        address: vendor.address || '',
+        phone1: vendor.phone1 || '',
+        phone2: vendor.phone2 || '',
+        phone3: vendor.phone3 || '',
+        cnic: vendor.cnic || '',
+        status: vendor.status || 'Active',
+        vendorCnicFrontPic: vendor.vendorCnicFrontPic || null,
+        vendorCnicBackPic: vendor.vendorCnicBackPic || null
       });
-      setCnicFrontPreview(vendor.cnicFrontPreview || '');
-      setCnicBackPreview(vendor.cnicBackPreview || '');
+      setCnicFrontPreview(vendor.vendorCnicFrontPic || '');
+      setCnicBackPreview(vendor.vendorCnicBackPic || '');
     } else if (!vendor && open) {
       // Reset form for new vendor
       setFormData({
         vendorName: '',
-        vendorAddress: '',
-        primaryPhone: '',
-        phoneNumber2: '',
-        phoneNumber3: '',
-        category: '',
-        cnicFront: null,
-        cnicBack: null
+        address: '',
+        phone1: '',
+        phone2: '',
+        phone3: '',
+        cnic: '',
+        status: 'Active',
+        vendorCnicFrontPic: null,
+        vendorCnicBackPic: null
       });
       setCnicFrontPreview('');
       setCnicBackPreview('');
@@ -90,22 +85,32 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave }) => {
       newErrors.vendorName = 'Vendor name is required';
     }
 
-    if (!formData.vendorAddress.trim()) {
-      newErrors.vendorAddress = 'Vendor address is required';
+    if (!formData.address.trim()) {
+      newErrors.address = 'Vendor address is required';
     }
 
-    if (!formData.primaryPhone.trim()) {
-      newErrors.primaryPhone = 'Primary phone number is required';
-    } else if (!/^[\+]?[0-9\s\-\(\)]{10,}$/.test(formData.primaryPhone)) {
-      newErrors.primaryPhone = 'Please enter a valid phone number';
+    if (!formData.phone1.trim()) {
+      newErrors.phone1 = 'Primary phone number is required';
+    } else if (!/^[\+]?[0-9\s\-\(\)]{10,20}$/.test(formData.phone1)) {
+      newErrors.phone1 = 'Please enter a valid phone number (up to 20 characters)';
     }
 
-    if (formData.phoneNumber2 && !/^[\+]?[0-9\s\-\(\)]{10,}$/.test(formData.phoneNumber2)) {
-      newErrors.phoneNumber2 = 'Please enter a valid phone number';
+    if (formData.phone2 && !/^[\+]?[0-9\s\-\(\)]{10,20}$/.test(formData.phone2)) {
+      newErrors.phone2 = 'Please enter a valid phone number (up to 20 characters)';
     }
 
-    if (formData.phoneNumber3 && !/^[\+]?[0-9\s\-\(\)]{10,}$/.test(formData.phoneNumber3)) {
-      newErrors.phoneNumber3 = 'Please enter a valid phone number';
+    if (formData.phone3 && !/^[\+]?[0-9\s\-\(\)]{10,20}$/.test(formData.phone3)) {
+      newErrors.phone3 = 'Please enter a valid phone number (up to 20 characters)';
+    }
+
+    if (!formData.cnic.trim()) {
+      newErrors.cnic = 'CNIC is required';
+    } else if (!/^\d{13}$|^\d{5}-\d{7}-\d$/.test(formData.cnic)) {
+      newErrors.cnic = 'Please enter a valid CNIC (13 digits or format: 12345-1234567-1)';
+    }
+
+    if (!formData.status) {
+      newErrors.status = 'Status is required';
     }
 
     setErrors(newErrors);
@@ -131,19 +136,31 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave }) => {
     if (file) {
       // Validate file type
       if (!['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)) {
-        alert('Please upload only PNG or JPG files');
+        setErrors(prev => ({
+          ...prev,
+          [field]: 'Please upload only PNG or JPG files'
+        }));
         return;
       }
 
       // Validate file size (5MB)
       if (file.size > 5 * 1024 * 1024) {
-        alert('File size should be less than 5MB');
+        setErrors(prev => ({
+          ...prev,
+          [field]: 'File size should be less than 5MB'
+        }));
         return;
       }
 
       setFormData(prev => ({
         ...prev,
         [field]: file
+      }));
+
+      // Clear any previous errors
+      setErrors(prev => ({
+        ...prev,
+        [field]: ''
       }));
 
       // Create preview
@@ -159,27 +176,29 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave }) => {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (validateForm()) {
       const vendorData = {
-        id: vendor?.id || Date.now(),
-        name: formData.vendorName,
-        address: formData.vendorAddress,
-        primaryPhone: formData.primaryPhone,
-        phoneNumber2: formData.phoneNumber2,
-        phoneNumber3: formData.phoneNumber3,
-        category: formData.category,
-        cnicFront: formData.cnicFront,
-        cnicBack: formData.cnicBack,
-        cnicFrontPreview,
-        cnicBackPreview,
-        status: vendor?.status || 'pending',
-        rating: vendor?.rating || 0,
-        projects: vendor?.projects || 0,
-        lastActive: vendor?.lastActive || 'Just now',
-        color: vendor?.color || '#757575'
+        vendorId: vendor?.vendorId,  // Include vendorId for updates
+        vendorName: formData.vendorName,
+        address: formData.address,
+        phone1: formData.phone1,
+        phone2: formData.phone2 || '',
+        phone3: formData.phone3 || '',
+        cnic: formData.cnic,
+        status: formData.status,
+        vendorCnicFrontPic: formData.vendorCnicFrontPic,
+        vendorCnicBackPic: formData.vendorCnicBackPic
       };
-      onSave(vendorData);
+
+      try {
+        await onSave(vendorData);
+      } catch (error) {
+        setErrors(prev => ({
+          ...prev,
+          submit: error.message || 'An error occurred while saving'
+        }));
+      }
     }
   };
 
@@ -203,16 +222,19 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave }) => {
         }
       }}
     >
-      <DialogTitle sx={{ 
-        background: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
-        color: 'white',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-      }}>
-        <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
+      <DialogTitle 
+        sx={{ 
+          background: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
+          color: 'white',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          p: 2
+        }}
+      >
+        <Box component="div" sx={{ display: 'flex', alignItems: 'center' }}>
           {isEditMode ? 'Edit Vendor' : vendor ? 'Vendor Details' : 'Vendor Registration'}
-        </Typography>
+        </Box>
         <IconButton onClick={handleClose} sx={{ color: 'white' }}>
           <CloseIcon />
         </IconButton>
@@ -246,32 +268,50 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave }) => {
             />
           </Grid>
 
+
+
           <Grid item xs={12} md={6}>
-            <FormControl fullWidth disabled={isReadOnly}>
-              <InputLabel>Category</InputLabel>
+            <FormControl fullWidth disabled={isReadOnly} error={!!errors.status}>
+              <InputLabel>Status</InputLabel>
               <Select
-                value={formData.category}
-                onChange={(e) => handleInputChange('category', e.target.value)}
-                label="Category"
+                value={formData.status}
+                onChange={(e) => handleInputChange('status', e.target.value)}
+                label="Status"
                 readOnly={isReadOnly}
               >
-                {categories.map((category) => (
-                  <MenuItem key={category} value={category}>
-                    {category}
+                {statuses.map((status) => (
+                  <MenuItem key={status} value={status}>
+                    {status}
                   </MenuItem>
                 ))}
               </Select>
+              {errors.status && <FormHelperText>{errors.status}</FormHelperText>}
             </FormControl>
           </Grid>
 
           <Grid item xs={12}>
             <TextField
               fullWidth
-              label="Vendor Address *"
-              value={formData.vendorAddress}
-              onChange={(e) => handleInputChange('vendorAddress', e.target.value)}
-              error={!!errors.vendorAddress}
-              helperText={errors.vendorAddress || 'Required field'}
+              label="CNIC *"
+              value={formData.cnic}
+              onChange={(e) => handleInputChange('cnic', e.target.value)}
+              error={!!errors.cnic}
+              helperText={errors.cnic || 'Format: 12345-1234567-1 or 1234512345671'}
+              disabled={isReadOnly}
+              InputProps={{
+                readOnly: isReadOnly
+              }}
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Address *"
+              value={formData.address}
+              onChange={(e) => handleInputChange('address', e.target.value)}
+              error={!!errors.address}
+              helperText={errors.address || 'Required field'}
               multiline
               rows={3}
               disabled={isReadOnly}
@@ -291,11 +331,11 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave }) => {
           <Grid item xs={12} md={4}>
             <TextField
               fullWidth
-              label="Primary Phone Number *"
-              value={formData.primaryPhone}
-              onChange={(e) => handleInputChange('primaryPhone', e.target.value)}
-              error={!!errors.primaryPhone}
-              helperText={errors.primaryPhone || 'Required field'}
+              label="Phone Number 1 *"
+              value={formData.phone1}
+              onChange={(e) => handleInputChange('phone1', e.target.value)}
+              error={!!errors.phone1}
+              helperText={errors.phone1 || 'Required field'}
               disabled={isReadOnly}
               InputProps={{
                 readOnly: isReadOnly
@@ -307,10 +347,10 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave }) => {
             <TextField
               fullWidth
               label="Phone Number 2 (Optional)"
-              value={formData.phoneNumber2}
-              onChange={(e) => handleInputChange('phoneNumber2', e.target.value)}
-              error={!!errors.phoneNumber2}
-              helperText={errors.phoneNumber2 || 'Optional field'}
+              value={formData.phone2}
+              onChange={(e) => handleInputChange('phone2', e.target.value)}
+              error={!!errors.phone2}
+              helperText={errors.phone2 || 'Optional field'}
               disabled={isReadOnly}
               InputProps={{
                 readOnly: isReadOnly
@@ -322,10 +362,10 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave }) => {
             <TextField
               fullWidth
               label="Phone Number 3 (Optional)"
-              value={formData.phoneNumber3}
-              onChange={(e) => handleInputChange('phoneNumber3', e.target.value)}
-              error={!!errors.phoneNumber3}
-              helperText={errors.phoneNumber3 || 'Optional field'}
+              value={formData.phone3}
+              onChange={(e) => handleInputChange('phone3', e.target.value)}
+              error={!!errors.phone3}
+              helperText={errors.phone3 || 'Optional field'}
               disabled={isReadOnly}
               InputProps={{
                 readOnly: isReadOnly
@@ -382,7 +422,7 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave }) => {
                 type="file"
                 accept="image/png,image/jpeg,image/jpg"
                 style={{ display: 'none' }}
-                onChange={(e) => handleFileUpload('cnicFront', e.target.files[0])}
+                onChange={(e) => handleFileUpload('vendorCnicFrontPic', e.target.files[0])}
                 disabled={isReadOnly}
               />
             </Paper>
@@ -427,7 +467,7 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave }) => {
                 type="file"
                 accept="image/png,image/jpeg,image/jpg"
                 style={{ display: 'none' }}
-                onChange={(e) => handleFileUpload('cnicBack', e.target.files[0])}
+                onChange={(e) => handleFileUpload('vendorCnicBackPic', e.target.files[0])}
                 disabled={isReadOnly}
               />
             </Paper>
@@ -454,11 +494,7 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave }) => {
           {isReadOnly ? (
             <Button 
               variant="contained"
-              onClick={() => {
-                // Switch to edit mode
-                onClose();
-                // This will trigger the edit mode in parent component
-              }}
+              onClick={() => onEdit(vendor)}
               sx={{
                 background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
                 '&:hover': {

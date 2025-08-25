@@ -22,6 +22,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
+import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import './Dashboard.css';
 import { logout, getUserRole, getUserCustomers, getUserAssignedMenus } from '../utils/auth';
 
@@ -109,6 +110,9 @@ const Dashboard = ({ user, onLogout, children }) => {
         case 'lookup-management':
           navigate('/lookup-management');
           break;
+        case 'vehicle-management':
+          navigate('/vehicle-management');
+          break;
         default:
           break;
       }
@@ -175,6 +179,13 @@ const Dashboard = ({ user, onLogout, children }) => {
       icon: <AccountBalanceIcon />,
       color: '#607D8B',
       route: 'lookup-management'
+    },
+    {
+      id: 9, // Vehicle Management & Driver
+      label: 'Vehicle Management & Driver',
+      icon: <DirectionsCarIcon />,
+      color: '#228B22',
+      route: 'vehicle-management'
     }
   ];
 

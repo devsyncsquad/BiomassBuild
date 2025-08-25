@@ -15,6 +15,7 @@ import CompanyManagement from "./components/CompanyManagement";
 import CustomerManagement from "./components/CustomerManagement";
 import CustomerLocations from "./components/CustomerLocations";
 import VendorManagement from "./components/VendorManagement";
+import VehicleManagement from "./components/vehicle-management/VehicleManagement";
 import UserManagement from "./components/user-management";
 import MoneyAccount from "./components/MoneyAccount";
 import CostCenters from "./components/CostCenters";
@@ -607,6 +608,16 @@ function App() {
                 <ProtectedRoute>
                   <Layout>
                     <Lookup />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path='/vehicle-management'
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <VehicleManagement />
                   </Layout>
                 </ProtectedRoute>
               }

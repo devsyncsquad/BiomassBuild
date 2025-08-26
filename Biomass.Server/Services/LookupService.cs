@@ -1,64 +1,107 @@
 using Biomass.Api.Model;
 using Biomass.Server.Interfaces;
 using Biomass.Server.Models.Lookup;
+using Biomass.Server.Data;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Biomass.Server.Services
 {
     public class LookupService : ILookupService
     {
-        private readonly ILookupRepository _repo;
-        public LookupService(ILookupRepository repo)
+        private readonly ApplicationDbContext _dbContext;
+        public LookupService(ApplicationDbContext dbContext)
         {
-            _repo = repo;
+            _dbContext = dbContext;
         }
 
-        public async Task<ServiceResponse<(IEnumerable<Lookup> Items, int TotalCount)>> GetAsync(string? domain, int page, int pageSize)
+        public async Task<ServiceResponse<(IEnumerable<LookupDto> Items, int TotalCount)>> GetAsync(string? domain, string? status, string? search, int page, int pageSize)
         {
-            var response = new ServiceResponse<(IEnumerable<Lookup> Items, int TotalCount)>();
-
+            var response = new ServiceResponse<(IEnumerable<LookupDto> Items, int TotalCount)>();
             try
             {
-                var result = await _repo.GetAsync(domain, page, pageSize);
-                response.Result = result;
+                page = page <= 0 ? 1 : page;
+                pageSize = pageSize <= 0 ? 10 : pageSize;
+                var query = _dbContext.Lookups.AsNoTracking().AsQueryable();
+                if (!string.IsNullOrWhiteSpace(domain)) { query = query.Where(l => l.LookupDomain == domain); }
+                if (!string.IsNullOrWhiteSpace(status))
+                {
+                    switch (status.ToLower())
+                    {
+                        case "enabled": query = query.Where(l => l.Enabled); break;
+                        case "disabled": query = query.Where(l => !l.Enabled); break;
+                        case "pending": query = query.Where(l => l.SortOrder > 0 && !l.Enabled); break;
+                    }
+                }
+                if (!string.IsNullOrWhiteSpace(search))
+                {
+                    query = query.Where(l => 
+                        l.LookupName.Contains(search) || 
+                        l.LookupId.ToString().Contains(search) ||
+                        l.LookupDomain.Contains(search)
+                    );
+                }
+                var total = await query.CountAsync();
+                var items = await query
+                    .OrderBy(l => l.SortOrder)
+                    .ThenBy(l => l.LookupName)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+                var dtos = items.Select(Map).ToList();
+                response.Result = (dtos, total);
                 response.Success = true;
             }
-            catch (Exception ex)
-            {
-                response.Success = false;
-                response.Message = ex.Message;
-            }
-
+            catch (Exception ex) { response.Success = false; response.Message = ex.Message; }
             return response;
         }
-        //public async Task<ServiceResponse<(IEnumerable<LookupDto> Items, int TotalCount)>> GetAsync(string? domain, int page, int pageSize)
-        //{
-        //    var response = new ServiceResponse<(IEnumerable<LookupDto>, int)>();
-        //    try
-        //    {
-        //        page = page <= 0 ? 1 : page;
-        //        pageSize = pageSize <= 0 ? 10 : pageSize;
-        //        var (items, total) = await _repo.GetAsync(domain, page, pageSize);
-        //        response.Result = (items.Select(Map).ToList(), total);
-        //        response.Success = true;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        response.Success = false;
-        //        response.Message = ex.Message;
-        //    }
-        //    return response;
-        //}
+
+        public async Task<ServiceResponse<IEnumerable<LookupDto>>> GetAllUnpaginatedAsync(string? domain, string? status, string? search)
+        {
+            var response = new ServiceResponse<IEnumerable<LookupDto>>();
+            try
+            {
+                var query = _dbContext.Lookups.AsNoTracking().AsQueryable();
+                if (!string.IsNullOrWhiteSpace(domain)) { query = query.Where(l => l.LookupDomain == domain); }
+                if (!string.IsNullOrWhiteSpace(status))
+                {
+                    switch (status.ToLower())
+                    {
+                        case "enabled": query = query.Where(l => l.Enabled); break;
+                        case "disabled": query = query.Where(l => !l.Enabled); break;
+                        case "pending": query = query.Where(l => l.SortOrder > 0 && !l.Enabled); break;
+                    }
+                }
+                if (!string.IsNullOrWhiteSpace(search))
+                {
+                    query = query.Where(l => 
+                        l.LookupName.Contains(search) || 
+                        l.LookupId.ToString().Contains(search) ||
+                        l.LookupDomain.Contains(search)
+                    );
+                }
+                var items = await query
+                    .OrderBy(l => l.SortOrder)
+                    .ThenBy(l => l.LookupName)
+                    .ToListAsync();
+                var dtos = items.Select(Map).ToList();
+                response.Result = dtos;
+                response.Success = true;
+            }
+            catch (Exception ex) { response.Success = false; response.Message = ex.Message; }
+            return response;
+        }
 
         public async Task<ServiceResponse<LookupDto>> GetByIdAsync(int id)
         {
             var response = new ServiceResponse<LookupDto>();
             try
             {
-                var entity = await _repo.GetByIdAsync(id);
+                var entity = await _dbContext.Lookups.AsNoTracking().FirstOrDefaultAsync(l => l.LookupId == id);
                 if (entity == null)
                 {
                     response.Success = false;
-                    response.Message = "Not found";
+                    response.Message = "Lookup not found";
                     return response;
                 }
                 response.Result = Map(entity);
@@ -72,29 +115,40 @@ namespace Biomass.Server.Services
             return response;
         }
 
-        public async Task<ServiceResponse<LookupDto>> CreateAsync(Lookup request)
+        public async Task<ServiceResponse<LookupDto>> CreateAsync(CreateLookupRequest request)
         {
             var response = new ServiceResponse<LookupDto>();
             try
             {
-                if (string.IsNullOrWhiteSpace(request.LookUpName))
+                // Check for uniqueness constraint
+                var existingLookup = await _dbContext.Lookups
+                    .FirstOrDefaultAsync(l => 
+                        l.LookupName.ToLower() == request.LookupName.ToLower() && 
+                        l.LookupDomain.ToLower() == request.LookupDomain.ToLower());
+
+                if (existingLookup != null)
                 {
                     response.Success = false;
-                    response.Message = "Name is required";
+                    response.Message = $"A lookup with name '{request.LookupName}' already exists in domain '{request.LookupDomain}'";
                     return response;
                 }
+
                 var entity = new Lookup
                 {
-                    LookUpName = request.LookUpName.Trim(),
-                    LookUpDomain = request.LookUpDomain?.Trim(),
+                    LookupName = request.LookupName.Trim(),
+                    LookupDomain = request.LookupDomain.Trim(),
                     Enabled = request.Enabled,
-                    CreatedBy = request.CreatedBy,
+                    SortOrder = request.SortOrder,
+                    CreatedBy = 1, // TODO: Get from current user context
                     CreatedOn = DateTime.UtcNow
                 };
-                var saved = await _repo.CreateAsync(entity);
-                response.Result = Map(saved);
+
+                _dbContext.Lookups.Add(entity);
+                await _dbContext.SaveChangesAsync();
+                
+                response.Result = Map(entity);
                 response.Success = true;
-                response.Message = "Created";
+                response.Message = "Lookup created successfully";
             }
             catch (Exception ex)
             {
@@ -109,29 +163,38 @@ namespace Biomass.Server.Services
             var response = new ServiceResponse<LookupDto>();
             try
             {
-                if (string.IsNullOrWhiteSpace(request.LookUpName))
+                var entity = await _dbContext.Lookups.FirstOrDefaultAsync(l => l.LookupId == request.LookupId);
+                if (entity == null)
                 {
                     response.Success = false;
-                    response.Message = "Name is required";
+                    response.Message = "Lookup not found";
                     return response;
                 }
-                var toUpdate = new Lookup
-                {
-                    LookUpId = request.LookUpId,
-                    LookUpName = request.LookUpName.Trim(),
-                    LookUpDomain = request.LookUpDomain?.Trim(),
-                    Enabled = request.Enabled
-                };
-                var updated = await _repo.UpdateAsync(toUpdate);
-                if (updated == null)
+
+                // Check for uniqueness constraint (excluding current record)
+                var existingLookup = await _dbContext.Lookups
+                    .FirstOrDefaultAsync(l => 
+                        l.LookupId != request.LookupId &&
+                        l.LookupName.ToLower() == request.LookupName.ToLower() && 
+                        l.LookupDomain.ToLower() == request.LookupDomain.ToLower());
+
+                if (existingLookup != null)
                 {
                     response.Success = false;
-                    response.Message = "Not found";
+                    response.Message = $"A lookup with name '{request.LookupName}' already exists in domain '{request.LookupDomain}'";
                     return response;
                 }
-                response.Result = Map(updated);
+
+                entity.LookupName = request.LookupName.Trim();
+                entity.LookupDomain = request.LookupDomain.Trim();
+                entity.Enabled = request.Enabled;
+                entity.SortOrder = request.SortOrder;
+
+                await _dbContext.SaveChangesAsync();
+                
+                response.Result = Map(entity);
                 response.Success = true;
-                response.Message = "Updated";
+                response.Message = "Lookup updated successfully";
             }
             catch (Exception ex)
             {
@@ -146,10 +209,71 @@ namespace Biomass.Server.Services
             var response = new ServiceResponse<bool>();
             try
             {
-                var ok = await _repo.DeleteAsync(id);
-                response.Result = ok;
-                response.Success = ok;
-                response.Message = ok ? "Deleted" : "Not found";
+                var entity = await _dbContext.Lookups.FirstOrDefaultAsync(l => l.LookupId == id);
+                if (entity == null)
+                {
+                    response.Result = false;
+                    response.Success = false;
+                    response.Message = "Lookup not found";
+                    return response;
+                }
+
+                _dbContext.Lookups.Remove(entity);
+                await _dbContext.SaveChangesAsync();
+                
+                response.Result = true;
+                response.Success = true;
+                response.Message = "Lookup deleted successfully";
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+        public async Task<ServiceResponse<LookupStatistics>> GetStatisticsAsync()
+        {
+            var response = new ServiceResponse<LookupStatistics>();
+            try
+            {
+                var total = await _dbContext.Lookups.CountAsync();
+                var enabled = await _dbContext.Lookups.CountAsync(l => l.Enabled);
+                var disabled = await _dbContext.Lookups.CountAsync(l => !l.Enabled);
+                var pending = await _dbContext.Lookups.CountAsync(l => l.SortOrder > 0 && !l.Enabled);
+
+                response.Result = new LookupStatistics
+                {
+                    Total = total,
+                    Enabled = enabled,
+                    Disabled = disabled,
+                    Pending = pending
+                };
+                response.Success = true;
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+        public async Task<ServiceResponse<List<string>>> GetDomainsAsync()
+        {
+            var response = new ServiceResponse<List<string>>();
+            try
+            {
+                var domains = await _dbContext.Lookups
+                    .AsNoTracking()
+                    .Select(l => l.LookupDomain)
+                    .Distinct()
+                    .OrderBy(d => d)
+                    .ToListAsync();
+
+                response.Result = domains;
+                response.Success = true;
             }
             catch (Exception ex)
             {
@@ -164,12 +288,9 @@ namespace Biomass.Server.Services
             var response = new ServiceResponse<Dictionary<string, List<LookupDto>>>();
             try
             {
-                // Get all lookups without domain filter to get all data
-                var (allItems, _) = await _repo.GetAsync(null, 1, int.MaxValue);
-                
-                // Group by domain
+                var allItems = await _dbContext.Lookups.AsNoTracking().ToListAsync();
                 var result = allItems
-                    .GroupBy(l => l.LookUpDomain ?? "Unknown")
+                    .GroupBy(l => l.LookupDomain ?? "Unknown")
                     .ToDictionary(
                         group => group.Key,
                         group => group.Select(Map).ToList()
@@ -189,11 +310,14 @@ namespace Biomass.Server.Services
 
         private static LookupDto Map(Lookup l) => new LookupDto
         {
-            LookUpId = l.LookUpId,
-            LookUpName = l.LookUpName,
-            LookUpDomain = l.LookUpDomain,
+            LookupId = l.LookupId,
+            LookupName = l.LookupName,
+            LookupDomain = l.LookupDomain,
             Enabled = l.Enabled,
-            Created_at = l.CreatedOn
+            SortOrder = l.SortOrder,
+            CreatedOn = l.CreatedOn,
+            CreatedBy = l.CreatedBy,
+            Status = l.Enabled ? "Enabled" : "Disabled"
         };
     }
 }

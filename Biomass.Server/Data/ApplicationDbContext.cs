@@ -180,16 +180,38 @@ namespace Biomass.Server.Data
 
             modelBuilder.Entity<CustomerLocation>(entity =>
             {
+                entity.ToTable("locations");
                 entity.HasKey(e => e.LocationId);
-                entity.Property(e => e.LocationName).IsRequired().HasMaxLength(100);
-                entity.Property(e => e.LocationCode).IsRequired().HasMaxLength(50);
-                entity.Property(e => e.Address).HasMaxLength(250);
-                entity.Property(e => e.DispatchChargeType).HasMaxLength(50);
-                entity.Property(e => e.VariableChargeType).HasMaxLength(50);
-                entity.Property(e => e.ReceivingChargeType).HasMaxLength(50);
-                entity.Property(e => e.ReceivingVariableChargeType).HasMaxLength(50);
-                entity.Property(e => e.Status).IsRequired().HasMaxLength(20);
-                entity.Property(e => e.CreatedOn).IsRequired();
+                entity.Property(e => e.LocationId).HasColumnName("locationid");
+                entity.Property(e => e.CustomerId).HasColumnName("customerid").IsRequired();
+                entity.Property(e => e.LocationName).HasColumnName("locationname").IsRequired().HasMaxLength(100);
+                entity.Property(e => e.LocationCode).HasColumnName("locationcode").IsRequired().HasMaxLength(50);
+                entity.Property(e => e.Address).HasColumnName("address").HasMaxLength(250);
+                entity.Property(e => e.Latitude).HasColumnName("latitude").HasColumnType("decimal(10,7)");
+                entity.Property(e => e.Longitude).HasColumnName("longitude").HasColumnType("decimal(10,7)");
+                entity.Property(e => e.CenterDispatchWeightLimit).HasColumnName("center_dispatch_weight_limit").HasColumnType("decimal(10,2)");
+                entity.Property(e => e.AdvancePercentageAllowed).HasColumnName("advance_percentage_allowed").HasColumnType("decimal(5,2)");
+                entity.Property(e => e.ToleranceLimitPercentage).HasColumnName("tolerance_limit_percentage").HasColumnType("decimal(5,2)");
+                entity.Property(e => e.ToleranceLimitKg).HasColumnName("tolerance_limit_kg").HasColumnType("decimal(10,2)");
+                entity.Property(e => e.MaterialPenaltyRatePerKg).HasColumnName("material_penalty_rateperkg").HasColumnType("decimal(10,2)");
+                entity.Property(e => e.DispatchLoadingChargesEnabled).HasColumnName("dispatch_loading_charges_enabled");
+                entity.Property(e => e.DispatchChargeType).HasColumnName("dispatch_charge_type").HasMaxLength(50);
+                entity.Property(e => e.FixedLoaderCost).HasColumnName("fixed_loader_cost").HasColumnType("decimal(10,2)");
+                entity.Property(e => e.VariableChargeType).HasColumnName("variable_charge_type").HasMaxLength(50);
+                entity.Property(e => e.VariableChargeAmount).HasColumnName("variable_charge_amount").HasColumnType("decimal(10,2)");
+                entity.Property(e => e.LaborChargesEnabled).HasColumnName("labor_charges_enabled");
+                entity.Property(e => e.LaborChargeType).HasColumnName("labor_charge_type").HasMaxLength(50);
+                entity.Property(e => e.LaborChargesCost).HasColumnName("labor_charges_cost").HasColumnType("decimal(10,2)");
+                entity.Property(e => e.ReceivingUnloadingCostEnabled).HasColumnName("receiving_unloading_cost_enabled");
+                entity.Property(e => e.ReceivingChargeType).HasColumnName("receiving_charge_type").HasMaxLength(50);
+                entity.Property(e => e.FixedUnloadingCost).HasColumnName("fixed_unloading_cost").HasColumnType("decimal(10,2)");
+                entity.Property(e => e.ReceivingVariableChargeType).HasColumnName("receiving_variable_charge_type").HasMaxLength(50);
+                entity.Property(e => e.ReceivingVariableChargeAmount).HasColumnName("receiving_variable_charge_amount").HasColumnType("decimal(10,2)");
+                entity.Property(e => e.Status).HasColumnName("status").IsRequired().HasMaxLength(20);
+                entity.Property(e => e.CreatedBy).HasColumnName("createdby");
+                entity.Property(e => e.CreatedOn).HasColumnName("createdon").IsRequired();
+                entity.Property(e => e.LastUpdatedBy).HasColumnName("lastupdatedby");
+                entity.Property(e => e.LastUpdatedOn).HasColumnName("lastupdatedon");
 
                 entity.HasOne(e => e.Customer)
                       .WithMany(e => e.Locations)
@@ -206,25 +228,17 @@ namespace Biomass.Server.Data
                 entity.Property(e => e.EffectiveDate).HasColumnName("effectivedate").IsRequired();
                 entity.Property(e => e.CompanyRate).HasColumnName("company_rate").IsRequired().HasColumnType("decimal(10,2)");
                 entity.Property(e => e.TransporterRate).HasColumnName("transporter_rate").IsRequired().HasColumnType("decimal(10,2)");
+               // entity.Property(e => e.DispatchWeight).HasColumnName("dispatchweight").HasColumnType("decimal(10,2)");
+               // entity.Property(e => e.ReceivingWeight).HasColumnName("receivingweight").HasColumnType("decimal(10,2)");
                 entity.Property(e => e.Route).HasColumnName("route").HasMaxLength(100);
                 entity.Property(e => e.MaterialType).HasColumnName("materialtype").HasMaxLength(100);
-                entity.Property(e => e.DispatchWeight).HasColumnName("dispatchweight").HasColumnType("decimal(10,2)");
-                entity.Property(e => e.ReceivingWeight).HasColumnName("receivingweight").HasColumnType("decimal(10,2)");
                 entity.Property(e => e.Status).HasColumnName("status").IsRequired().HasMaxLength(20);
                 entity.Property(e => e.CreatedBy).HasColumnName("createdby");
                 entity.Property(e => e.CreatedOn).HasColumnName("createdon").IsRequired();
                 entity.Property(e => e.LocationId).HasColumnName("location_id");
 
-                // Foreign key relationships
-                entity.HasOne(e => e.Customer)
-                      .WithMany(e => e.MaterialRates)
-                      .HasForeignKey(e => e.CustomerId)
-                      .OnDelete(DeleteBehavior.Cascade);
-
-                entity.HasOne(e => e.CustomerLocation)
-                      .WithMany()
-                      .HasForeignKey(e => e.LocationId)
-                      .OnDelete(DeleteBehavior.NoAction); // Using NoAction to avoid circular cascade
+                // Remove foreign key constraints to avoid database schema issues
+                // These will be handled at the application level
             });
 
             modelBuilder.Entity<MainMenus>(entity =>
@@ -356,13 +370,14 @@ namespace Biomass.Server.Data
             modelBuilder.Entity<Lookup>(entity =>
             {
                 entity.ToTable("lookups");
-                entity.HasKey(e => e.LookUpId);
-                entity.Property(e => e.LookUpId).HasColumnName("lookup_id");
-                entity.Property(e => e.LookUpName).HasColumnName("lookup_name").IsRequired().HasMaxLength(100);
-                entity.Property(e => e.LookUpDomain).HasColumnName("lookup_domain").HasMaxLength(100);
-                entity.Property(e => e.Enabled).HasColumnName("enabled").HasMaxLength(1);
-                //entity.Property(e => e.CreatedBy).HasColumnName("createdby").HasMaxLength(100);
+                entity.HasKey(e => e.LookupId);
+                entity.Property(e => e.LookupId).HasColumnName("lookup_id");
+                entity.Property(e => e.LookupName).HasColumnName("lookup_name").IsRequired().HasMaxLength(100);
+                entity.Property(e => e.LookupDomain).HasColumnName("lookup_domain").IsRequired().HasMaxLength(100);
+                entity.Property(e => e.Enabled).HasColumnName("enabled").IsRequired();
+                entity.Property(e => e.SortOrder).HasColumnName("sort_order").IsRequired();
                 entity.Property(e => e.CreatedOn).HasColumnName("created_on").IsRequired();
+                entity.Property(e => e.CreatedBy).HasColumnName("created_by");
             });
 
             // MoneyAccounts

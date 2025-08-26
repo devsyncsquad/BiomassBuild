@@ -44,6 +44,9 @@ namespace Biomass.Server.Services
                         FixedLoaderCost = l.FixedLoaderCost,
                         VariableChargeType = l.VariableChargeType,
                         VariableChargeAmount = l.VariableChargeAmount,
+                        LaborChargesEnabled = l.LaborChargesEnabled,
+                        LaborChargeType = l.LaborChargeType,
+                        LaborChargesCost = l.LaborChargesCost,
                         ReceivingUnloadingCostEnabled = l.ReceivingUnloadingCostEnabled,
                         ReceivingChargeType = l.ReceivingChargeType,
                         FixedUnloadingCost = l.FixedUnloadingCost,
@@ -97,6 +100,9 @@ namespace Biomass.Server.Services
                         FixedLoaderCost = l.FixedLoaderCost,
                         VariableChargeType = l.VariableChargeType,
                         VariableChargeAmount = l.VariableChargeAmount,
+                        LaborChargesEnabled = l.LaborChargesEnabled,
+                        LaborChargeType = l.LaborChargeType,
+                        LaborChargesCost = l.LaborChargesCost,
                         ReceivingUnloadingCostEnabled = l.ReceivingUnloadingCostEnabled,
                         ReceivingChargeType = l.ReceivingChargeType,
                         FixedUnloadingCost = l.FixedUnloadingCost,
@@ -150,6 +156,9 @@ namespace Biomass.Server.Services
                         FixedLoaderCost = l.FixedLoaderCost,
                         VariableChargeType = l.VariableChargeType,
                         VariableChargeAmount = l.VariableChargeAmount,
+                        LaborChargesEnabled = l.LaborChargesEnabled,
+                        LaborChargeType = l.LaborChargeType,
+                        LaborChargesCost = l.LaborChargesCost,
                         ReceivingUnloadingCostEnabled = l.ReceivingUnloadingCostEnabled,
                         ReceivingChargeType = l.ReceivingChargeType,
                         FixedUnloadingCost = l.FixedUnloadingCost,
@@ -228,6 +237,9 @@ namespace Biomass.Server.Services
                     FixedLoaderCost = request.FixedLoaderCost,
                     VariableChargeType = request.VariableChargeType,
                     VariableChargeAmount = request.VariableChargeAmount,
+                    LaborChargesEnabled = request.LaborChargesEnabled,
+                    LaborChargeType = request.LaborChargeType,
+                    LaborChargesCost = request.LaborChargesCost,
                     ReceivingUnloadingCostEnabled = request.ReceivingUnloadingCostEnabled,
                     ReceivingChargeType = request.ReceivingChargeType,
                     FixedUnloadingCost = request.FixedUnloadingCost,
@@ -260,6 +272,9 @@ namespace Biomass.Server.Services
                     FixedLoaderCost = location.FixedLoaderCost,
                     VariableChargeType = location.VariableChargeType,
                     VariableChargeAmount = location.VariableChargeAmount,
+                    LaborChargesEnabled = location.LaborChargesEnabled,
+                    LaborChargeType = location.LaborChargeType,
+                    LaborChargesCost = location.LaborChargesCost,
                     ReceivingUnloadingCostEnabled = location.ReceivingUnloadingCostEnabled,
                     ReceivingChargeType = location.ReceivingChargeType,
                     FixedUnloadingCost = location.FixedUnloadingCost,
@@ -328,6 +343,9 @@ namespace Biomass.Server.Services
                 location.FixedLoaderCost = request.FixedLoaderCost;
                 location.VariableChargeType = request.VariableChargeType;
                 location.VariableChargeAmount = request.VariableChargeAmount;
+                location.LaborChargesEnabled = request.LaborChargesEnabled;
+                location.LaborChargeType = request.LaborChargeType;
+                location.LaborChargesCost = request.LaborChargesCost;
                 location.ReceivingUnloadingCostEnabled = request.ReceivingUnloadingCostEnabled;
                 location.ReceivingChargeType = request.ReceivingChargeType;
                 location.FixedUnloadingCost = request.FixedUnloadingCost;
@@ -358,6 +376,9 @@ namespace Biomass.Server.Services
                     FixedLoaderCost = location.FixedLoaderCost,
                     VariableChargeType = location.VariableChargeType,
                     VariableChargeAmount = location.VariableChargeAmount,
+                    LaborChargesEnabled = location.LaborChargesEnabled,
+                    LaborChargeType = location.LaborChargeType,
+                    LaborChargesCost = location.LaborChargesCost,
                     ReceivingUnloadingCostEnabled = location.ReceivingUnloadingCostEnabled,
                     ReceivingChargeType = location.ReceivingChargeType,
                     FixedUnloadingCost = location.FixedUnloadingCost,
@@ -459,6 +480,9 @@ namespace Biomass.Server.Services
                         FixedLoaderCost = l.FixedLoaderCost,
                         VariableChargeType = l.VariableChargeType,
                         VariableChargeAmount = l.VariableChargeAmount,
+                        LaborChargesEnabled = l.LaborChargesEnabled,
+                        LaborChargeType = l.LaborChargeType,
+                        LaborChargesCost = l.LaborChargesCost,
                         ReceivingUnloadingCostEnabled = l.ReceivingUnloadingCostEnabled,
                         ReceivingChargeType = l.ReceivingChargeType,
                         FixedUnloadingCost = l.FixedUnloadingCost,
@@ -502,6 +526,70 @@ namespace Biomass.Server.Services
             {
                 response.Success = false;
                 response.Message = $"Error getting location count: {ex.Message}";
+            }
+
+            return response;
+        }
+        
+        public async Task<ServiceResponse<LocationCostsDto>> GetLocationCostsForDispatchAsync(int locationId)
+        {
+            var response = new ServiceResponse<LocationCostsDto>();
+
+            try
+            {
+                var location = await _context.CustomerLocations
+                    .Include(l => l.Customer)
+                    .Where(l => l.LocationId == locationId && l.Status.ToLower() == "active")
+                    .Select(l => new LocationCostsDto
+                    {
+                        LocationId = l.LocationId,
+                        LocationName = l.LocationName,
+                        LocationCode = l.LocationCode,
+                        CustomerId = l.CustomerId,
+                        CustomerName = l.Customer.FirstName + " " + l.Customer.LastName,
+                        
+                        // Dispatch Loading Charges
+                        DispatchLoadingChargesEnabled = l.DispatchLoadingChargesEnabled,
+                        DispatchChargeType = l.DispatchChargeType,
+                        FixedLoaderCost = l.FixedLoaderCost,
+                        VariableChargeType = l.VariableChargeType,
+                        VariableChargeAmount = l.VariableChargeAmount,
+                        
+                        // Labour Charges
+                        LaborChargesEnabled = l.LaborChargesEnabled,
+                        LaborChargeType = l.LaborChargeType,
+                        LaborChargesCost = l.LaborChargesCost,
+                        
+                        // Receiving Unloading Cost
+                        ReceivingUnloadingCostEnabled = l.ReceivingUnloadingCostEnabled,
+                        ReceivingChargeType = l.ReceivingChargeType,
+                        FixedUnloadingCost = l.FixedUnloadingCost,
+                        ReceivingVariableChargeType = l.ReceivingVariableChargeType,
+                        ReceivingVariableChargeAmount = l.ReceivingVariableChargeAmount,
+                        
+                        // Tolerance and Limits
+                        ToleranceLimitPercentage = l.ToleranceLimitPercentage,
+                        ToleranceLimitKg = l.ToleranceLimitKg,
+                        CenterDispatchWeightLimit = l.CenterDispatchWeightLimit,
+                        MaterialPenaltyRatePerKg = l.MaterialPenaltyRatePerKg
+                    })
+                    .FirstOrDefaultAsync();
+
+                if (location == null)
+                {
+                    response.Success = false;
+                    response.Message = "Location not found or inactive";
+                    return response;
+                }
+
+                response.Result = location;
+                response.Success = true;
+                response.Message = "Location costs retrieved successfully for dispatch";
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = $"Error retrieving location costs: {ex.Message}";
             }
 
             return response;

@@ -1,5 +1,6 @@
 using Biomass.Server.Models.Customer;
 using Biomass.Server.Model;
+using Biomass.Server.Models.UserManagement;
 
 namespace Biomass.Server.Models
 {
@@ -18,12 +19,13 @@ namespace Biomass.Server.Models
         public string? CanTamper { get; set; }
         public string? CanEdit { get; set; }
         public List<CustomerDto> Customers { get; set; } = new List<CustomerDto>();
+        public List<UserAssignedMenus> AssignedMenus { get; set; } = new List<UserAssignedMenus>();
 
         public EnhancedAuthenticateResponse()
         {
         }
 
-        public EnhancedAuthenticateResponse(AuthenticateResponse baseResponse, List<CustomerDto> customers)
+        public EnhancedAuthenticateResponse(AuthenticateResponse baseResponse, List<CustomerDto> customers, List<UserAssignedMenus> assignedMenus)
         {
             UserId = baseResponse.UserId;
             FirstName = baseResponse.FirstName;
@@ -38,6 +40,7 @@ namespace Biomass.Server.Models
             CanTamper = baseResponse.CanTamper;
             CanEdit = baseResponse.CanEdit;
             Customers = customers;
+            AssignedMenus = assignedMenus;
         }
     }
 }

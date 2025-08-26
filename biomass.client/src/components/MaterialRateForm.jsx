@@ -6,14 +6,17 @@ import {
   DialogActions,
   Button,
   TextField,
-  Grid,
-  Typography,
-  Box,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
-  Alert
+  Grid,
+  Typography,
+  Box,
+  Divider,
+  Alert,
+  Card,
+  CardContent
 } from '@mui/material';
 import {
   Save as SaveIcon,
@@ -21,80 +24,117 @@ import {
 } from '@mui/icons-material';
 import axios from 'axios';
 
-const MaterialRateForm = ({ open, onClose, locationId, locationName, customerId, materialRateData = null, onSave }) => {
+export const MaterialRateForm = ({ open, onClose, customerId, locationId, locationName, customerName, materialRateData = null, onSave }) => {
   const [formData, setFormData] = useState({
-    customerId: customerId,
-    locationId: locationId,
+    customerId: customerId || '',
+    locationId: locationId || '',
     effectiveDate: new Date().toISOString().split('T')[0],
-    buyingRate: 0,
-    sellingRate: 0,
+    companyRate: 0,
+    transporterRate: 0,
     route: '',
     materialType: 'Paper',
-    dispatchWeight: 0,
-    receivingWeight: 0
+    status: 'Active'
   });
 
   const [isEditing, setIsEditing] = useState(false);
+  const [customers, setCustomers] = useState([]);
+  const [locations, setLocations] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
+    if (open) {
+      loadCustomers();
+      if (customerId) {
+        loadLocationsByCustomer(customerId);
+      }
+    }
+  }, [open, customerId]);
+
+  useEffect(() => {
     if (materialRateData) {
       setFormData({
-        customerId: customerId,
-        locationId: locationId,
+        customerId: materialRateData.customerId || customerId || '',
+        locationId: materialRateData.locationId || locationId || '',
         effectiveDate: materialRateData.effectiveDate ? new Date(materialRateData.effectiveDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-        buyingRate: materialRateData.buyingRate || 0,
-        sellingRate: materialRateData.sellingRate || 0,
+        companyRate: materialRateData.companyRate || 0,
+        transporterRate: materialRateData.transporterRate || 0,
         route: materialRateData.route || '',
         materialType: materialRateData.materialType || 'Paper',
-        dispatchWeight: materialRateData.dispatchWeight || 0,
-        receivingWeight: materialRateData.receivingWeight || 0
+        status: materialRateData.status || 'Active'
       });
       setIsEditing(true);
     } else {
       setFormData({
-        customerId: customerId,
-        locationId: locationId,
+        customerId: customerId || '',
+        locationId: locationId || '',
         effectiveDate: new Date().toISOString().split('T')[0],
-        buyingRate: 0,
-        sellingRate: 0,
+        companyRate: 0,
+        transporterRate: 0,
         route: '',
         materialType: 'Paper',
-        dispatchWeight: 0,
-        receivingWeight: 0
+        status: 'Active'
       });
       setIsEditing(false);
     }
-  }, [materialRateData, locationId, customerId]);
+  }, [materialRateData, customerId, locationId]);
+
+  const loadCustomers = async () => {
+    try {
+      const response = await axios.get('https://localhost:7084/api/customers/GetAllCustomers');
+      if (response.data.success) {
+        setCustomers(response.data.result);
+      }
+    } catch (error) {
+      console.error('Error loading customers:', error);
+    }
+  };
+
+  const loadLocationsByCustomer = async (customerId) => {
+    if (!customerId) return;
+    try {
+      const response = await axios.get(`https://localhost:7084/api/customerlocations/GetLocationsByCustomerId/${customerId}`);
+      if (response.data.success) {
+        setLocations(response.data.result);
+      }
+    } catch (error) {
+      console.error('Error loading locations:', error);
+    }
+  };
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
+
+    // If customer changes, reload locations
+    if (field === 'customerId') {
+      loadLocationsByCustomer(value);
+      setFormData(prev => ({ ...prev, locationId: '' }));
+    }
   };
 
   const handleSave = async () => {
     // Validate required fields
     if (!formData.customerId) {
-      setError('Customer ID is required');
+      setError('Customer is required');
       return;
     }
     if (!formData.locationId) {
-      setError('Location ID is required');
+      setError('Location is required');
       return;
     }
     if (!formData.effectiveDate) {
       setError('Effective Date is required');
       return;
     }
-    if (!formData.buyingRate || formData.buyingRate <= 0) {
-      setError('Buying Rate must be greater than 0');
+    if (!formData.companyRate || formData.companyRate <= 0) {
+      setError('Company Rate must be greater than 0');
       return;
     }
-    if (!formData.sellingRate || formData.sellingRate <= 0) {
-      setError('Selling Rate must be greater than 0');
+    if (!formData.transporterRate || formData.transporterRate <= 0) {
+      setError('Transporter Rate must be greater than 0');
       return;
     }
 
@@ -103,8 +143,8 @@ const MaterialRateForm = ({ open, onClose, locationId, locationName, customerId,
 
     try {
       const url = isEditing 
-        ? `https://localhost:7084/api/materialrates/${materialRateData.rateId}`
-        : 'https://localhost:7084/api/materialrates';
+        ? `https://localhost:7084/api/materialrates/UpdateMaterialRate/${materialRateData.rateId}`
+        : 'https://localhost:7084/api/materialrates/CreateMaterialRate';
       
       const method = isEditing ? 'put' : 'post';
       
@@ -113,15 +153,15 @@ const MaterialRateForm = ({ open, onClose, locationId, locationName, customerId,
         CustomerId: parseInt(formData.customerId),
         LocationId: parseInt(formData.locationId),
         EffectiveDate: new Date(formData.effectiveDate).toISOString(),
-        BuyingRate: parseFloat(formData.buyingRate),
-        SellingRate: parseFloat(formData.sellingRate),
+        CompanyRate: parseFloat(formData.companyRate),
+        TransporterRate: parseFloat(formData.transporterRate),
+        DispatchWeight: 0, // Default values as per existing model
+        ReceivingWeight: 0,
         Route: formData.route,
-        MaterialType: formData.materialType,
-        DispatchWeight: formData.dispatchWeight ? parseFloat(formData.dispatchWeight) : null,
-        ReceivingWeight: formData.receivingWeight ? parseFloat(formData.receivingWeight) : null
+        MaterialType: formData.materialType
       };
 
-      const data = isEditing ? { ...backendData, Status: 'active' } : backendData;
+      const data = isEditing ? { ...backendData, Status: formData.status } : backendData;
 
       console.log('Sending material rate data to backend:', data);
 
@@ -208,11 +248,48 @@ const MaterialRateForm = ({ open, onClose, locationId, locationName, customerId,
             Material Rate Information
           </Typography>
           <Typography variant="body2" color="text.secondary" gutterBottom>
-            {locationName && `Location: ${locationName}`}
+            {locationName && `Location: ${locationName}`} {customerName && `| Customer: ${customerName}`}
           </Typography>
         </Box>
 
         <Grid container spacing={3}>
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth>
+              <InputLabel>Customer</InputLabel>
+              <Select
+                value={formData.customerId}
+                onChange={(e) => handleInputChange('customerId', e.target.value)}
+                label="Customer"
+                required
+              >
+                {customers.map((customer) => (
+                  <MenuItem key={customer.customerId} value={customer.customerId}>
+                    {customer.companyName || `${customer.firstName} ${customer.lastName}`}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth>
+              <InputLabel>Location</InputLabel>
+              <Select
+                value={formData.locationId}
+                onChange={(e) => handleInputChange('locationId', e.target.value)}
+                label="Location"
+                required
+                disabled={!formData.customerId}
+              >
+                {locations.map((location) => (
+                  <MenuItem key={location.locationId} value={location.locationId}>
+                    {location.locationName} ({location.locationCode})
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
@@ -228,12 +305,26 @@ const MaterialRateForm = ({ open, onClose, locationId, locationName, customerId,
           </Grid>
           
           <Grid item xs={12} sm={6}>
+            <FormControl fullWidth>
+              <InputLabel>Status</InputLabel>
+              <Select
+                value={formData.status}
+                onChange={(e) => handleInputChange('status', e.target.value)}
+                label="Status"
+              >
+                <MenuItem value="Active">Active</MenuItem>
+                <MenuItem value="Inactive">Inactive</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          
+          <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
-              label="Buying Rate"
+              label="Company Rate"
               type="number"
-              value={formData.buyingRate}
-              onChange={(e) => handleInputChange('buyingRate', parseFloat(e.target.value))}
+              value={formData.companyRate}
+              onChange={(e) => handleInputChange('companyRate', parseFloat(e.target.value))}
               required
               InputProps={{
                 startAdornment: <Typography variant="body2">Rs</Typography>
@@ -244,10 +335,10 @@ const MaterialRateForm = ({ open, onClose, locationId, locationName, customerId,
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
-              label="Selling Rate"
+              label="Transporter Rate"
               type="number"
-              value={formData.sellingRate}
-              onChange={(e) => handleInputChange('sellingRate', parseFloat(e.target.value))}
+              value={formData.transporterRate}
+              onChange={(e) => handleInputChange('transporterRate', parseFloat(e.target.value))}
               required
               InputProps={{
                 startAdornment: <Typography variant="body2">Rs</Typography>
@@ -280,32 +371,6 @@ const MaterialRateForm = ({ open, onClose, locationId, locationName, customerId,
               </Select>
             </FormControl>
           </Grid>
-          
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label="Dispatch Weight"
-              type="number"
-              value={formData.dispatchWeight}
-              onChange={(e) => handleInputChange('dispatchWeight', parseFloat(e.target.value))}
-              InputProps={{
-                endAdornment: <Typography variant="body2">kg</Typography>
-              }}
-            />
-          </Grid>
-          
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label="Receiving Weight"
-              type="number"
-              value={formData.receivingWeight}
-              onChange={(e) => handleInputChange('receivingWeight', parseFloat(e.target.value))}
-              InputProps={{
-                endAdornment: <Typography variant="body2">kg</Typography>
-              }}
-            />
-          </Grid>
         </Grid>
       </DialogContent>
 
@@ -317,6 +382,12 @@ const MaterialRateForm = ({ open, onClose, locationId, locationName, customerId,
           onClick={handleSave}
           disabled={loading}
           size="large"
+          sx={{
+            bgcolor: '#228B22',
+            '&:hover': {
+              bgcolor: '#006400',
+            }
+          }}
         >
           {loading ? 'Saving...' : (isEditing ? 'Update Rate' : 'Add Rate')}
         </Button>

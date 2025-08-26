@@ -92,7 +92,7 @@ const Signup = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: 'linear-gradient(135deg, #228B22 0%, #32CD32 50%, #90EE90 100%)',
         position: 'relative',
         overflow: 'hidden',
         '&::before': {
@@ -105,21 +105,21 @@ const Signup = () => {
           background: 'url("/DS_Login1.jpg")',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          opacity: 0.3,
+          opacity: 0.2,
           zIndex: 0
         }
       }}
     >
-      {/* Animated background elements */}
+      {/* Modern geometric background elements */}
       <Box
         sx={{
           position: 'absolute',
-          top: '15%',
-          right: '10%',
-          width: 180,
-          height: 180,
+          top: '8%',
+          right: '8%',
+          width: 250,
+          height: 250,
           borderRadius: '50%',
-          background: alpha(theme.palette.secondary.main, 0.1),
+          background: 'linear-gradient(45deg, rgba(50, 205, 50, 0.1), rgba(34, 139, 34, 0.1))',
           animation: 'float 7s ease-in-out infinite',
           zIndex: 1
         }}
@@ -127,13 +127,42 @@ const Signup = () => {
       <Box
         sx={{
           position: 'absolute',
-          bottom: '15%',
-          left: '10%',
+          bottom: '12%',
+          left: '8%',
+          width: 180,
+          height: 180,
+          borderRadius: '50%',
+          background: 'linear-gradient(45deg, rgba(34, 139, 34, 0.1), rgba(144, 238, 144, 0.1))',
+          animation: 'float 9s ease-in-out infinite reverse',
+          zIndex: 1
+        }}
+      />
+      
+      {/* Additional geometric shapes */}
+      <Box
+        sx={{
+          position: 'absolute',
+          top: '55%',
+          right: '20%',
           width: 120,
           height: 120,
-          borderRadius: '50%',
-          background: alpha(theme.palette.primary.main, 0.1),
-          animation: 'float 9s ease-in-out infinite reverse',
+          borderRadius: '24px',
+          background: 'linear-gradient(45deg, rgba(34, 139, 34, 0.08), rgba(144, 238, 144, 0.08))',
+          animation: 'float 11s ease-in-out infinite',
+          zIndex: 1
+        }}
+      />
+      
+      <Box
+        sx={{
+          position: 'absolute',
+          top: '25%',
+          left: '5%',
+          width: 80,
+          height: 80,
+          borderRadius: '16px',
+          background: 'linear-gradient(45deg, rgba(50, 205, 50, 0.06), rgba(34, 139, 34, 0.06))',
+          animation: 'float 8s ease-in-out infinite reverse',
           zIndex: 1
         }}
       />
@@ -142,18 +171,18 @@ const Signup = () => {
         elevation={24}
         sx={{
           width: '100%',
-          maxWidth: 600,
-          borderRadius: 4,
-          background: alpha(theme.palette.background.paper, 0.95),
-          backdropFilter: 'blur(20px)',
-          border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+          maxWidth: 650,
+          borderRadius: '24px',
+          background: 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(25px)',
+          border: '1px solid rgba(34, 139, 34, 0.1)',
           position: 'relative',
           zIndex: 2,
           transform: 'translateY(0)',
-          transition: 'all 0.3s ease-in-out',
+          transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
           '&:hover': {
-            transform: 'translateY(-8px)',
-            boxShadow: theme.shadows[25]
+            transform: 'translateY(-12px)',
+            boxShadow: '0 32px 64px rgba(34, 139, 34, 0.2)'
           }
         }}
       >
@@ -162,40 +191,56 @@ const Signup = () => {
           <Box sx={{ textAlign: 'center', mb: 4 }}>
             <Box
               sx={{
-                width: 80,
-                height: 80,
-                borderRadius: '50%',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                width: 90,
+                height: 90,
+                borderRadius: '24px',
+                background: 'linear-gradient(135deg, #228B22 0%, #32CD32 100%)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                margin: '0 auto 16px',
-                boxShadow: theme.shadows[8]
+                margin: '0 auto 20px',
+                boxShadow: '0 8px 32px rgba(34, 139, 34, 0.3)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'scale(1.05) rotate(-5deg)',
+                  boxShadow: '0 12px 40px rgba(34, 139, 34, 0.4)'
+                }
               }}
             >
-              <PersonAdd sx={{ fontSize: 40, color: 'white' }} />
+              <PersonAdd sx={{ fontSize: 45, color: 'white' }} />
             </Box>
             <Typography
               variant="h4"
               sx={{
-                fontWeight: 700,
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                fontWeight: 800,
+                background: 'linear-gradient(135deg, #228B22 0%, #32CD32 100%)',
                 backgroundClip: 'text',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
-                mb: 1
+                mb: 1,
+                letterSpacing: '-0.5px'
               }}
             >
               Create Account
             </Typography>
-            <Typography variant="body1" color="text.secondary">
+            <Typography variant="body1" color="text.secondary" sx={{ fontSize: '1.1rem' }}>
               Join the Biomass Portal community
             </Typography>
           </Box>
 
           {/* Error Alert */}
           {error && (
-            <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
+            <Alert 
+              severity="error" 
+              sx={{ 
+                mb: 3, 
+                borderRadius: '16px',
+                border: '1px solid rgba(211, 47, 47, 0.2)',
+                '& .MuiAlert-icon': {
+                  color: '#d32f2f'
+                }
+              }}
+            >
               {error}
             </Alert>
           )}
@@ -215,9 +260,40 @@ const Signup = () => {
                   required
                   sx={{
                     '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                      '&:hover fieldset': {
-                        borderColor: theme.palette.primary.main
+                      borderRadius: '16px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        backgroundColor: 'rgba(255, 255, 255, 1)',
+                        '& fieldset': {
+                          borderColor: '#228B22',
+                          borderWidth: '2px'
+                        }
+                      },
+                      '&.Mui-focused': {
+                        backgroundColor: 'rgba(255, 255, 255, 1)',
+                        '& fieldset': {
+                          borderColor: '#228B22',
+                          borderWidth: '2px'
+                        }
+                      },
+                      '& input': {
+                        color: '#333',
+                        fontSize: '1rem',
+                        fontWeight: 500
+                      }
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: '#666',
+                      fontSize: '0.95rem',
+                      fontWeight: 500,
+                      '&.Mui-focused': {
+                        color: '#228B22',
+                        fontWeight: 600
+                      },
+                      '&.Mui-shrink': {
+                        color: '#228B22',
+                        fontWeight: 600
                       }
                     }
                   }}
@@ -235,9 +311,40 @@ const Signup = () => {
                   required
                   sx={{
                     '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                      '&:hover fieldset': {
-                        borderColor: theme.palette.primary.main
+                      borderRadius: '16px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        backgroundColor: 'rgba(255, 255, 255, 1)',
+                        '& fieldset': {
+                          borderColor: '#228B22',
+                          borderWidth: '2px'
+                        }
+                      },
+                      '&.Mui-focused': {
+                        backgroundColor: 'rgba(255, 255, 255, 1)',
+                        '& fieldset': {
+                          borderColor: '#228B22',
+                          borderWidth: '2px'
+                        }
+                      },
+                      '& input': {
+                        color: '#333',
+                        fontSize: '1rem',
+                        fontWeight: 500
+                      }
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: '#666',
+                      fontSize: '0.95rem',
+                      fontWeight: 500,
+                      '&.Mui-focused': {
+                        color: '#228B22',
+                        fontWeight: 600
+                      },
+                      '&.Mui-shrink': {
+                        color: '#228B22',
+                        fontWeight: 600
                       }
                     }
                   }}
@@ -255,9 +362,40 @@ const Signup = () => {
                   required
                   sx={{
                     '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                      '&:hover fieldset': {
-                        borderColor: theme.palette.primary.main
+                      borderRadius: '16px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        backgroundColor: 'rgba(255, 255, 255, 1)',
+                        '& fieldset': {
+                          borderColor: '#228B22',
+                          borderWidth: '2px'
+                        }
+                      },
+                      '&.Mui-focused': {
+                        backgroundColor: 'rgba(255, 255, 255, 1)',
+                        '& fieldset': {
+                          borderColor: '#228B22',
+                          borderWidth: '2px'
+                        }
+                      },
+                      '& input': {
+                        color: '#333',
+                        fontSize: '1rem',
+                        fontWeight: 500
+                      }
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: '#666',
+                      fontSize: '0.95rem',
+                      fontWeight: 500,
+                      '&.Mui-focused': {
+                        color: '#228B22',
+                        fontWeight: 600
+                      },
+                      '&.Mui-shrink': {
+                        color: '#228B22',
+                        fontWeight: 600
                       }
                     }
                   }}
@@ -275,9 +413,40 @@ const Signup = () => {
                   disabled={loading}
                   sx={{
                     '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                      '&:hover fieldset': {
-                        borderColor: theme.palette.primary.main
+                      borderRadius: '16px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        backgroundColor: 'rgba(255, 255, 255, 1)',
+                        '& fieldset': {
+                          borderColor: '#228B22',
+                          borderWidth: '2px'
+                        }
+                      },
+                      '&.Mui-focused': {
+                        backgroundColor: 'rgba(255, 255, 255, 1)',
+                        '& fieldset': {
+                          borderColor: '#228B22',
+                          borderWidth: '2px'
+                        }
+                      },
+                      '& input': {
+                        color: '#333',
+                        fontSize: '1rem',
+                        fontWeight: 500
+                      }
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: '#666',
+                      fontSize: '0.95rem',
+                      fontWeight: 500,
+                      '&.Mui-focused': {
+                        color: '#228B22',
+                        fontWeight: 600
+                      },
+                      '&.Mui-shrink': {
+                        color: '#228B22',
+                        fontWeight: 600
                       }
                     }
                   }}
@@ -296,9 +465,40 @@ const Signup = () => {
                   required
                   sx={{
                     '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                      '&:hover fieldset': {
-                        borderColor: theme.palette.primary.main
+                      borderRadius: '16px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        backgroundColor: 'rgba(255, 255, 255, 1)',
+                        '& fieldset': {
+                          borderColor: '#228B22',
+                          borderWidth: '2px'
+                        }
+                      },
+                      '&.Mui-focused': {
+                        backgroundColor: 'rgba(255, 255, 255, 1)',
+                        '& fieldset': {
+                          borderColor: '#228B22',
+                          borderWidth: '2px'
+                        }
+                      },
+                      '& input': {
+                        color: '#333',
+                        fontSize: '1rem',
+                        fontWeight: 500
+                      }
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: '#666',
+                      fontSize: '0.95rem',
+                      fontWeight: 500,
+                      '&.Mui-focused': {
+                        color: '#228B22',
+                        fontWeight: 600
+                      },
+                      '&.Mui-shrink': {
+                        color: '#228B22',
+                        fontWeight: 600
                       }
                     }
                   }}
@@ -322,6 +522,12 @@ const Signup = () => {
                           onClick={handleClickShowPassword}
                           edge="end"
                           disabled={loading}
+                          sx={{
+                            color: '#228B22',
+                            '&:hover': {
+                              backgroundColor: 'rgba(34, 139, 34, 0.1)'
+                            }
+                          }}
                         >
                           {isPasswordShown ? <VisibilityOff /> : <Visibility />}
                         </IconButton>
@@ -330,36 +536,46 @@ const Signup = () => {
                   }}
                   sx={{
                     '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                      '&:hover fieldset': {
-                        borderColor: theme.palette.primary.main
+                      borderRadius: '16px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        backgroundColor: 'rgba(255, 255, 255, 1)',
+                        '& fieldset': {
+                          borderColor: '#228B22',
+                          borderWidth: '2px'
+                        }
+                      },
+                      '&.Mui-focused': {
+                        backgroundColor: 'rgba(255, 255, 255, 1)',
+                        '& fieldset': {
+                          borderColor: '#228B22',
+                          borderWidth: '2px'
+                        }
+                      },
+                      '& input': {
+                        color: '#333',
+                        fontSize: '1rem',
+                        fontWeight: 500
+                      }
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: '#666',
+                      fontSize: '0.95rem',
+                      fontWeight: 500,
+                      '&.Mui-focused': {
+                        color: '#228B22',
+                        fontWeight: 600
+                      },
+                      '&.Mui-shrink': {
+                        color: '#228B22',
+                        fontWeight: 600
                       }
                     }
                   }}
                 />
               </Grid>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Role ID"
-                  variant="outlined"
-                  name="roleId"
-                  type="number"
-                  value={formData.roleId}
-                  onChange={handleChange}
-                  disabled={loading}
-                  required
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                      '&:hover fieldset': {
-                        borderColor: theme.palette.primary.main
-                      }
-                    }
-                  }}
-                />
-              </Grid>
+              
               <Grid item xs={12}>
                 <TextField
                   fullWidth
@@ -373,14 +589,46 @@ const Signup = () => {
                   rows={2}
                   sx={{
                     '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                      '&:hover fieldset': {
-                        borderColor: theme.palette.primary.main
+                      borderRadius: '16px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        backgroundColor: 'rgba(255, 255, 255, 1)',
+                        '& fieldset': {
+                          borderColor: '#228B22',
+                          borderWidth: '2px'
+                        }
+                      },
+                      '&.Mui-focused': {
+                        backgroundColor: 'rgba(255, 255, 255, 1)',
+                        '& fieldset': {
+                          borderColor: '#228B22',
+                          borderWidth: '2px'
+                        }
+                      },
+                      '& textarea': {
+                        color: '#333',
+                        fontSize: '1rem',
+                        fontWeight: 500
+                      }
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: '#666',
+                      fontSize: '0.95rem',
+                      fontWeight: 500,
+                      '&.Mui-focused': {
+                        color: '#228B22',
+                        fontWeight: 600
+                      },
+                      '&.Mui-shrink': {
+                        color: '#228B22',
+                        fontWeight: 600
                       }
                     }
                   }}
                 />
               </Grid>
+            </Grid>
             
             <Button
               fullWidth
@@ -389,19 +637,25 @@ const Signup = () => {
               disabled={loading}
               sx={{
                 mt: 4,
-                py: 1.5,
-                borderRadius: 2,
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                py: 2,
+                borderRadius: '16px',
+                background: 'linear-gradient(135deg, #228B22 0%, #32CD32 100%)',
                 fontSize: '1.1rem',
-                fontWeight: 600,
+                fontWeight: 700,
                 textTransform: 'none',
-                boxShadow: theme.shadows[4],
+                boxShadow: '0 8px 24px rgba(34, 139, 34, 0.3)',
+                transition: 'all 0.3s ease',
                 '&:hover': {
-                  background: 'linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%)',
-                  boxShadow: theme.shadows[8]
+                  background: 'linear-gradient(135deg, #1a6b1a 0%, #28a428 100%)',
+                  boxShadow: '0 12px 32px rgba(34, 139, 34, 0.4)',
+                  transform: 'translateY(-2px)'
+                },
+                '&:active': {
+                  transform: 'translateY(0)'
                 },
                 '&:disabled': {
-                  background: theme.palette.action.disabledBackground
+                  background: '#ccc',
+                  boxShadow: 'none'
                 }
               }}
             >
@@ -413,18 +667,20 @@ const Signup = () => {
             </Button>
 
             {/* Sign in link */}
-            <Box sx={{ textAlign: 'center', mt: 3 }}>
-              <Typography variant="body2" color="text.secondary">
+            <Box sx={{ textAlign: 'center', mt: 4 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ fontSize: '1rem' }}>
                 Already have an account?{' '}
                 <Button
                   onClick={() => navigate('/login')}
                   startIcon={<ArrowBack />}
                   sx={{
                     textTransform: 'none',
-                    fontWeight: 600,
-                    color: theme.palette.primary.main,
+                    fontWeight: 700,
+                    color: '#228B22',
+                    fontSize: '1rem',
                     '&:hover': {
-                      background: alpha(theme.palette.primary.main, 0.1)
+                      background: 'rgba(34, 139, 34, 0.1)',
+                      borderRadius: '8px'
                     }
                   }}
                 >
@@ -435,11 +691,16 @@ const Signup = () => {
           </Box>
 
           {/* Footer */}
-          <Box sx={{ textAlign: 'center', mt: 4, pt: 3, borderTop: `1px solid ${alpha(theme.palette.divider, 0.1)}` }}>
-            <Typography variant="caption" color="text.secondary">
+          <Box sx={{ 
+            textAlign: 'center', 
+            mt: 5, 
+            pt: 3, 
+            borderTop: '1px solid rgba(34, 139, 34, 0.1)' 
+          }}>
+            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.9rem' }}>
               © {new Date().getFullYear()} Biomass Portal. All rights reserved.
             </Typography>
-            <Typography variant="caption" display="block" color="text.secondary" sx={{ mt: 0.5 }}>
+            <Typography variant="caption" display="block" color="text.secondary" sx={{ mt: 0.5, fontSize: '0.9rem' }}>
               Version 1.0.0
             </Typography>
           </Box>
@@ -450,28 +711,30 @@ const Signup = () => {
       <Box
         sx={{
           position: 'absolute',
-          top: 20,
-          right: 20,
-          background: alpha(theme.palette.background.paper, 0.9),
-          backdropFilter: 'blur(10px)',
-          borderRadius: 2,
-          px: 3,
-          py: 1.5,
-          zIndex: 3
+          top: 30,
+          right: 30,
+          background: 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(15px)',
+          borderRadius: '20px',
+          px: 4,
+          py: 2,
+          zIndex: 3,
+          border: '1px solid rgba(34, 139, 34, 0.1)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
         }}
       >
-        <Typography variant="body2" sx={{ fontWeight: 600, color: theme.palette.text.primary }}>
+        <Typography variant="body2" sx={{ fontWeight: 700, color: '#228B22', mb: 0.5 }}>
           AI-Driven Safety for Drivers and Vehicles
         </Typography>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
           Powered by Biomass
         </Typography>
       </Box>
 
       <style>{`
         @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-25px) rotate(2deg); }
         }
       `}</style>
     </Box>

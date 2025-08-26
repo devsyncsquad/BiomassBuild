@@ -24,17 +24,31 @@ import {
   Select,
   MenuItem,
   Alert,
-  Snackbar
+  Snackbar,
+  CircularProgress,
+  Card,
+  CardContent,
+  CardHeader,
+  Grid
 } from '@mui/material';
-import { Edit, Delete, Add } from '@mui/icons-material';
+import { Edit, Delete, Add, Menu as MenuIcon } from '@mui/icons-material';
 
-const ViewMainMenus = () => {
+// Utility Imports
+import { getAuthHeaders, getCurrentUser } from '../../../utils/auth';
+
+const baseUrl = import.meta.env.VITE_APP_BASE_URL || 'https://localhost:7084';
+
+const ViewMenus = ({ setMenuData }) => {
   const [menus, setMenus] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [selectedMenu, setSelectedMenu] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  // Get current user
+  const user = getCurrentUser();
 
   useEffect(() => {
     fetchMenus();
@@ -43,19 +57,20 @@ const ViewMainMenus = () => {
   const fetchMenus = async () => {
     try {
       setLoading(true);
-      const baseUrl = import.meta.env.VITE_APP_BASE_URL || 'https://localhost:7084';
+      console.log('Fetching menus from API...');
+      
       const response = await fetch(`${baseUrl}/api/UserManagement/GetMenuList`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
-        }
+        headers: getAuthHeaders()
       });
 
+      console.log('API Response status:', response.status);
+
       if (!response.ok) {
-        throw new Error('Failed to fetch menus');
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
+      console.log('API Response data:', data);
       
       if (data.success) {
         setMenus(data.result || []);
@@ -76,70 +91,83 @@ const ViewMainMenus = () => {
   const handleDeleteMenu = async (menuId) => {
     if (window.confirm('Are you sure you want to delete this menu?')) {
       try {
-        const baseUrl = import.meta.env.VITE_APP_BASE_URL || 'https://localhost:7084';
+        setDeleteLoading(true);
+        console.log('Deleting menu with ID:', menuId);
+        
         const response = await fetch(`${baseUrl}/api/UserManagement/DeleteMenuById?menuId=${menuId}`, {
           method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json'
-          }
+          headers: getAuthHeaders()
         });
 
+        console.log('Delete response status:', response.status);
+
         if (!response.ok) {
-          throw new Error('Failed to delete menu');
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const data = await response.json();
+        console.log('Delete response data:', data);
+        
         if (data.success) {
           showSnackbar('Menu deleted successfully', 'success');
-          fetchMenus();
+          fetchMenus(); // Refresh the list
         } else {
           showSnackbar(data.message || 'Error deleting menu', 'error');
         }
       } catch (error) {
         console.error('Error deleting menu:', error);
-        showSnackbar('Error deleting menu', 'error');
+        showSnackbar('Error deleting menu. Please try again.', 'error');
+      } finally {
+        setDeleteLoading(false);
       }
     }
   };
 
   const handleEditMenu = (menu) => {
+    console.log('Editing menu:', menu);
     setSelectedMenu(menu);
-    setOpenEditDialog(true);
+    setMenuData(menu); // Pass to parent for editing
+    setOpenEditDialog(false); // Close the dialog since we're using the form above
   };
 
   const handleUpdateMenu = async (updatedMenu) => {
     try {
-      const baseUrl = import.meta.env.VITE_APP_BASE_URL || 'https://localhost:7084';
+      console.log('Updating menu:', updatedMenu);
+      
       const response = await fetch(`${baseUrl}/api/UserManagement/UpdateMenu`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify(updatedMenu)
       });
 
+      console.log('Update response status:', response.status);
+
       if (!response.ok) {
-        throw new Error('Failed to update menu');
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
+      console.log('Update response data:', data);
+      
       if (data.success) {
         showSnackbar('Menu updated successfully', 'success');
         setOpenEditDialog(false);
-        fetchMenus();
+        fetchMenus(); // Refresh the list
       } else {
         showSnackbar(data.message || 'Error updating menu', 'error');
       }
     } catch (error) {
       console.error('Error updating menu:', error);
-      showSnackbar('Error updating menu', 'error');
+      showSnackbar('Error updating menu. Please try again.', 'error');
     }
   };
 
   const showSnackbar = (message, severity) => {
     setSnackbar({ open: true, message, severity });
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
   };
 
   // Sample data functions for demo purposes
@@ -157,444 +185,173 @@ const ViewMainMenus = () => {
     },
     {
       menuId: 2,
-      menuName: 'User Management',
-      link: '/user-management',
+      menuName: 'Company Management',
+      link: '/CompanyManagment',
       orderNo: 2,
       isEnabled: 'Y',
       createdBy: 1,
-      createdAt: '2025-08-07 05:40:31.835834',
+      createdAt: '2025-08-07 11:04:01.78226',
       updatedBy: 1,
-      updatedAt: '2025-08-07 05:40:31.835834'
-    },
-    {
-      menuId: 3,
-      menuName: 'Company Management',
-      link: '/company-management',
-      orderNo: 3,
-      isEnabled: 'Y',
-      createdBy: 1,
-      createdAt: '2025-08-07 05:40:31.835834',
-      updatedBy: 1,
-      updatedAt: '2025-08-07 05:40:31.835834'
-    },
-    {
-      menuId: 4,
-      menuName: 'Reports',
-      link: '/reports',
-      orderNo: 4,
-      isEnabled: 'N',
-      createdBy: 1,
-      createdAt: '2025-08-07 05:40:31.835834',
-      updatedBy: 1,
-      updatedAt: '2025-08-07 05:40:31.835834'
+      updatedAt: '2025-08-07 11:04:35.964673'
     }
   ];
 
+  const getStatusColor = (status) => {
+    return status === 'Y' ? 'success' : 'error';
+  };
+
+  const getStatusText = (status) => {
+    return status === 'Y' ? 'Active' : 'Inactive';
+  };
+
   if (loading) {
-    return <Typography>Loading menus...</Typography>;
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
   }
 
   return (
-    <Box>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h4" component="h1">
-          Menus Management
-        </Typography>
-        <Button
-          variant="contained"
-          startIcon={<Add />}
-          onClick={() => setOpenAddDialog(true)}
-        >
-          Add Menu
-        </Button>
-      </Box>
+    <Box sx={{ width: '100%' }}>
+      <Card sx={{ 
+        borderRadius: '16px', 
+        overflow: 'hidden',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
+      }}>
+        <CardHeader
+          title={
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <MenuIcon sx={{ color: '#228B22' }} />
+              <Typography variant="h5" sx={{ fontWeight: 600, color: '#1e293b' }}>
+                Menu Management
+              </Typography>
+            </Box>
+          }
+          subheader="View and manage all system menus"
+          sx={{
+            background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+            borderBottom: '1px solid #e2e8f0'
+          }}
+        />
+        
+        <CardContent sx={{ p: 0 }}>
+          <TableContainer component={Paper} sx={{ boxShadow: 'none' }}>
+            <Table sx={{ minWidth: 650 }}>
+              <TableHead>
+                <TableRow sx={{ backgroundColor: '#f8fafc' }}>
+                  <TableCell sx={{ fontWeight: 600, color: '#374151' }}>ID</TableCell>
+                  <TableCell sx={{ fontWeight: 600, color: '#374151' }}>Menu Name</TableCell>
+                  <TableCell sx={{ fontWeight: 600, color: '#374151' }}>Link</TableCell>
+                  <TableCell sx={{ fontWeight: 600, color: '#374151' }}>Order</TableCell>
+                  <TableCell sx={{ fontWeight: 600, color: '#374151' }}>Status</TableCell>
+                  <TableCell sx={{ fontWeight: 600, color: '#374151' }}>Created By</TableCell>
+                  <TableCell sx={{ fontWeight: 600, color: '#374151' }}>Created At</TableCell>
+                  <TableCell sx={{ fontWeight: 600, color: '#374151' }}>Last Updated</TableCell>
+                  <TableCell sx={{ fontWeight: 600, color: '#374151' }}>Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {menus.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={9} align="center" sx={{ py: 4 }}>
+                      <Typography variant="body1" color="textSecondary">
+                        No menus found
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  menus.map((menu) => (
+                    <TableRow key={menu.menuId} hover>
+                      <TableCell>{menu.menuId}</TableCell>
+                      <TableCell>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                          {menu.menuName}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" sx={{ fontFamily: 'monospace', color: '#6b7280' }}>
+                          {menu.link}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>{menu.orderNo}</TableCell>
+                      <TableCell>
+                        <Chip
+                          label={getStatusText(menu.isEnabled)}
+                          color={getStatusColor(menu.isEnabled)}
+                          size="small"
+                          sx={{ fontWeight: 500 }}
+                        />
+                      </TableCell>
+                      <TableCell>{menu.createdBy}</TableCell>
+                      <TableCell>
+                        <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+                          {new Date(menu.createdAt).toLocaleDateString()}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+                          {new Date(menu.updatedAt).toLocaleDateString()}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', gap: 1 }}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleEditMenu(menu)}
+                            sx={{
+                              color: '#228B22',
+                              '&:hover': { backgroundColor: 'rgba(34, 139, 34, 0.1)' }
+                            }}
+                          >
+                            <Edit fontSize="small" />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleDeleteMenu(menu.menuId)}
+                            disabled={deleteLoading}
+                            sx={{
+                              color: '#dc2626',
+                              '&:hover': { backgroundColor: 'rgba(220, 38, 38, 0.1)' },
+                              '&:disabled': { color: '#9ca3af' }
+                            }}
+                          >
+                            {deleteLoading ? (
+                              <CircularProgress size={16} />
+                            ) : (
+                              <Delete fontSize="small" />
+                            )}
+                          </IconButton>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </CardContent>
+      </Card>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Menu Name</TableCell>
-              <TableCell>Link</TableCell>
-              <TableCell>Order</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Created At</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {menus.map((menu) => (
-              <TableRow key={menu.menuId}>
-                <TableCell>{menu.menuName}</TableCell>
-                <TableCell>{menu.link}</TableCell>
-                <TableCell>{menu.orderNo}</TableCell>
-                <TableCell>
-                  <Chip
-                    label={menu.isEnabled === 'Y' ? 'Active' : 'Inactive'}
-                    color={menu.isEnabled === 'Y' ? 'success' : 'error'}
-                    size="small"
-                  />
-                </TableCell>
-                <TableCell>
-                  {menu.createdAt ? new Date(menu.createdAt).toLocaleDateString() : 'N/A'}
-                </TableCell>
-                <TableCell>
-                  <IconButton onClick={() => handleEditMenu(menu)}>
-                    <Edit />
-                  </IconButton>
-                  <IconButton onClick={() => handleDeleteMenu(menu.menuId)}>
-                    <Delete />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-
-      {/* Add Menu Dialog */}
-      <Dialog open={openAddDialog} onClose={() => setOpenAddDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Add New Menu</DialogTitle>
-        <DialogContent>
-          <AddMenuForm
-            onSuccess={() => {
-              setOpenAddDialog(false);
-              fetchMenus();
-              showSnackbar('Menu added successfully', 'success');
-            }}
-            onCancel={() => setOpenAddDialog(false)}
-          />
-        </DialogContent>
-      </Dialog>
-
-      {/* Edit Menu Dialog */}
-      <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Edit Menu</DialogTitle>
-        <DialogContent>
-          {selectedMenu && (
-            <EditMenuForm
-              menu={selectedMenu}
-              onUpdate={handleUpdateMenu}
-              onCancel={() => setOpenEditDialog(false)}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
-
-      {/* Snackbar */}
+      {/* Snackbar for notifications */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
-        <Alert severity={snackbar.severity} onClose={() => setSnackbar({ ...snackbar, open: false })}>
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
           {snackbar.message}
         </Alert>
       </Snackbar>
-    </Box>
-  );
-};
 
-// Add Menu Form Component
-const AddMenuForm = ({ onSuccess, onCancel }) => {
-  const [formData, setFormData] = useState({
-    menuName: '',
-    link: '',
-    orderNo: '',
-    isEnabled: 'Y'
-  });
-
-  const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({});
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
-    
-    if (errors[name]) {
-      setErrors({
-        ...errors,
-        [name]: ''
-      });
-    }
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.menuName.trim()) {
-      newErrors.menuName = 'Menu name is required';
-    }
-
-    if (!formData.link.trim()) {
-      newErrors.link = 'Link is required';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const baseUrl = import.meta.env.VITE_APP_BASE_URL || 'https://localhost:7084';
-      const response = await fetch(`${baseUrl}/api/UserManagement/SaveMenu`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify(formData)
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to save menu');
-      }
-
-      const data = await response.json();
       
-      if (data.success) {
-        onSuccess();
-      } else {
-        setErrors({ submit: data.message || 'Error adding menu' });
-      }
-    } catch (error) {
-      console.error('Error adding menu:', error);
-      setErrors({ submit: 'Error adding menu. Please try again.' });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
-      {errors.submit && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {errors.submit}
-        </Alert>
-      )}
-
-      <TextField
-        name="menuName"
-        label="Menu Name"
-        value={formData.menuName}
-        onChange={handleChange}
-        error={!!errors.menuName}
-        helperText={errors.menuName}
-        required
-        fullWidth
-        sx={{ mb: 2 }}
-      />
-
-      <TextField
-        name="link"
-        label="Link"
-        value={formData.link}
-        onChange={handleChange}
-        error={!!errors.link}
-        helperText={errors.link}
-        required
-        fullWidth
-        sx={{ mb: 2 }}
-      />
-
-      <TextField
-        name="orderNo"
-        label="Order Number"
-        type="number"
-        value={formData.orderNo}
-        onChange={handleChange}
-        fullWidth
-        sx={{ mb: 2 }}
-      />
-
-      <FormControl fullWidth sx={{ mb: 2 }}>
-        <InputLabel>Status</InputLabel>
-        <Select
-          name="isEnabled"
-          value={formData.isEnabled}
-          onChange={handleChange}
-          label="Status"
-        >
-          <MenuItem value="Y">Enabled</MenuItem>
-          <MenuItem value="N">Disabled</MenuItem>
-        </Select>
-      </FormControl>
-
-      <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-        <Button onClick={onCancel} disabled={loading}>
-          Cancel
-        </Button>
-        <Button 
-          type="submit" 
-          variant="contained" 
-          disabled={loading}
-        >
-          {loading ? 'Adding...' : 'Add Menu'}
-        </Button>
-      </Box>
     </Box>
   );
 };
 
-// Edit Menu Form Component
-const EditMenuForm = ({ menu, onUpdate, onCancel }) => {
-  const [formData, setFormData] = useState({
-    menuId: menu.menuId,
-    menuName: menu.menuName || '',
-    link: menu.link || '',
-    orderNo: menu.orderNo || '',
-    isEnabled: menu.isEnabled || 'Y'
-  });
-
-  const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({});
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
-    
-    if (errors[name]) {
-      setErrors({
-        ...errors,
-        [name]: ''
-      });
-    }
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.menuName.trim()) {
-      newErrors.menuName = 'Menu name is required';
-    }
-
-    if (!formData.link.trim()) {
-      newErrors.link = 'Link is required';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const baseUrl = import.meta.env.VITE_APP_BASE_URL || 'https://localhost:7084';
-      const response = await fetch(`${baseUrl}/api/UserManagement/UpdateMenu`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify(formData)
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update menu');
-      }
-
-      const data = await response.json();
-      
-      if (data.success) {
-        onUpdate(formData);
-      } else {
-        setErrors({ submit: data.message || 'Error updating menu' });
-      }
-    } catch (error) {
-      console.error('Error updating menu:', error);
-      setErrors({ submit: 'Error updating menu. Please try again.' });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
-      {errors.submit && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {errors.submit}
-        </Alert>
-      )}
-
-      <TextField
-        name="menuName"
-        label="Menu Name"
-        value={formData.menuName}
-        onChange={handleChange}
-        error={!!errors.menuName}
-        helperText={errors.menuName}
-        required
-        fullWidth
-        sx={{ mb: 2 }}
-      />
-
-      <TextField
-        name="link"
-        label="Link"
-        value={formData.link}
-        onChange={handleChange}
-        error={!!errors.link}
-        helperText={errors.link}
-        required
-        fullWidth
-        sx={{ mb: 2 }}
-      />
-
-      <TextField
-        name="orderNo"
-        label="Order Number"
-        type="number"
-        value={formData.orderNo}
-        onChange={handleChange}
-        fullWidth
-        sx={{ mb: 2 }}
-      />
-
-      <FormControl fullWidth sx={{ mb: 2 }}>
-        <InputLabel>Status</InputLabel>
-        <Select
-          name="isEnabled"
-          value={formData.isEnabled}
-          onChange={handleChange}
-          label="Status"
-        >
-          <MenuItem value="Y">Enabled</MenuItem>
-          <MenuItem value="N">Disabled</MenuItem>
-        </Select>
-      </FormControl>
-
-      <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-        <Button onClick={onCancel} disabled={loading}>
-          Cancel
-        </Button>
-        <Button 
-          type="submit" 
-          variant="contained" 
-          disabled={loading}
-        >
-          {loading ? 'Updating...' : 'Update Menu'}
-        </Button>
-      </Box>
-    </Box>
-  );
-};
-
-export default ViewMainMenus;
+export default ViewMenus;

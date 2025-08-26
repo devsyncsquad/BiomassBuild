@@ -1,4 +1,5 @@
 using Biomass.Api.Model;
+using Biomass.Server.Models.CostCenter;
 using System.Collections.Generic;
 
 namespace Biomass.Server.Interfaces
@@ -8,7 +9,7 @@ namespace Biomass.Server.Interfaces
 		public int CostCenterId { get; set; }
 		public string Code { get; set; } = string.Empty;
 		public string Name { get; set; } = string.Empty;
-		public bool IsActive { get; set; } = true;
+		public bool? IsActive { get; set; } = true;
 		public int? ParentCostCenterId { get; set; }
 		public int? CompanyId { get; set; }
 		public DateTime? CreatedAt { get; set; }
@@ -34,8 +35,9 @@ namespace Biomass.Server.Interfaces
 
 	public interface ICostCenterService
 	{
-		Task<ServiceResponse<(IEnumerable<CostCenterDto> Items, int TotalCount)>> GetAllAsync(int page, int pageSize, int? companyId, bool? isActive, string? term);
-		Task<ServiceResponse<List<CostCenterDto>>> GetTreeAsync(int? companyId = null);
+		Task<ServiceResponse<List<VCostCenter>>> GetAllViewAsync();
+
+        Task<ServiceResponse<List<CostCenterDto>>> GetTreeAsync(int? companyId = null);
 		Task<ServiceResponse<CostCenterDto>> GetByIdAsync(int id);
 		Task<ServiceResponse<List<CostCenterDto>>> GetChildrenAsync(int parentId);
 		Task<ServiceResponse<List<CostCenterDto>>> GetActiveParentCostCentersAsync(int? companyId = null);

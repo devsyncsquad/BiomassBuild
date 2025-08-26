@@ -315,382 +315,331 @@ const AddUser = ({ userData, setUserData }) => {
           {/* Form */}
           <Box component="form" onSubmit={handleSubmit} noValidate>
             
-            {/* Basic Information Section */}
+            {/* Form Fields - No Section Headings */}
             <Grid container spacing={3} sx={{ mb: 4 }}>
-              <Grid item xs={12}>
-                <Paper sx={{ p: 3, borderRadius: '12px', bgcolor: '#f8fafc' }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
-                    <Person sx={{ color: '#228B22' }} />
-                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#1e293b' }}>
-                      Basic Information
-                    </Typography>
-                  </Box>
-                  
-                  <Grid container spacing={3}>
-                    <Grid item xs={12} md={4}>
-                      <TextField
-                        fullWidth
-                        name="firstName"
-                        label="First Name"
-                        value={formData.firstName}
-                        onChange={handleChange}
-                        error={!!errors.firstName}
-                        helperText={errors.firstName}
-                        required
-                        sx={{
-                          '& .MuiOutlinedInput-root': {
-                            borderRadius: '12px',
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                              borderColor: '#228B22',
-                            },
-                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                              borderColor: '#228B22',
-                              borderWidth: '2px',
-                            },
-                          },
-                        }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={4}>
-                      <TextField
-                        fullWidth
-                        name="lastName"
-                        label="Last Name"
-                        value={formData.lastName}
-                        onChange={handleChange}
-                        error={!!errors.lastName}
-                        helperText={errors.lastName}
-                        required
-                        sx={{
-                          '& .MuiOutlinedInput-root': {
-                            borderRadius: '12px',
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                              borderColor: '#228B22',
-                            },
-                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                              borderColor: '#228B22',
-                              borderWidth: '2px',
-                            },
-                          },
-                        }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={4}>
-                      <TextField
-                        fullWidth
-                        name="username"
-                        label="Username"
-                        value={formData.username}
-                        onChange={handleChange}
-                        error={!!errors.username}
-                        helperText={errors.username}
-                        required
-                        sx={{
-                          '& .MuiOutlinedInput-root': {
-                            borderRadius: '12px',
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                              borderColor: '#228B22',
-                            },
-                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                              borderColor: '#228B22',
-                              borderWidth: '2px',
-                            },
-                          },
-                        }}
-                      />
-                    </Grid>
-                  </Grid>
-                </Paper>
+              {/* Basic Information Fields */}
+              <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
+                  name="firstName"
+                  label="First Name"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  error={!!errors.firstName}
+                  helperText={errors.firstName}
+                  required
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '12px',
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#228B22',
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#228B22',
+                        borderWidth: '2px',
+                      },
+                    },
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
+                  name="lastName"
+                  label="Last Name"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  error={!!errors.lastName}
+                  helperText={errors.lastName}
+                  required
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '12px',
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#228B22',
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#228B22',
+                        borderWidth: '2px',
+                      },
+                    },
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
+                  name="username"
+                  label="Username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  error={!!errors.username}
+                  helperText={errors.username}
+                  required
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '12px',
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#228B22',
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#228B22',
+                        borderWidth: '2px',
+                      },
+                    },
+                  }}
+                />
               </Grid>
 
-              {/* Contact & Security Section */}
-              <Grid item xs={12}>
-                <Paper sx={{ p: 3, borderRadius: '12px', bgcolor: '#f8fafc' }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
-                    <Phone sx={{ color: '#228B22' }} />
-                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#1e293b' }}>
-                      Contact & Security
-                    </Typography>
-                  </Box>
-                  
-                  <Grid container spacing={3}>
-                    <Grid item xs={12} md={4}>
-                      <TextField
-                        fullWidth
-                        name="passwordHash"
-                        label="Password"
-                        type="password"
-                        value={formData.passwordHash}
-                        onChange={handleChange}
-                        error={!!errors.passwordHash}
-                        helperText={errors.passwordHash}
-                        required={!userData}
-                        sx={{
-                          '& .MuiOutlinedInput-root': {
-                            borderRadius: '12px',
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                              borderColor: '#228B22',
-                            },
-                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                              borderColor: '#228B22',
-                              borderWidth: '2px',
-                            },
-                          },
-                        }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={4}>
-                      <TextField
-                        fullWidth
-                        name="empNo"
-                        label="Employee Number"
-                        value={formData.empNo}
-                        onChange={handleChange}
-                        error={!!errors.empNo}
-                        helperText={errors.empNo}
-                        required
-                        sx={{
-                          '& .MuiOutlinedInput-root': {
-                            borderRadius: '12px',
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                              borderColor: '#228B22',
-                            },
-                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                              borderColor: '#228B22',
-                              borderWidth: '2px',
-                            },
-                          },
-                        }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={4}>
-                      <TextField
-                        fullWidth
-                        name="phoneNumber"
-                        label="Phone Number"
-                        value={formData.phoneNumber}
-                        onChange={handleChange}
-                        error={!!errors.phoneNumber}
-                        helperText={errors.phoneNumber}
-                        sx={{
-                          '& .MuiOutlinedInput-root': {
-                            borderRadius: '12px',
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                              borderColor: '#228B22',
-                            },
-                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                              borderColor: '#228B22',
-                              borderWidth: '2px',
-                            },
-                          },
-                        }}
-                      />
-                    </Grid>
-                  </Grid>
-                </Paper>
+              {/* Contact & Security Fields */}
+              <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
+                  name="passwordHash"
+                  label="Password"
+                  type="password"
+                  value={formData.passwordHash}
+                  onChange={handleChange}
+                  error={!!errors.passwordHash}
+                  helperText={errors.passwordHash}
+                  required={!userData}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '12px',
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#228B22',
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#228B22',
+                        borderWidth: '2px',
+                      },
+                    },
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
+                  name="empNo"
+                  label="Employee Number"
+                  value={formData.empNo}
+                  onChange={handleChange}
+                  error={!!errors.empNo}
+                  helperText={errors.empNo}
+                  required
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '12px',
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#228B22',
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#228B22',
+                        borderWidth: '2px',
+                      },
+                    },
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
+                  name="phoneNumber"
+                  label="Phone Number"
+                  value={formData.phoneNumber}
+                  onChange={handleChange}
+                  error={!!errors.phoneNumber}
+                  helperText={errors.phoneNumber}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '12px',
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#228B22',
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#228B22',
+                        borderWidth: '2px',
+                      },
+                    },
+                  }}
+                />
               </Grid>
 
-              {/* Role & Permissions Section */}
-              <Grid item xs={12}>
-                <Paper sx={{ p: 3, borderRadius: '12px', bgcolor: '#f8fafc' }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
-                    <Security sx={{ color: '#228B22' }} />
-                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#1e293b' }}>
-                      Role & Permissions
-                    </Typography>
-                  </Box>
-                  
-                  <Grid container spacing={3}>
-                    <Grid item xs={12} md={4}>
-                      <FormControl fullWidth>
-                        <InputLabel>Role</InputLabel>
-                        <Select
-                          name="roleId"
-                          value={formData.roleId}
-                          onChange={handleChange}
-                          error={!!errors.roleId}
-                          required
-                          sx={{
-                            borderRadius: '12px',
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                              borderColor: '#228B22',
-                            },
-                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                              borderColor: '#228B22',
-                              borderWidth: '2px',
-                            },
-                          }}
-                        >
-                          {roles.map((role) => (
-                            <MenuItem key={role.roleId} value={role.roleId}>
-                              {role.roleName}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    </Grid>
-                    <Grid item xs={12} md={4}>
-                      <FormControl fullWidth>
-                        <InputLabel>Team Lead</InputLabel>
-                        <Select
-                          name="isTeamLead"
-                          value={formData.isTeamLead}
-                          onChange={handleChange}
-                          sx={{
-                            borderRadius: '12px',
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                              borderColor: '#228B22',
-                            },
-                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                              borderColor: '#228B22',
-                              borderWidth: '2px',
-                            },
-                          }}
-                        >
-                          <MenuItem value="Y">Yes</MenuItem>
-                          <MenuItem value="N">No</MenuItem>
-                        </Select>
-                      </FormControl>
-                    </Grid>
-                    <Grid item xs={12} md={4}>
-                      <FormControl fullWidth>
-                        <InputLabel>Status</InputLabel>
-                        <Select
-                          name="enabled"
-                          value={formData.enabled}
-                          onChange={handleChange}
-                          sx={{
-                            borderRadius: '12px',
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                              borderColor: '#228B22',
-                            },
-                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                              borderColor: '#228B22',
-                              borderWidth: '2px',
-                            },
-                          }}
-                        >
-                          <MenuItem value="Y">Active</MenuItem>
-                          <MenuItem value="N">Inactive</MenuItem>
-                        </Select>
-                      </FormControl>
-                    </Grid>
-                  </Grid>
-                </Paper>
+              {/* Role & Permissions Fields */}
+              <Grid item xs={12} md={4}>
+                <FormControl fullWidth>
+                  <InputLabel>Role</InputLabel>
+                  <Select
+                    name="roleId"
+                    value={formData.roleId}
+                    onChange={handleChange}
+                    error={!!errors.roleId}
+                    required
+                    sx={{
+                      borderRadius: '12px',
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#228B22',
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#228B22',
+                        borderWidth: '2px',
+                      },
+                    }}
+                  >
+                    {roles.map((role) => (
+                      <MenuItem key={role.roleId} value={role.roleId}>
+                        {role.roleName}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <FormControl fullWidth>
+                  <InputLabel>Team Lead</InputLabel>
+                  <Select
+                    name="isTeamLead"
+                    value={formData.isTeamLead}
+                    onChange={handleChange}
+                    sx={{
+                      borderRadius: '12px',
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#228B22',
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#228B22',
+                        borderWidth: '2px',
+                      },
+                    }}
+                  >
+                    <MenuItem value="Y">Yes</MenuItem>
+                    <MenuItem value="N">No</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <FormControl fullWidth>
+                  <InputLabel>Status</InputLabel>
+                  <Select
+                    name="enabled"
+                    value={formData.enabled}
+                    onChange={handleChange}
+                    sx={{
+                      borderRadius: '12px',
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#228B22',
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#228B22',
+                        borderWidth: '2px',
+                      },
+                    }}
+                  >
+                    <MenuItem value="Y">Active</MenuItem>
+                    <MenuItem value="N">Inactive</MenuItem>
+                  </Select>
+                </FormControl>
               </Grid>
 
-              {/* Customer Assignment & Additional Information Section */}
-              <Grid item xs={12}>
-                <Paper sx={{ p: 3, borderRadius: '12px', bgcolor: '#f8fafc' }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
-                    <Business sx={{ color: '#228B22' }} />
-                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#1e293b' }}>
-                      Customer Assignment & Additional Information
-                    </Typography>
-                  </Box>
-                  
-                  <Grid container spacing={3}>
-                    <Grid item xs={12} md={4}>
-                      <FormControl fullWidth>
-                        <InputLabel>Customers</InputLabel>
-                        <Select
-                          name="customerIds"
-                          multiple
-                          value={formData.customerIds}
-                          onChange={handleChange}
-                          renderValue={(selected) => (
-                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                              {selected.map((value) => (
-                                <Chip
-                                  key={value}
-                                  label={customers.find(c => c.customerId === value)?.companyName || `${customers.find(c => c.customerId === value)?.firstName} ${customers.find(c => c.customerId === value)?.lastName}` || ''}
-                                  size="small"
-                                  sx={{
-                                    bgcolor: 'rgba(34, 139, 34, 0.1)',
-                                    color: '#228B22',
-                                    fontWeight: 600
-                                  }}
-                                />
-                              ))}
-                            </Box>
-                          )}
-                          MenuProps={{
-                            PaperProps: {
-                              sx: {
-                                maxHeight: 200,
-                                width: 250,
-                              },
-                            },
-                          }}
-                          sx={{
-                            borderRadius: '12px',
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                              borderColor: '#228B22',
-                            },
-                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                              borderColor: '#228B22',
-                              borderWidth: '2px',
-                            },
-                          }}
-                        >
-                          {customers.map((customer) => (
-                            <MenuItem key={customer.customerId} value={customer.customerId}>
-                              <Checkbox checked={formData.customerIds.indexOf(customer.customerId) > -1} />
-                              <ListItemText primary={customer.companyName || `${customer.firstName} ${customer.lastName}`} />
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    </Grid>
-                    
-                    <Grid item xs={12} md={4}>
-                      <TextField
-                        fullWidth
-                        name="reportingTo"
-                        label="Reporting To (Employee ID)"
-                        type="number"
-                        value={formData.reportingTo}
-                        onChange={handleChange}
-                        sx={{
-                          '& .MuiOutlinedInput-root': {
-                            borderRadius: '12px',
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                              borderColor: '#228B22',
-                            },
-                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                              borderColor: '#228B22',
-                              borderWidth: '2px',
-                            },
-                          },
-                        }}
-                      />
-                    </Grid>
-                    
-                    <Grid item xs={12} md={4}>
-                      <TextField
-                        fullWidth
-                        name="comments"
-                        label="Comments"
-                        value={formData.comments}
-                        onChange={handleChange}
-                        multiline
-                        rows={3}
-                        sx={{
-                          '& .MuiOutlinedInput-root': {
-                            borderRadius: '12px',
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                              borderColor: '#228B22',
-                            },
-                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                              borderColor: '#228B22',
-                              borderWidth: '2px',
-                            },
-                          },
-                        }}
-                      />
-                    </Grid>
-                  </Grid>
-                </Paper>
+              {/* Customer Assignment & Additional Information Fields */}
+              <Grid item xs={12} md={4}>
+                <FormControl fullWidth>
+                  <InputLabel>Customers</InputLabel>
+                  <Select
+                    name="customerIds"
+                    multiple
+                    value={formData.customerIds}
+                    onChange={handleChange}
+                    renderValue={(selected) => (
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                        {selected.map((value) => (
+                          <Chip
+                            key={value}
+                            label={customers.find(c => c.customerId === value)?.companyName || `${customers.find(c => c.customerId === value)?.firstName} ${customers.find(c => c.customerId === value)?.lastName}` || ''}
+                            size="small"
+                            sx={{
+                              bgcolor: 'rgba(34, 139, 34, 0.1)',
+                              color: '#228B22',
+                              fontWeight: 600
+                            }}
+                          />
+                        ))}
+                      </Box>
+                    )}
+                    MenuProps={{
+                      PaperProps: {
+                        sx: {
+                          maxHeight: 200,
+                          width: 250,
+                        },
+                      },
+                    }}
+                    sx={{
+                      borderRadius: '12px',
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#228B22',
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#228B22',
+                        borderWidth: '2px',
+                      },
+                    }}
+                  >
+                    {customers.map((customer) => (
+                      <MenuItem key={customer.customerId} value={customer.customerId}>
+                        <Checkbox checked={formData.customerIds.indexOf(customer.customerId) > -1} />
+                        <ListItemText primary={customer.companyName || `${customer.firstName} ${customer.lastName}`} />
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              
+              <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
+                  name="reportingTo"
+                  label="Reporting To (Employee ID)"
+                  type="number"
+                  value={formData.reportingTo}
+                  onChange={handleChange}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '12px',
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#228B22',
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#228B22',
+                        borderWidth: '2px',
+                      },
+                    },
+                  }}
+                />
+              </Grid>
+              
+              <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
+                  name="comments"
+                  label="Comments"
+                  value={formData.comments}
+                  onChange={handleChange}
+                  multiline
+                  rows={1}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '12px',
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#228B22',
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#228B22',
+                        borderWidth: '2px',
+                      },
+                    },
+                  }}
+                />
               </Grid>
             </Grid>
 

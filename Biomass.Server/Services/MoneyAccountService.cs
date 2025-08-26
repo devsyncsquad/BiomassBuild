@@ -30,7 +30,7 @@ namespace Biomass.Server.Services
                 }
 
                 // Validate that kind_lookup_id exists
-                var lookupExists = await _db.Lookups.AnyAsync(l => l.LookUpId == request.KindLookupId);
+                var lookupExists = await _db.Lookups.AnyAsync(l => l.LookupId == request.KindLookupId);
                 if (!lookupExists)
                 {
                     response.Success = false;
@@ -117,7 +117,7 @@ namespace Biomass.Server.Services
                 }
 
                 // Validate that kind_lookup_id exists
-                var lookupExists = await _db.Lookups.AnyAsync(l => l.LookUpId == request.KindLookupId);
+                var lookupExists = await _db.Lookups.AnyAsync(l => l.LookupId == request.KindLookupId);
                 if (!lookupExists)
                 {
                     response.Success = false;
@@ -425,7 +425,7 @@ namespace Biomass.Server.Services
                 AccountCode = entity.AccountCode,
                 Name = entity.Name,
                 KindLookupId = entity.KindLookupId,
-                KindLookupName = entity.KindLookup?.LookUpName,
+                KindLookupName = entity.KindLookup?.LookupName,
                 AccountHolder = entity.AccountHolder,
                 CompanyRegNo = entity.CompanyRegNo,
                 BankName = entity.BankName,

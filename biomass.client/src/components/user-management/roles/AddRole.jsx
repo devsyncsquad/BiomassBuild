@@ -17,29 +17,26 @@ import {
   Typography,
   Divider,
   CircularProgress,
-  Box
+  Box,
+  Card,
+  CardContent,
+  Alert
 } from '@mui/material';
-import { Security } from '@mui/icons-material';
+import { Security, Save, Clear } from '@mui/icons-material';
 
 // Component Imports
 import {
   useGetRoleListQuery
 } from '../../../redux/apis/userManagementApi';
 
+// Utility Imports
+import { getAuthHeaders, getCurrentUser } from '../../../utils/auth';
+
 const baseUrl = import.meta.env.VITE_APP_BASE_URL || 'https://localhost:7084';
 
-const AddRole = ({ initialData }) => {
-  // Temporary workaround - get user from localStorage
-  const getUserFromStorage = () => {
-    try {
-      const storedUser = localStorage.getItem('user');
-      return storedUser ? JSON.parse(storedUser) : { empId: 1 }; // Default empId if no user
-    } catch (error) {
-      console.error('Error parsing user data:', error);
-      return { empId: 1 }; // Default empId
-    }
-  };
-  const user = getUserFromStorage();
+const AddRole = ({ initialData, onRoleSaved, onCancel }) => {
+  // Get current user from auth utility
+  const user = getCurrentUser();
   const { enqueueSnackbar } = useSnackbar();
 
   const [formData, setFormData] = useState({
@@ -53,17 +50,15 @@ const AddRole = ({ initialData }) => {
     updatedAt: new Date().toISOString()
   });
   const [isRoleSaveLoading, setIsRoleSaveLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [successMessage, setSuccessMessage] = useState('');
+  
   const {
     data: rolesData,
     isLoading: isRolesLoading,
     error: rolesError,
     refetch: refetchRoleList
   } = useGetRoleListQuery();
-  const [errors, setErrors] = useState({});
-
-  const getAuthTokenFromLocalStorage = () => {
-    return localStorage.getItem('authToken');
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -78,67 +73,173 @@ const AddRole = ({ initialData }) => {
     let isValid = true;
     const newErrors = {};
 
-    if (!formData.roleName) {
+    if (!formData.roleName || !formData.roleName.trim()) {
       newErrors.roleName = 'Role name is required';
       isValid = false;
     }
+    
     if (!formData.enabled) {
-      newErrors.enabled = 'This field is required';
+      newErrors.enabled = 'Status is required';
       isValid = false;
     }
+
+    // Check if role name already exists (for new roles)
+    if (!initialData && formData.roleName.trim()) {
+      const existingRole = rolesData?.result?.find(role => 
+        role.roleName.toLowerCase() === formData.roleName.toLowerCase()
+      );
+      if (existingRole) {
+        newErrors.roleName = 'Role name already exists';
+        isValid = false;
+      }
+    }
+
     setErrors(newErrors);
     return isValid;
   };
 
   const handleSubmit = async (e) => {
+    e.preventDefault();
+    
     if (!validateFields()) {
       return;
     }
 
-    const roleData = {
-      ...formData,
-      createdBy: user.empId,
-      updatedBy: user.empId,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
     setIsRoleSaveLoading(true);
+    setErrors({});
+    setSuccessMessage('');
+
     try {
-      const authToken = getAuthTokenFromLocalStorage();
-      if (!authToken) {
-        console.error('Authorization token not found');
+      // Check if user is authenticated
+      if (!user || !user.empId) {
+        enqueueSnackbar('User not authenticated. Please login again.', {
+          variant: 'error',
+          autoHideDuration: 5000
+        });
         return;
       }
 
-      const { data } = await axios.post(
-        `${baseUrl}UserManagement/SaveRole`,
-        roleData,
-        {
-          headers: {
-            Authorization: `Bearer ${authToken}`
-          }
-        }
-      );
-      if (data.success) {
-        setFormData({
-          roleId: 0,
-          roleName: '',
-          description: '',
-          enabled: 'Y',
-          createdBy: 0,
-          createdAt: new Date().toISOString(),
-          updatedBy: 0,
+      console.log('Current user for role operation:', {
+        empId: user.empId,
+        username: user.username || 'N/A',
+        role: user.role || 'N/A'
+      });
+
+      let response;
+      let isUpdate = !!initialData;
+
+      if (isUpdate) {
+        // Update existing role - preserve original creator, update the updater
+        const updateData = {
+          roleId: formData.roleId,
+          roleName: formData.roleName.trim(),
+          description: formData.description || '',
+          enabled: formData.enabled,
+          createdBy: formData.createdBy, // Keep original creator ID
+          createdAt: formData.createdAt, // Keep original creation date
+          updatedBy: user.empId, // Set current user as updater
           updatedAt: new Date().toISOString()
-        });
+        };
+
+        console.log('Updating role:', updateData);
+        console.log('API URL:', `${baseUrl}/api/UserManagement/UpdateRole`);
+        console.log('Headers:', getAuthHeaders());
+        console.log('Original creator ID:', formData.createdBy);
+        console.log('Current updater ID:', user.empId);
+        
+        response = await axios.put(
+          `${baseUrl}/api/UserManagement/UpdateRole`,
+          updateData,
+          {
+            headers: getAuthHeaders()
+          }
+        );
+      } else {
+        // Create new role - set current user as both creator and updater
+        const createData = {
+          roleId: 0, // API expects 0 for new roles
+          roleName: formData.roleName.trim(),
+          description: formData.description || '',
+          enabled: formData.enabled,
+          createdBy: user.empId, // Set current user as creator
+          createdAt: new Date().toISOString(),
+          updatedBy: user.empId, // Set current user as updater
+          updatedAt: new Date().toISOString()
+        };
+
+        console.log('Creating role:', createData);
+        console.log('API URL:', `${baseUrl}/api/UserManagement/SaveRole`);
+        console.log('Headers:', getAuthHeaders());
+        console.log('Creator ID:', user.empId);
+        console.log('Updater ID:', user.empId);
+        
+        response = await axios.post(
+          `${baseUrl}/api/UserManagement/SaveRole`,
+          createData,
+          {
+            headers: getAuthHeaders()
+          }
+        );
+      }
+
+      console.log('API Response:', response.data);
+
+      if (response.data && response.data.success) {
+        setSuccessMessage(isUpdate ? 'Role updated successfully!' : 'Role created successfully!');
+        
+        // Reset form for new role creation
+        if (!isUpdate) {
+          setFormData({
+            roleId: 0,
+            roleName: '',
+            description: '',
+            enabled: 'Y',
+            createdBy: 0,
+            createdAt: new Date().toISOString(),
+            updatedBy: 0,
+            updatedAt: new Date().toISOString()
+          });
+        }
+        
+        // Refresh role list
         refetchRoleList();
-        enqueueSnackbar('Role saved successfully', {
+        
+        // Notify parent component
+        if (onRoleSaved) {
+          onRoleSaved(response.data.result);
+        }
+        
+        enqueueSnackbar(response.data.message || 'Role saved successfully', {
           variant: 'success',
+          autoHideDuration: 5000
+        });
+      } else {
+        const errorMsg = response.data?.message || 'Failed to save role';
+        setErrors({ submit: errorMsg });
+        enqueueSnackbar(errorMsg, {
+          variant: 'error',
           autoHideDuration: 5000
         });
       }
     } catch (error) {
-      console.error('Error adding role:', error);
-      enqueueSnackbar('Error adding Role. Please try again.', {
+      console.error('Error saving role:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      
+      let errorMessage = 'Error saving role. Please try again.';
+      
+      if (error.response?.status === 400) {
+        errorMessage = error.response.data?.message || 'Validation error. Please check your input.';
+      } else if (error.response?.status === 401) {
+        errorMessage = 'Unauthorized. Please check your authentication.';
+      } else if (error.response?.status === 409) {
+        errorMessage = 'Role name already exists.';
+      } else if (error.response?.status === 500) {
+        errorMessage = 'Server error. Please try again later.';
+      }
+      
+      setErrors({ submit: errorMessage });
+      enqueueSnackbar(errorMessage, {
         variant: 'error',
         autoHideDuration: 5000
       });
@@ -147,104 +248,237 @@ const AddRole = ({ initialData }) => {
     }
   };
 
+  const handleCancel = () => {
+    if (onCancel) {
+      onCancel();
+    } else {
+      // Reset form
+      setFormData({
+        roleId: 0,
+        roleName: '',
+        description: '',
+        enabled: 'Y',
+        createdBy: 0,
+        createdAt: new Date().toISOString(),
+        updatedBy: 0,
+        updatedAt: new Date().toISOString()
+      });
+      setErrors({});
+      setSuccessMessage('');
+    }
+  };
+
   useEffect(() => {
     if (initialData) {
-      setFormData({
-        ...formData,
-        roleId: initialData?.roleId,
-        roleName: initialData?.roleName,
-        description: initialData?.description,
-        enabled: initialData?.enabled,
-        createdBy: initialData?.createdBy,
-        createdAt: initialData?.createdAt,
-        updatedBy: initialData?.updatedBy,
-        updatedAt: initialData?.updatedAt
-      });
+      console.log('Populating form with initial data:', initialData);
+      
+      const populatedFormData = {
+        roleId: initialData.roleId || 0,
+        roleName: initialData.roleName || '',
+        description: initialData.description || '',
+        enabled: initialData.enabled || 'Y',
+        createdBy: initialData.createdBy || 0, // Preserve original creator
+        createdAt: initialData.createdAt || new Date().toISOString(),
+        updatedBy: initialData.updatedBy || 0,
+        updatedAt: initialData.updatedAt || new Date().toISOString()
+      };
+      
+      console.log('Setting form data for edit:', populatedFormData);
+      console.log('Original creator ID preserved:', populatedFormData.createdBy);
+      
+      setFormData(populatedFormData);
+    } else {
+      console.log('Initializing form for new role creation');
+      // Reset form for new role
+      const newFormData = {
+        roleId: 0,
+        roleName: '',
+        description: '',
+        enabled: 'Y',
+        createdBy: 0, // Will be set to current user on save
+        createdAt: new Date().toISOString(),
+        updatedBy: 0, // Will be set to current user on save
+        updatedAt: new Date().toISOString()
+      };
+      
+      console.log('Setting form data for new role:', newFormData);
+      setFormData(newFormData);
     }
   }, [initialData]);
 
   return (
     <Box sx={{ width: '100%', p: 2 }}>
-      {/* Header */}
-      <Box sx={{
-        background: 'linear-gradient(135deg, #228B22 0%, #32CD32 100%)',
-        p: 3,
-        color: 'white'
+      <Card sx={{ 
+        borderRadius: '16px', 
+        overflow: 'hidden',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
       }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Security sx={{ fontSize: '2rem' }} />
-          <Box>
-            <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
-              {initialData ? 'Edit Role' : 'Add New Role'}
-            </Typography>
-            <Typography variant="body2" sx={{ opacity: 0.9 }}>
-              {initialData ? 'Update role information and permissions' : 'Create a new role with specific permissions'}
-            </Typography>
+        {/* Header */}
+        <Box sx={{
+          background: 'linear-gradient(135deg, #228B22 0%, #32CD32 100%)',
+          p: 3,
+          color: 'white'
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Security sx={{ fontSize: '2rem' }} />
+            <Box>
+              <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
+                {initialData ? 'Edit Role' : 'Add New Role'}
+              </Typography>
+              <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                {initialData ? 'Update role information and permissions' : 'Create a new role with specific permissions'}
+              </Typography>
+            </Box>
           </Box>
         </Box>
-      </Box>
-      <Divider sx={{ mb: 3 }} />
-      <Grid
-        container
-        spacing={5}
-        width="Inherit"
-        sx={{ paddingY: 2, paddingX: 2 }}
-      >
-        <Grid item xs={12} sm={4}>
-          <TextField
-            fullWidth
-            label="Role Name"
-            value={formData.roleName}
-            name="roleName"
-            placeholder="Role Name"
-            onChange={handleChange}
-            required
-            error={!!errors.roleName}
-            helperText={errors.roleName}
-          />
-        </Grid>
-        <Grid item xs={12} sm={4}>
-          <TextField
-            fullWidth
-            label="Description"
-            value={formData.description}
-            name="description"
-            placeholder="Description"
-            onChange={handleChange}
-            multiline
-            rows={3}
-          />
-        </Grid>
-        <Grid item xs={12} sm={4}>
-          <TextField
-            label="Enabled"
-            select
-            variant="outlined"
-            fullWidth
-            value={formData.enabled}
-            name="enabled"
-            onChange={handleChange}
-            error={!!errors.enabled}
-            helperText={errors.enabled}
-          >
-            <MenuItem value="Y">Yes</MenuItem>
-            <MenuItem value="N">No</MenuItem>
-          </TextField>
-        </Grid>
-        <Grid item xs={12} textAlign="right" sx={{ mt: 2 }}>
-          <Button
-            variant="contained"
-            onClick={handleSubmit}
-            sx={{ minWidth: 90 }}
-          >
-            {isRoleSaveLoading ? (
-              <CircularProgress size={22} color="inherit" />
-            ) : (
-              'Save'
-            )}
-          </Button>
-        </Grid>
-      </Grid>
+
+        <CardContent sx={{ p: 4 }}>
+          {/* Success Message */}
+          {successMessage && (
+            <Alert severity="success" sx={{ mb: 3, borderRadius: '12px' }}>
+              {successMessage}
+            </Alert>
+          )}
+
+          {/* Error Message */}
+          {errors.submit && (
+            <Alert severity="error" sx={{ mb: 3, borderRadius: '12px' }}>
+              {errors.submit}
+            </Alert>
+          )}
+
+          {/* Form */}
+          <Box component="form" onSubmit={handleSubmit} noValidate>
+            <Grid container spacing={3} sx={{ mb: 4 }}>
+              <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
+                  label="Role Name *"
+                  value={formData.roleName}
+                  name="roleName"
+                  placeholder="Enter role name"
+                  onChange={handleChange}
+                  required
+                  error={!!errors.roleName}
+                  helperText={errors.roleName}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '12px',
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#228B22',
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#228B22',
+                        borderWidth: '2px',
+                      },
+                    },
+                  }}
+                />
+              </Grid>
+              
+              <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
+                  label="Description"
+                  value={formData.description}
+                  name="description"
+                  placeholder="Enter role description"
+                  onChange={handleChange}
+                  multiline
+                  rows={1}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '12px',
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#228B22',
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#228B22',
+                        borderWidth: '2px',
+                      },
+                    },
+                  }}
+                />
+              </Grid>
+              
+              <Grid item xs={12} md={4}>
+                <FormControl fullWidth error={!!errors.enabled}>
+                  <InputLabel>Status *</InputLabel>
+                  <Select
+                    value={formData.enabled}
+                    name="enabled"
+                    onChange={handleChange}
+                    label="Status *"
+                    sx={{
+                      borderRadius: '12px',
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#228B22',
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#228B22',
+                        borderWidth: '2px',
+                      },
+                    }}
+                  >
+                    <MenuItem value="Y">Active</MenuItem>
+                    <MenuItem value="N">Inactive</MenuItem>
+                  </Select>
+                  {errors.enabled && (
+                    <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.5 }}>
+                      {errors.enabled}
+                    </Typography>
+                  )}
+                </FormControl>
+              </Grid>
+            </Grid>
+
+            {/* Action Buttons */}
+            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mt: 4 }}>
+              <Button
+                type="button"
+                variant="outlined"
+                onClick={handleCancel}
+                startIcon={<Clear />}
+                sx={{
+                  borderColor: '#228B22',
+                  color: '#228B22',
+                  borderRadius: '12px',
+                  px: 4,
+                  py: 1.5,
+                  '&:hover': {
+                    borderColor: '#1B5E20',
+                    bgcolor: 'rgba(34, 139, 34, 0.04)',
+                  },
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={isRoleSaveLoading}
+                startIcon={isRoleSaveLoading ? <CircularProgress size={20} /> : <Save />}
+                sx={{
+                  bgcolor: '#228B22',
+                  borderRadius: '12px',
+                  px: 4,
+                  py: 1.5,
+                  '&:hover': {
+                    bgcolor: '#1B5E20',
+                  },
+                  '&:disabled': {
+                    bgcolor: '#9CA3AF',
+                  },
+                }}
+              >
+                {isRoleSaveLoading ? 'Saving...' : (initialData ? 'Update Role' : 'Save Role')}
+              </Button>
+            </Box>
+          </Box>
+
+          
+        </CardContent>
+      </Card>
     </Box>
   );
 };

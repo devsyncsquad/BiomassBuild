@@ -18,7 +18,9 @@ import {
   Divider,
   Alert,
   Card,
-  CardContent
+  CardContent,
+  Select,
+  MenuItem
 } from '@mui/material';
 import {
   Save as SaveIcon,
@@ -45,6 +47,10 @@ export const CustomerLocationForm = ({ open, onClose, customerId, locationData =
     fixedLoaderCost: 5000,
     variableChargeType: 'LoaderPerMaan',
     variableChargeAmount: 300,
+    // Labour Charges
+    laborChargesEnabled: false,
+    laborChargeType: 'Fixed',
+    laborChargesCost: 3500,
     receivingUnloadingCostEnabled: false,
     receivingChargeType: 'Fixed',
     fixedUnloadingCost: 4000,
@@ -55,7 +61,17 @@ export const CustomerLocationForm = ({ open, onClose, customerId, locationData =
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    if (locationData) {
+    // Check if we have a complete location object with locationId (editing existing)
+    const isEditingExisting = locationData && locationData.locationId;
+    
+    console.log('CustomerLocationForm useEffect:', {
+      locationData,
+      customerId,
+      isEditingExisting,
+      hasLocationId: locationData?.locationId
+    });
+    
+    if (isEditingExisting) {
       setFormData({
         ...locationData,
         customerId: customerId,
@@ -64,10 +80,12 @@ export const CustomerLocationForm = ({ open, onClose, customerId, locationData =
         toleranceLimitKg: locationData.toleranceLimitKg || 0
       });
       setIsEditing(true);
+      console.log('Setting form to EDIT mode for existing location');
     } else {
+      // This is a new location or just has customerName from handleAddLocation
       setFormData({
         customerId: customerId,
-        customerName: '',
+        customerName: locationData?.customerName || '', // Use customerName if provided
         locationName: '',
         locationCode: '',
         address: '',
@@ -83,6 +101,10 @@ export const CustomerLocationForm = ({ open, onClose, customerId, locationData =
         fixedLoaderCost: 5000,
         variableChargeType: 'LoaderPerMaan',
         variableChargeAmount: 300,
+        // Labour Charges
+        laborChargesEnabled: false,
+        laborChargeType: 'Fixed',
+        laborChargesCost: 3500,
         receivingUnloadingCostEnabled: false,
         receivingChargeType: 'Fixed',
         fixedUnloadingCost: 4000,
@@ -90,6 +112,7 @@ export const CustomerLocationForm = ({ open, onClose, customerId, locationData =
         receivingVariableChargeAmount: 250
       });
       setIsEditing(false);
+      console.log('Setting form to NEW location mode');
     }
   }, [locationData, customerId]);
 
@@ -102,10 +125,6 @@ export const CustomerLocationForm = ({ open, onClose, customerId, locationData =
 
   const handleSave = async () => {
     // Validate required fields
-    if (!formData.customerName?.trim()) {
-      alert('Customer Name is required');
-      return;
-    }
     if (!formData.locationName?.trim()) {
       alert('Location Name is required');
       return;
@@ -145,16 +164,18 @@ export const CustomerLocationForm = ({ open, onClose, customerId, locationData =
     }
 
     try {
-      const url = isEditing 
-        ? `https://localhost:7084/api/customerlocations/${locationData.locationId}`
-        : 'https://localhost:7084/api/customerlocations';
+      // Determine if this is a new location or an edit
+      const isNewLocation = !locationData || !locationData.locationId;
       
-      const method = isEditing ? 'put' : 'post';
+      const url = isNewLocation 
+        ? 'https://localhost:7084/api/customerlocations/CreateLocation'
+        : `https://localhost:7084/api/customerlocations/UpdateLocation/${locationData.locationId}`;
+      
+      const method = isNewLocation ? 'post' : 'put';
       
       // Convert camelCase to PascalCase for backend compatibility
       const backendData = {
         CustomerId: parseInt(formData.customerId) || 0,
-        CustomerName: formData.customerName,
         LocationName: formData.locationName,
         LocationCode: formData.locationCode,
         Address: formData.address,
@@ -170,6 +191,9 @@ export const CustomerLocationForm = ({ open, onClose, customerId, locationData =
         FixedLoaderCost: formData.fixedLoaderCost ? parseFloat(formData.fixedLoaderCost) : null,
         VariableChargeType: formData.variableChargeType,
         VariableChargeAmount: formData.variableChargeAmount ? parseFloat(formData.variableChargeAmount) : null,
+        LaborChargesEnabled: Boolean(formData.laborChargesEnabled),
+        LaborChargeType: formData.laborChargeType,
+        LaborChargesCost: formData.laborChargesCost ? parseFloat(formData.laborChargesCost) : null,
         ReceivingUnloadingCostEnabled: Boolean(formData.receivingUnloadingCostEnabled),
         ReceivingChargeType: formData.receivingChargeType,
         FixedUnloadingCost: formData.fixedUnloadingCost ? parseFloat(formData.fixedUnloadingCost) : null,
@@ -177,9 +201,13 @@ export const CustomerLocationForm = ({ open, onClose, customerId, locationData =
         ReceivingVariableChargeAmount: formData.receivingVariableChargeAmount ? parseFloat(formData.receivingVariableChargeAmount) : null
       };
 
-      const data = isEditing ? { ...backendData, Status: 'active' } : backendData;
+      // Only add Status for edit operations
+      const data = isNewLocation ? backendData : { ...backendData, Status: 'active' };
 
       console.log('Sending data to backend:', data);
+      console.log('Request method:', method.toUpperCase());
+      console.log('Request URL:', url);
+      console.log('Is new location:', isNewLocation);
 
       const response = await axios[method](url, data);
       
@@ -198,6 +226,8 @@ export const CustomerLocationForm = ({ open, onClose, customerId, locationData =
         alert('Error saving location: ' + error.response.data.message);
       } else if (error.response?.status === 400) {
         alert('Bad Request: Please check your input data. Error: ' + (error.response.data?.message || 'Unknown error'));
+      } else if (error.response?.status === 404) {
+        alert('Not Found: The requested resource was not found. Please check the URL and try again.');
       } else {
         alert('Error saving location. Please try again. Status: ' + (error.response?.status || 'Unknown'));
       }
@@ -214,7 +244,7 @@ export const CustomerLocationForm = ({ open, onClose, customerId, locationData =
         style: {
           borderRadius: 16,
           maxHeight: '90vh',
-          minWidth: '1400px'
+          margin: '16px'
         }
       }}
     >
@@ -224,20 +254,15 @@ export const CustomerLocationForm = ({ open, onClose, customerId, locationData =
         borderBottom: '1px solid #e0e0e0',
         display: 'flex',
         justifyContent: 'space-between',
-        alignItems: 'center'
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: 1
       }}>
-        <Typography variant="h6" fontWeight="bold">
+        <Typography variant="h6" fontWeight="bold" sx={{ color: 'white' }}>
           Customer Locations Form
         </Typography>
-        <Box>
-          <Button
-            variant="contained"
-            startIcon={<SaveIcon />}
-            onClick={handleSave}
-            sx={{ mr: 1, bgcolor: 'white', color: '#228B22', '&:hover': { bgcolor: '#f5f5f5' } }}
-          >
-            Save Customer location
-          </Button>
+        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+          
           <Button
             variant="outlined"
             startIcon={<CancelIcon />}
@@ -264,11 +289,19 @@ export const CustomerLocationForm = ({ open, onClose, customerId, locationData =
               <TextField
                 fullWidth
                 label="Customer Name"
-                placeholder="Enter customer name"
                 value={formData.customerName}
-                onChange={(e) => handleInputChange('customerName', e.target.value)}
-                required
-                sx={{ '& .MuiInputLabel-root': { '&.Mui-focused': { color: 'red' } } }}
+                InputProps={{
+                  readOnly: true,
+                }}
+                sx={{ 
+                  '& .MuiInputBase-root': {
+                    backgroundColor: '#f5f5f5',
+                    '&.Mui-focused': {
+                      backgroundColor: '#f5f5f5'
+                    }
+                  }
+                }}
+                helperText="Customer name is read-only and will be saved with the location"
               />
             </Grid>
             
@@ -298,7 +331,7 @@ export const CustomerLocationForm = ({ open, onClose, customerId, locationData =
               </Typography>
             </Grid>
             
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid item xs={12} sm={6} md={4}>
               <TextField
                 fullWidth
                 label="Location/City Name"
@@ -309,7 +342,7 @@ export const CustomerLocationForm = ({ open, onClose, customerId, locationData =
               />
             </Grid>
             
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid item xs={12} sm={6} md={4}>
               <TextField
                 fullWidth
                 label="Location Code"
@@ -320,7 +353,7 @@ export const CustomerLocationForm = ({ open, onClose, customerId, locationData =
               />
             </Grid>
             
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid item xs={12} sm={6} md={4}>
               <TextField
                 fullWidth
                 label="Center Dispatch Weight Limit (kg)"
@@ -330,7 +363,7 @@ export const CustomerLocationForm = ({ open, onClose, customerId, locationData =
               />
             </Grid>
             
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid item xs={12} sm={6} md={4}>
               <TextField
                 fullWidth
                 label="Advance Percentage allowed"
@@ -362,7 +395,7 @@ export const CustomerLocationForm = ({ open, onClose, customerId, locationData =
               </Typography>
             </Grid>
             
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid item xs={12} sm={6} md={4}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <TextField
                   fullWidth
@@ -398,7 +431,7 @@ export const CustomerLocationForm = ({ open, onClose, customerId, locationData =
               </Typography>
             </Grid>
             
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid item xs={12} sm={6} md={4}>
               <TextField
                 fullWidth
                 label="Tolerance Limit (kg)"
@@ -420,7 +453,7 @@ export const CustomerLocationForm = ({ open, onClose, customerId, locationData =
               </Typography>
             </Grid>
             
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid item xs={12} sm={6} md={4}>
               <TextField
                 fullWidth
                 label="Material Penalty Rate/kg"
@@ -433,172 +466,243 @@ export const CustomerLocationForm = ({ open, onClose, customerId, locationData =
               />
             </Grid>
 
-            {/* Dispatch Loading Charges */}
+            {/* Cost Management Section - All in One Row */}
             <Grid item xs={12}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 2 }}>
-                <Typography variant="subtitle1" fontWeight="bold">
-                  Dispatch: Loading Charges
-                </Typography>
-                <Switch
-                  checked={formData.dispatchLoadingChargesEnabled}
-                  onChange={(e) => handleInputChange('dispatchLoadingChargesEnabled', e.target.checked)}
-                />
-              </Box>
+              <Typography variant="subtitle1" fontWeight="bold" gutterBottom sx={{ mt: 2 }}>
+                Cost Management
+              </Typography>
             </Grid>
             
-            {formData.dispatchLoadingChargesEnabled && (
-              <Grid item xs={12}>
-                <RadioGroup
-                  row
-                  value={formData.dispatchChargeType}
-                  onChange={(e) => handleInputChange('dispatchChargeType', e.target.value)}
-                >
-                  <FormControlLabel value="Fixed" control={<Radio />} label="Fixed" />
-                  <FormControlLabel value="Variable" control={<Radio />} label="Variable" />
-                </RadioGroup>
-                
-                {/* Informational Note */}
-                <Alert severity="info" sx={{ mt: 1, mb: 2 }}>
-                  <Typography variant="body2">
-                    <strong>Fixed or Variable cost will be fetched here.</strong> This will be fetched on the dispatch screen based on the customer location. 
-                    <strong>CALCULATION WILL BE DONE ON THE BASIS OF FIXED OR VARIABLE.</strong>
+            {/* Dispatch Loading Charges */}
+            <Grid item xs={12} sm={6} md={4}>
+              <Box sx={{ 
+                border: '1px solid #e0e0e0', 
+                borderRadius: 2, 
+                p: 2, 
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column'
+              }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                  <Typography variant="subtitle2" fontWeight="bold" color="primary">
+                    Dispatch: Loading Charges
                   </Typography>
-                </Alert>
-                
-                {formData.dispatchChargeType === 'Fixed' && (
-                  <TextField
-                    fullWidth
-                    label="Fixed Loader Cost"
-                    type="number"
-                    value={formData.fixedLoaderCost}
-                    onChange={(e) => handleInputChange('fixedLoaderCost', parseFloat(e.target.value))}
-                    sx={{ mt: 1 }}
+                  <Switch
+                    size="small"
+                    checked={formData.dispatchLoadingChargesEnabled}
+                    onChange={(e) => handleInputChange('dispatchLoadingChargesEnabled', e.target.checked)}
                   />
-                )}
+                </Box>
                 
-                {formData.dispatchChargeType === 'Variable' && (
-                  <Box sx={{ mt: 1 }}>
-                    <RadioGroup
-                      row
-                      value={formData.variableChargeType}
-                      onChange={(e) => handleInputChange('variableChargeType', e.target.value)}
-                    >
-                      <FormControlLabel value="LoaderPerMaan" control={<Radio />} label="Loader Per Maan" />
-                      <FormControlLabel value="LaborPerMonth" control={<Radio />} label="Labor Per Month" />
-                    </RadioGroup>
-                    <TextField
-                      fullWidth
-                      label="Variable Charge Amount"
-                      type="number"
-                      value={formData.variableChargeAmount}
-                      onChange={(e) => handleInputChange('variableChargeAmount', parseFloat(e.target.value))}
-                      sx={{ mt: 1 }}
-                    />
+                {formData.dispatchLoadingChargesEnabled && (
+                  <Box sx={{ flex: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                      <Typography variant="body2" fontWeight="medium">
+                        Loader cost:
+                      </Typography>
+                      <FormControl size="small" sx={{ minWidth: 100 }}>
+                        <Select
+                          value={formData.dispatchChargeType}
+                          onChange={(e) => handleInputChange('dispatchChargeType', e.target.value)}
+                          displayEmpty
+                        >
+                          <MenuItem value="Fixed">Fixed</MenuItem>
+                          <MenuItem value="Variable">Variable</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Box>
+                    
+                    {formData.dispatchChargeType === 'Fixed' && (
+                      <TextField
+                        fullWidth
+                        size="small"
+                        label="Fixed Amount"
+                        type="number"
+                        value={formData.fixedLoaderCost}
+                        onChange={(e) => handleInputChange('fixedLoaderCost', parseFloat(e.target.value))}
+                        sx={{ mt: 1 }}
+                      />
+                    )}
+                    
+                    {formData.dispatchChargeType === 'Variable' && (
+                      <Box sx={{ mt: 1 }}>
+                        <FormControl size="small" fullWidth sx={{ mb: 1 }}>
+                          <Select
+                            value={formData.variableChargeType}
+                            onChange={(e) => handleInputChange('variableChargeType', e.target.value)}
+                            displayEmpty
+                          >
+                            <MenuItem value="LoaderPerMaan">Loader Per Maan</MenuItem>
+                            <MenuItem value="LaborPerMonth">Labor Per Month</MenuItem>
+                          </Select>
+                        </FormControl>
+                        <TextField
+                          fullWidth
+                          size="small"
+                          label="Variable Amount"
+                          type="number"
+                          value={formData.variableChargeAmount}
+                          onChange={(e) => handleInputChange('variableChargeAmount', parseFloat(e.target.value))}
+                        />
+                      </Box>
+                    )}
                   </Box>
                 )}
+              </Box>
+            </Grid>
 
-                {/* Calculation Examples */}
-                <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
-                  {formData.dispatchChargeType === 'Variable' && (
-                    <Card sx={{ bgcolor: '#fff3cd', border: '1px solid #ffeaa7', maxWidth: 300 }}>
-                      <CardContent sx={{ p: 2 }}>
-                        <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
-                          Case1: Variable Per Maan Cost (Everything in Maan)
-                        </Typography>
-                        <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>
-                          • Company Rate = 310 per ton<br/>
-                          • Convert company rate to maan<br/>
-                          • 310 × 25 = 7750 (Saffi Rate exclusive of all taxes)<br/>
-                          • Per Maan<br/>
-                          • Rate to Trolly owner = 300<br/>
-                          • Loading/Bucket Charges = 10<br/>
-                          • Labour charges = Rs 5<br/>
-                          • Freight Charges = 285
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                  )}
-                  
-                  {formData.dispatchChargeType === 'Fixed' && (
-                    <Card sx={{ bgcolor: '#fff3cd', border: '1px solid #ffeaa7', maxWidth: 300 }}>
-                      <CardContent sx={{ p: 2 }}>
-                        <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
-                          Case3: Fixed Rate
-                        </Typography>
-                        <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>
-                          • Company Rate = 310 per maan<br/>
-                          • Convert company rate to maan<br/>
-                          • 310 × 25 = 7750 (Saffi Rate exclusive of all taxes)<br/>
-                          • Fixed Cost<br/>
-                          • Rate to Trolly owner = 30500<br/>
-                          • Loading/Bucket Charges = 5000<br/>
-                          • Labour charges = Rs 3500<br/>
-                          • Freight Charges = 285
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                  )}
+            {/* Labour Charges */}
+            <Grid item xs={12} sm={6} md={4}>
+              <Box sx={{ 
+                border: '1px solid #e0e0e0', 
+                borderRadius: 2, 
+                p: 2, 
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column'
+              }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                  <Typography variant="subtitle2" fontWeight="bold" color="primary">
+                    Labor Cost
+                  </Typography>
+                  <Switch
+                    size="small"
+                    checked={formData.laborChargesEnabled}
+                    onChange={(e) => handleInputChange('laborChargesEnabled', e.target.checked)}
+                  />
                 </Box>
-              </Grid>
-            )}
+                
+                {formData.laborChargesEnabled && (
+                  <Box sx={{ flex: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                      <FormControl size="small" sx={{ minWidth: 100 }}>
+                        <Select
+                          value={formData.laborChargeType}
+                          onChange={(e) => handleInputChange('laborChargeType', e.target.value)}
+                          displayEmpty
+                        >
+                          <MenuItem value="Fixed">Fixed</MenuItem>
+                          <MenuItem value="Variable">Variable</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Box>
+                    
+                    {formData.laborChargeType === 'Fixed' && (
+                      <TextField
+                        fullWidth
+                        size="small"
+                        label="Fixed Amount"
+                        type="number"
+                        value={formData.laborChargesCost}
+                        onChange={(e) => handleInputChange('laborChargesCost', parseFloat(e.target.value))}
+                        sx={{ mt: 1 }}
+                      />
+                    )}
+                    
+                    {formData.laborChargeType === 'Variable' && (
+                      <Box sx={{ mt: 1 }}>
+                        <FormControl size="small" fullWidth sx={{ mb: 1 }}>
+                          <Select
+                            value={formData.variableChargeType}
+                            onChange={(e) => handleInputChange('variableChargeType', e.target.value)}
+                            displayEmpty
+                          >
+                            <MenuItem value="LoaderPerMaan">Loader Per Maan</MenuItem>
+                            <MenuItem value="LaborPerMonth">Labor Per Month</MenuItem>
+                          </Select>
+                        </FormControl>
+                        <TextField
+                          fullWidth
+                          size="small"
+                          label="Variable Amount"
+                          type="number"
+                          value={formData.variableChargeAmount}
+                          onChange={(e) => handleInputChange('variableChargeAmount', parseFloat(e.target.value))}
+                        />
+                      </Box>
+                    )}
+                  </Box>
+                )}
+              </Box>
+            </Grid>
 
             {/* Receiving Unloading Cost */}
-            <Grid item xs={12}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 2 }}>
-                <Typography variant="subtitle1" fontWeight="bold">
-                  Receiving: Unloading Cost
-                </Typography>
-                <Switch
-                  checked={formData.receivingUnloadingCostEnabled}
-                  onChange={(e) => handleInputChange('receivingUnloadingCostEnabled', e.target.checked)}
-                />
-              </Box>
-            </Grid>
-            
-            {formData.receivingUnloadingCostEnabled && (
-              <Grid item xs={12}>
-                <RadioGroup
-                  row
-                  value={formData.receivingChargeType}
-                  onChange={(e) => handleInputChange('receivingChargeType', e.target.value)}
-                >
-                  <FormControlLabel value="Fixed" control={<Radio />} label="Fixed" />
-                  <FormControlLabel value="Variable" control={<Radio />} label="Variable" />
-                </RadioGroup>
-                
-                {formData.receivingChargeType === 'Fixed' && (
-                  <TextField
-                    fullWidth
-                    label="Fixed Unloading Cost"
-                    type="number"
-                    value={formData.fixedUnloadingCost}
-                    onChange={(e) => handleInputChange('fixedUnloadingCost', parseFloat(e.target.value))}
-                    sx={{ mt: 1 }}
+            <Grid item xs={12} sm={6} md={4}>
+              <Box sx={{ 
+                border: '1px solid #e0e0e0', 
+                borderRadius: 2, 
+                p: 2, 
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column'
+              }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                  <Typography variant="subtitle2" fontWeight="bold" color="primary">
+                    Receiving: Unloading Cost
+                  </Typography>
+                  <Switch
+                    size="small"
+                    checked={formData.receivingUnloadingCostEnabled}
+                    onChange={(e) => handleInputChange('receivingUnloadingCostEnabled', e.target.checked)}
                   />
-                )}
+                </Box>
                 
-                {formData.receivingChargeType === 'Variable' && (
-                  <Box sx={{ mt: 1 }}>
-                    <RadioGroup
-                      row
-                      value={formData.receivingVariableChargeType}
-                      onChange={(e) => handleInputChange('receivingVariableChargeType', e.target.value)}
-                    >
-                      <FormControlLabel value="UnloadingPerMaan" control={<Radio />} label="Unloading Per Maan" />
-                      <FormControlLabel value="LaborPerMonth" control={<Radio />} label="Labor Per Month" />
-                    </RadioGroup>
-                    <TextField
-                      fullWidth
-                      label="Variable Charge Amount"
-                      type="number"
-                      value={formData.receivingVariableChargeAmount}
-                      onChange={(e) => handleInputChange('receivingVariableChargeAmount', parseFloat(e.target.value))}
-                      sx={{ mt: 1 }}
-                    />
+                {formData.receivingUnloadingCostEnabled && (
+                  <Box sx={{ flex: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                      <Typography variant="body2" fontWeight="medium">
+                        Unloading Cost:
+                      </Typography>
+                      <FormControl size="small" sx={{ minWidth: 100 }}>
+                        <Select
+                          value={formData.receivingChargeType}
+                          onChange={(e) => handleInputChange('receivingChargeType', e.target.value)}
+                          displayEmpty
+                        >
+                          <MenuItem value="Fixed">Fixed</MenuItem>
+                          <MenuItem value="Variable">Variable</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Box>
+                    
+                    {formData.receivingChargeType === 'Fixed' && (
+                      <TextField
+                        fullWidth
+                        size="small"
+                        label="Fixed Amount"
+                        type="number"
+                        value={formData.fixedUnloadingCost}
+                        onChange={(e) => handleInputChange('fixedUnloadingCost', parseFloat(e.target.value))}
+                        sx={{ mt: 1 }}
+                      />
+                    )}
+                    
+                    {formData.receivingChargeType === 'Variable' && (
+                      <Box sx={{ mt: 1 }}>
+                        <FormControl size="small" fullWidth sx={{ mb: 1 }}>
+                          <Select
+                            value={formData.receivingVariableChargeType}
+                            onChange={(e) => handleInputChange('receivingVariableChargeType', e.target.value)}
+                            displayEmpty
+                          >
+                            <MenuItem value="UnloadingPerMaan">Unloading Per Maan</MenuItem>
+                            <MenuItem value="LaborPerMonth">Labor Per Month</MenuItem>
+                          </Select>
+                        </FormControl>
+                        <TextField
+                          fullWidth
+                          size="small"
+                          label="Variable Amount"
+                          type="number"
+                          value={formData.receivingVariableChargeAmount}
+                          onChange={(e) => handleInputChange('receivingVariableChargeAmount', parseFloat(e.target.value))}
+                        />
+                      </Box>
+                    )}
                   </Box>
                 )}
-              </Grid>
-            )}
+              </Box>
+            </Grid>
           </Grid>
         </Box>
       </DialogContent>

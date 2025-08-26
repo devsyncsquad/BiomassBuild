@@ -1,272 +1,574 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import {
-	Box,
-	Button,
-	Card,
-	CardContent,
-	Checkbox,
-	Dialog,
-	DialogActions,
-	DialogContent,
-	DialogContentText,
-	DialogTitle,
-	Divider,
-	Grid,
-	IconButton,
-	List,
-	ListItem,
-	ListItemButton,
-	ListItemIcon,
-	ListItemText,
-	MenuItem,
-	Stack,
-	TextField,
-	Typography
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Checkbox,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  FormControl,
+  FormControlLabel,
+  Grid,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TablePagination,
+  TextField,
+  Typography,
+  Chip
 } from '@mui/material';
-import AccountTreeIcon from '@mui/icons-material/AccountTree';
-import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import RefreshIcon from '@mui/icons-material/Refresh';
+import {
+  Add as AddIcon,
+  Edit as EditIcon,
+  FilterList as FilterIcon,
+  AccountTree as AccountTreeIcon
+} from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
-
-const emptyForm = {
-	costCenterId: 0,
-	code: '',
-	name: '',
-	isActive: true,
-	parentCostCenterId: null,
-	companyId: null,
-	createdAt: null
-};
+import { getApiBaseUrl } from '../config/config';
 
 const CostCenters = () => {
-	const { enqueueSnackbar } = useSnackbar();
-	const [loading, setLoading] = useState(false);
-	const [tree, setTree] = useState([]);
-	const [selectedId, setSelectedId] = useState(null);
-	const [form, setForm] = useState(emptyForm);
-	const [parents, setParents] = useState([]);
-	const [confirmOpen, setConfirmOpen] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
+  const [costCenters, setCostCenters] = useState([]);
+  const [filteredCostCenters, setFilteredCostCenters] = useState([]);
+  const [filterType, setFilterType] = useState('all');
+  const [openDialog, setOpenDialog] = useState(false);
+  const [editingCostCenter, setEditingCostCenter] = useState(null);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
 
-	const loadTree = async () => {
-		setLoading(true);
-		try {
-			const res = await axios.get('/api/CostCenters/GetCostCenterTree');
-			if (res.data?.success) {
-				setTree(res.data.result || []);
-			} else {
-				enqueueSnackbar(res.data?.message || 'Failed to load cost centers', { variant: 'error' });
-			}
-		} catch (e) {
-			enqueueSnackbar('Error loading cost centers', { variant: 'error' });
-		} finally {
-			setLoading(false);
-		}
-	};
+  // Pagination state
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
-	useEffect(() => {
-		loadTree();
-	}, []);
+  // Form state
+  const [formData, setFormData] = useState({
+    name: '',
+    parentCostCenterId: null,
+    hasParent: false
+  });
 
-	useEffect(() => {
-		// parents are top-level nodes only
-		setParents(tree.map(n => ({ id: n.costCenterId, label: `${n.name} (${n.code})` })));
-	}, [tree]);
+  useEffect(() => {
+    loadData();
+  }, []);
 
-	const findNode = (nodes, id) => {
-		for (const n of nodes) {
-			if (n.costCenterId === id) return n;
-			if (n.children?.length) {
-				const f = findNode(n.children, id);
-				if (f) return f;
-			}
-		}
-		return null;
-	};
+  useEffect(() => {
+    applyFilter();
+  }, [filterType, costCenters]);
 
-	const handleSelect = (id) => {
-		setSelectedId(id);
-		const node = findNode(tree, id);
-		if (node) setForm({ ...emptyForm, ...node });
-	};
+  // Reset to first page when filter changes
+  useEffect(() => {
+    setPage(0);
+  }, [filterType]);
 
-	const handleChange = (e) => {
-		const { name, value } = e.target;
-		setForm(prev => ({ ...prev, [name]: name === 'companyId' ? (value === '' ? null : Number(value)) : value }));
-	};
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      console.log('Fetching cost centers from API...');
+      const apiBaseUrl = getApiBaseUrl();
+      const fullUrl = `${apiBaseUrl}/CostCenters/GetAllCostCentersView`;
+      console.log('API Base URL from config:', apiBaseUrl);
+      console.log('Full API URL:', fullUrl);
+      console.log('Current window location:', window.location.href);
+      
+      const response = await axios.get(fullUrl);
+      console.log('API Response:', response);
+      console.log('Response data:', response.data);
+      console.log('Response status:', response.status);
+      
+      // The API returns { "result": [...] } directly, not wrapped in success property
+      if (response.data?.result && Array.isArray(response.data.result)) {
+        console.log('Setting cost centers:', response.data.result);
+        setCostCenters(response.data.result || []);
+      } else {
+        console.log('API returned no result array');
+        console.log('API data structure:', response.data);
+        enqueueSnackbar('No cost center data received from API', { variant: 'warning' });
+      }
+    } catch (error) {
+      console.error('Error loading cost centers:', error);
+      console.error('Error response:', error.response);
+      console.error('Error message:', error.message);
+      console.error('Error config:', error.config);
+      
+      if (error.code === 'ERR_NETWORK') {
+        enqueueSnackbar('Network error: Unable to connect to API server. Check if backend is running on port 7084.', { variant: 'error' });
+      } else if (error.response?.status === 404) {
+        enqueueSnackbar('API endpoint not found. Check if the backend route exists.', { variant: 'error' });
+      } else {
+        enqueueSnackbar(`Error loading cost centers: ${error.message}`, { variant: 'error' });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
-	const handleToggleActive = (e) => {
-		setForm(prev => ({ ...prev, isActive: e.target.checked }));
-	};
+  const applyFilter = () => {
+    console.log('Applying filter. Filter type:', filterType);
+    console.log('Total cost centers:', costCenters.length);
+    console.log('Cost centers data:', costCenters);
+    
+    let filtered = [...costCenters];
+    
+    switch (filterType) {
+      case 'parent':
+        filtered = costCenters.filter(cc => !cc.isChild); // Changed from is_child to isChild
+        break;
+      case 'child':
+        filtered = costCenters.filter(cc => cc.isChild); // Changed from is_child to isChild
+        break;
+      default:
+        filtered = costCenters;
+        break;
+    }
+    
+    console.log('Filtered results:', filtered);
+    setFilteredCostCenters(filtered);
+  };
 
-	const handleCreateParent = () => {
-		setSelectedId(null);
-		setForm({ ...emptyForm, parentCostCenterId: null });
-	};
+  // Pagination handlers
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
 
-	const handleAddChild = () => {
-		if (!selectedId) {
-			enqueueSnackbar('Select a parent first', { variant: 'warning' });
-			return;
-		}
-		const node = findNode(tree, selectedId);
-		if (node?.parentCostCenterId) {
-			enqueueSnackbar('Can only add sub-category under a parent', { variant: 'warning' });
-			return;
-		}
-		setForm({ ...emptyForm, parentCostCenterId: selectedId });
-	};
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0); // Reset to first page when changing rows per page
+  };
 
-	const handleSave = async () => {
-		try {
-			if (!form.name?.trim()) {
-				enqueueSnackbar('Name is required', { variant: 'warning' });
-				return;
-			}
-			if (form.costCenterId && form.costCenterId > 0) {
-				// update
-				const payload = {
-					costCenterId: form.costCenterId,
-					name: form.name.trim(),
-					isActive: !!form.isActive,
-					parentCostCenterId: form.parentCostCenterId ?? null,
-					companyId: form.companyId ?? null
-				};
-				const res = await axios.put(`/api/CostCenters/UpdateCostCenter/${form.costCenterId}`, payload);
-				if (!res.data?.success) throw new Error(res.data?.message || 'Update failed');
-				enqueueSnackbar('Updated', { variant: 'success' });
-			} else {
-				// create
-				const payload = {
-					name: form.name.trim(),
-					isActive: !!form.isActive,
-					parentCostCenterId: form.parentCostCenterId ?? null,
-					companyId: form.companyId ?? null
-				};
-				const res = await axios.post('/api/CostCenters/CreateCostCenter', payload);
-				if (!res.data?.success) throw new Error(res.data?.message || 'Create failed');
-				enqueueSnackbar('Created', { variant: 'success' });
-			}
-			await loadTree();
-		} catch (e) {
-			enqueueSnackbar(e.message || 'Save failed', { variant: 'error' });
-		}
-	};
+  // Get paginated data
+  const getPaginatedData = () => {
+    const startIndex = page * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    return filteredCostCenters.slice(startIndex, endIndex);
+  };
 
-	const handleDelete = async () => {
-		if (!form.costCenterId) return;
-		try {
-			const res = await axios.delete(`/api/CostCenters/DeleteCostCenter/${form.costCenterId}`);
-			if (!res.data?.success) throw new Error(res.data?.message || 'Delete failed');
-			enqueueSnackbar('Deleted', { variant: 'success' });
-			setConfirmOpen(false);
-			setForm(emptyForm);
-			setSelectedId(null);
-			await loadTree();
-		} catch (e) {
-			enqueueSnackbar(e.message || 'Delete failed', { variant: 'error' });
-		}
-	};
+  const handleAddCostCenter = () => {
+    setIsEditMode(false);
+    setEditingCostCenter(null);
+    setFormData({
+      name: '',
+      parentCostCenterId: null,
+      hasParent: false
+    });
+    setOpenDialog(true);
+  };
 
-	const renderTree = (nodes) => (
-		<List disablePadding>
-			{nodes.map((n) => (
-				<Box key={n.costCenterId}>
-					<ListItem disablePadding>
-						<ListItemButton selected={selectedId === n.costCenterId} onClick={() => handleSelect(n.costCenterId)}>
-							<ListItemIcon>
-								<AccountTreeIcon fontSize="small" />
-							</ListItemIcon>
-							<ListItemText primary={n.name} secondary={n.code} />
-						</ListItemButton>
-					</ListItem>
-					{n.children?.length ? (
-						<Box sx={{ pl: 4 }}>
-							{renderTree(n.children)}
-						</Box>
-					) : null}
-					<Divider />
-				</Box>
-			))}
-		</List>
-	);
+  const handleEditCostCenter = (costCenter) => {
+    setIsEditMode(true);
+    setEditingCostCenter(costCenter);
+    setFormData({
+      name: costCenter.name,
+      parentCostCenterId: costCenter.parentCostCenterId, // Changed from parent_cost_center_id
+      hasParent: !!costCenter.parentCostCenterId
+    });
+    setOpenDialog(true);
+  };
 
-	return (
-		<Box sx={{ p: 3 }}>
-			<Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
-				<Typography variant="h4">Cost Centers</Typography>
-				<Stack direction="row" spacing={1}>
-					<Button variant="outlined" startIcon={<RefreshIcon />} onClick={loadTree} disabled={loading}>Refresh</Button>
-					<Button variant="contained" startIcon={<AddIcon />} onClick={handleCreateParent}>Create Parent</Button>
-					<Button variant="outlined" startIcon={<AddIcon />} onClick={handleAddChild} disabled={!selectedId}>Add Sub-Category</Button>
-				</Stack>
-			</Stack>
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setEditingCostCenter(null);
+    setIsEditMode(false);
+    setFormData({
+      name: '',
+      parentCostCenterId: null,
+      hasParent: false
+    });
+  };
 
-			<Grid container spacing={3}>
-				<Grid item xs={12} md={5} lg={4}>
-					<Card>
-						<CardContent>
-							<Typography variant="h6" gutterBottom>Hierarchy</Typography>
-							{renderTree(tree)}
-						</CardContent>
-					</Card>
-				</Grid>
+  const generateCode = (name, costCenterId) => {
+    if (!name || !costCenterId) return '';
+    
+    // Get first 3 letters of name, uppercase
+    const abbreviation = name.substring(0, 3).toUpperCase();
+    return `${abbreviation}_${costCenterId}`;
+  };
 
-				<Grid item xs={12} md={7} lg={8}>
-					<Card>
-						<CardContent>
-							<Typography variant="h6" gutterBottom>Details</Typography>
-							<Grid container spacing={2}>
-								<Grid item xs={12} sm={6}>
-									<TextField label="Code" value={form.code} InputProps={{ readOnly: true }} fullWidth size="small" />
-								</Grid>
-								<Grid item xs={12} sm={6}>
-									<TextField label="Name" name="name" value={form.name} onChange={handleChange} fullWidth size="small" />
-								</Grid>
-								<Grid item xs={12} sm={6}>
-									<TextField label="Parent" select fullWidth size="small" value={form.parentCostCenterId ?? ''} onChange={(e) => setForm(prev => ({ ...prev, parentCostCenterId: e.target.value === '' ? null : Number(e.target.value) }))}>
-										<MenuItem value="">None</MenuItem>
-										{parents.map(p => (
-											<MenuItem key={p.id} value={p.id}>{p.label}</MenuItem>
-										))}
-									</TextField>
-								</Grid>
-								<Grid item xs={12} sm={6}>
-									<TextField label="Company Id (optional)" name="companyId" value={form.companyId ?? ''} onChange={handleChange} type="number" fullWidth size="small" />
-								</Grid>
-								<Grid item xs={12} sm={6}>
-									<Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
-										<Checkbox checked={!!form.isActive} onChange={handleToggleActive} />
-										<Typography variant="body2">Is Active</Typography>
-									</Box>
-								</Grid>
-							</Grid>
+  const handleSave = async () => {
+    if (!formData.name.trim()) {
+      enqueueSnackbar('Name is required', { variant: 'warning' });
+      return;
+    }
 
-							<Stack direction="row" spacing={1} sx={{ mt: 2 }}>
-								<Button variant="contained" startIcon={<EditIcon />} onClick={handleSave}>Save</Button>
-								<Button variant="outlined" color="error" startIcon={<DeleteIcon />} onClick={() => setConfirmOpen(true)} disabled={!form.costCenterId}>Delete</Button>
-							</Stack>
-						</CardContent>
-					</Card>
-				</Grid>
-			</Grid>
+    setSaving(true);
+    try {
+      const apiBaseUrl = getApiBaseUrl();
+      
+      if (isEditMode) {
+        // Update existing cost center
+        const updateData = {
+          costCenterId: editingCostCenter.costCenterId,
+          name: formData.name.trim(),
+          parentCostCenterId: formData.hasParent ? formData.parentCostCenterId : null,
+          isActive: editingCostCenter.isActive,
+          code: editingCostCenter.code // Keep existing code
+        };
 
-			<Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
-				<DialogTitle>Delete Cost Center</DialogTitle>
-				<DialogContent>
-					<DialogContentText>
-						This will delete the selected cost center and all its sub-categories. Are you sure?
-					</DialogContentText>
-				</DialogContent>
-				<DialogActions>
-					<Button onClick={() => setConfirmOpen(false)}>Cancel</Button>
-					<Button color="error" onClick={handleDelete}>Delete</Button>
-				</DialogActions>
-			</Dialog>
-		</Box>
-	);
+        console.log('Updating cost center:', updateData);
+        const response = await axios.put(`${apiBaseUrl}/CostCenters/UpdateCostCenter/${editingCostCenter.costCenterId}`, updateData);
+        
+        if (response.data?.success) {
+          // Update local state with the response data
+          const updatedCostCenter = response.data.result;
+          setCostCenters(prev => prev.map(cc => 
+            cc.costCenterId === editingCostCenter.costCenterId ? updatedCostCenter : cc
+          ));
+          
+          enqueueSnackbar('Cost center updated successfully', { variant: 'success' });
+        } else {
+          enqueueSnackbar(response.data?.message || 'Failed to update cost center', { variant: 'error' });
+        }
+      } else {
+        // Create new cost center
+        const createData = {
+          name: formData.name.trim(),
+          parentCostCenterId: formData.hasParent ? formData.parentCostCenterId : null,
+          isActive: true
+        };
+
+        console.log('Creating cost center:', createData);
+        const response = await axios.post(`${apiBaseUrl}/CostCenters/CreateCostCenter`, createData);
+        
+        if (response.data?.success) {
+          // Add new cost center to local state
+          const newCostCenter = response.data.result;
+          setCostCenters(prev => [...prev, newCostCenter]);
+          
+          enqueueSnackbar('Cost center created successfully', { variant: 'success' });
+        } else {
+          enqueueSnackbar(response.data?.message || 'Failed to create cost center', { variant: 'error' });
+        }
+      }
+
+      handleCloseDialog();
+    } catch (error) {
+      console.error('Error saving cost center:', error);
+      console.error('Error response:', error.response);
+      
+      if (error.response?.status === 400) {
+        enqueueSnackbar(error.response.data?.message || 'Validation error. Please check your input.', { variant: 'error' });
+      } else if (error.response?.status === 404) {
+        enqueueSnackbar('Cost center not found. It may have been deleted.', { variant: 'error' });
+      } else if (error.code === 'ERR_NETWORK') {
+        enqueueSnackbar('Network error: Unable to connect to API server.', { variant: 'error' });
+      } else {
+        enqueueSnackbar(`Error saving cost center: ${error.message}`, { variant: 'error' });
+      }
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const getParentCostCenters = () => {
+    return costCenters.filter(cc => !cc.isChild); // Changed from is_child
+  };
+
+  const getStatusColor = (isChild) => {
+    return isChild ? 'warning' : 'success';
+  };
+
+  const getStatusLabel = (isChild) => {
+    return isChild ? 'Child' : 'Parent';
+  };
+
+  return (
+    <Box sx={{ p: 3, backgroundColor: '#f8fffa', minHeight: '100vh' }}>
+      {/* Header */}
+      <Box sx={{ mb: 4 }}>
+        <Typography 
+          variant="h3" 
+          component="h1" 
+          sx={{ 
+            fontWeight: 700,
+            background: 'linear-gradient(135deg, #228B22 0%, #006400 100%)',
+            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            mb: 2
+          }}
+        >
+          Cost Centers
+        </Typography>
+        <Typography variant="h6" color="#228B22" sx={{ mb: 3 }}>
+          Manage your cost center hierarchy and organizational structure
+        </Typography>
+      </Box>
+
+      {/* Top Section Controls */}
+      <Card sx={{ mb: 3, boxShadow: 2 }}>
+        <CardContent>
+          <Grid container spacing={3} alignItems="center">
+            <Grid item xs={12} md={4}>
+              <FormControl fullWidth>
+                <InputLabel>Filter Type</InputLabel>
+                <Select
+                  value={filterType}
+                  onChange={(e) => setFilterType(e.target.value)}
+                  label="Filter Type"
+                >
+                  <MenuItem value="all">All</MenuItem>
+                  <MenuItem value="parent">Parent</MenuItem>
+                  <MenuItem value="child">Child</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <Typography variant="body2" color="text.secondary">
+                Showing {filteredCostCenters.length} of {costCenters.length} cost centers
+              </Typography>
+            </Grid>
+            <Grid item xs={12} md={4} sx={{ textAlign: 'right' }}>
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleAddCostCenter}
+                sx={{
+                  background: 'linear-gradient(135deg, #228B22 0%, #006400 100%)',
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #006400 0%, #004d00 100%)',
+                  }
+                }}
+              >
+                Add Cost Centers
+              </Button>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
+
+      {/* Cost Centers Table */}
+      <Card sx={{ boxShadow: 2 }}>
+        <CardContent sx={{ p: 0 }}>
+          {loading ? (
+            <Box sx={{ p: 4, textAlign: 'center' }}>
+              <Typography variant="h6" color="text.secondary">
+                Loading cost centers...
+              </Typography>
+            </Box>
+          ) : costCenters.length === 0 ? (
+            <Box sx={{ p: 4, textAlign: 'center' }}>
+              <Typography variant="h6" color="text.secondary">
+                No cost centers found
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                The API returned an empty result. Check the console for debugging information.
+              </Typography>
+            </Box>
+          ) : (
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow sx={{ backgroundColor: '#228B22' }}>
+                    <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Code</TableCell>
+                    <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Name</TableCell>
+                    <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Status</TableCell>
+                    <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Parent</TableCell>
+                    <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Created</TableCell>
+                    <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Actions</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {getPaginatedData().map((costCenter) => (
+                    <TableRow key={costCenter.costCenterId} hover>
+                      <TableCell>
+                        <Chip 
+                          label={costCenter.code} 
+                          variant="outlined" 
+                          color="primary"
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" fontWeight="medium">
+                          {costCenter.name}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Chip 
+                          label={getStatusLabel(costCenter.isChild)}
+                          color={getStatusColor(costCenter.isChild)}
+                          size="small"
+                          icon={<AccountTreeIcon />}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        {costCenter.parentName ? (
+                          <Chip 
+                            label={costCenter.parentName} 
+                            variant="outlined" 
+                            size="small"
+                            color="secondary"
+                          />
+                        ) : (
+                          <Typography variant="body2" color="text.secondary">
+                            -
+                          </Typography>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" color="text.secondary">
+                          {costCenter.createdAt}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          startIcon={<EditIcon />}
+                          onClick={() => handleEditCostCenter(costCenter)}
+                          sx={{ color: '#228B22', borderColor: '#228B22' }}
+                        >
+                          Edit
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25]}
+                component="div"
+                count={filteredCostCenters.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+              />
+            </TableContainer>
+          )}
+        </CardContent>
+      </Card>
+
+     
+
+      {/* Add/Edit Dialog */}
+      <Dialog 
+        open={openDialog} 
+        onClose={handleCloseDialog}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+          }
+        }}
+      >
+        <DialogTitle sx={{ 
+          bgcolor: '#228B22', 
+          color: 'white',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <Typography variant="h6">
+            {isEditMode ? 'Edit Cost Center' : 'Add New Cost Center'}
+          </Typography>
+        </DialogTitle>
+
+        <DialogContent sx={{ pt: 3 }}>
+          <Grid container spacing={3} sx={{ pt: 10 }}>
+            {/* Name Field */}
+            <Grid item xs={6}>
+              <TextField
+                fullWidth
+                label="Name *"
+                value={formData.name}
+                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                variant="outlined"
+                size="medium"
+                placeholder="Enter cost center name"
+              />
+            </Grid>
+
+            {/* Parent Checkbox and Selector */}
+            <Grid item xs={6}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={formData.hasParent}
+                    onChange={(e) => setFormData(prev => ({ 
+                      ...prev, 
+                      hasParent: e.target.checked,
+                      parentCostCenterId: e.target.checked ? prev.parentCostCenterId : null
+                    }))}
+                    sx={{ color: '#228B22' }}
+                  />
+                }
+                label="Has Parent Cost Center"
+              />
+            </Grid>
+
+            {formData.hasParent && (
+              <Grid item xs={12}>
+                <FormControl fullWidth>
+                  <InputLabel>Parent Cost Center</InputLabel>
+                  <Select
+                    value={formData.parentCostCenterId || ''}
+                    onChange={(e) => setFormData(prev => ({ 
+                      ...prev, 
+                      parentCostCenterId: e.target.value 
+                    }))}
+                    label="Parent Cost Center"
+                  >
+                    {getParentCostCenters().map((parent) => (
+                      <MenuItem key={parent.costCenterId} value={parent.costCenterId}>
+                        {parent.name} ({parent.code})
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+            )}
+
+            {/* Auto-generated Code Preview */}
+            {formData.name && (
+              <Grid item xs={12}>
+                <Paper sx={{ p: 2, bgcolor: '#f5f5f5' }}>
+                  <Typography variant="body2" color="text.secondary">
+                    Auto-generated Code: <strong>{generateCode(formData.name, isEditMode ? editingCostCenter?.costCenterId : 'NEW')}</strong>
+                  </Typography>
+                </Paper>
+              </Grid>
+            )}
+          </Grid>
+        </DialogContent>
+
+        <DialogActions sx={{ p: 3, pt: 1 }}>
+          <Button onClick={handleCloseDialog} variant="outlined" disabled={saving}>
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleSave} 
+            variant="contained"
+            disabled={saving}
+            sx={{
+              background: 'linear-gradient(135deg, #228B22 0%, #006400 100%)',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #006400 0%, #004d00 100%)',
+              }
+            }}
+          >
+            {saving ? 'Saving...' : (isEditMode ? 'Update' : 'Create')} Cost Center
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
+  );
 };
 
 export default CostCenters;

@@ -78,7 +78,7 @@ namespace Biomass.Server.Controllers.Api
             return Ok(result);
         }
 
-        [HttpGet("GetMoneyAccountByKindLookupId/{kindLookupId}")]
+        [HttpGet("GetMoneyAccountByKindLookupId")]
         public async Task<IActionResult> GetMoneyAccountByKindLookupId(int kindLookupId)
         {
             var result = await _service.GetMoneyAccountsByKindLookupIdAsync(kindLookupId);

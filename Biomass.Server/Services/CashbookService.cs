@@ -389,7 +389,47 @@ namespace Biomass.Server.Services
 			return await GetEmployeeTransactionsAsync(employeeId, 30, page, pageSize);
 		}
 
+		public async Task<ServiceResponse<EmployeeTransactionResponse>> GetPendingTransactionsByEmployeeAsync(
+			int employeeId, string status)
+		{
+			var response = new ServiceResponse<EmployeeTransactionResponse>();
+			try
+			{
+				// Build the SQL query for transactions by status and employee
+				var sql = @"
+					SELECT 
+						cash_id, happened_at, cash_kind, amount, currency,
+						money_account_id, money_account_name, wallet_employee_id, employee_wallet_name,
+						category_id, category_name, cost_center_id, costcenter_name, cost_center_sub_id, costcenter_sub_name,
+						payment_mode_id, payment_mode_name, reference_no, counterparty_name, remarks, meta,
+						bank_delta, wallet_delta, status
+					FROM v_cashbook_effects 
+					WHERE wallet_employee_id = {0} 
+						AND status = {1}
+					ORDER BY happened_at DESC";
 
+				// Execute query
+				var items = await _db.Database.SqlQueryRaw<CashTransactionDetailed>(
+					sql, employeeId, status
+				).ToListAsync();
+
+				response.Result = new EmployeeTransactionResponse
+				{
+					Items = items,
+					TotalCount = items.Count, // Use actual items count
+					Page = 1, // No pagination, so always page 1
+					PageSize = items.Count, // Page size equals actual items count
+					TotalPages = 1 // Only one page since no pagination
+				};
+				response.Success = true;
+			}
+			catch (Exception ex)
+			{
+				response.Success = false;
+				response.Message = ex.Message;
+			}
+			return response;
+		}
 
 		private async Task<string> SaveReceiptFileAsync(IFormFile receipt)
 		{

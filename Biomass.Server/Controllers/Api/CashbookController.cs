@@ -16,25 +16,7 @@ namespace Biomass.Server.Controllers.Api
 			_service = service;
 		}
 
-        //[HttpPost("CreateCashbookEntry")]
-        //public async Task<IActionResult> CreateCashbookEntry([FromForm] CreateCashbookRequest request, [FromForm] IFormFile? receipt)
-        //{
-        //    try
-        //    {
-        //        var result = await _service.CreateCashbookEntryAsync(request, receipt);
-        //        if (!result.Success) 
-        //        {
-        //            return BadRequest(new { success = false, message = result.Message });
-        //        }
-
-        //        return Ok(new { success = true, message = "Cashbook entry created successfully", data = result.Result });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(new { success = false, message = "Error creating cashbook entry: " + ex.Message });
-        //    }
-        //}
-
+        
         [HttpPost("CreateCashbookEntry")]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> CreateCashbookEntry([FromForm] CashbookEntryDto dto)
@@ -42,7 +24,6 @@ namespace Biomass.Server.Controllers.Api
             var id = await _service.SaveCashbookEntryAsync(dto);
             return Ok(new { CashId = id });
         }
-
 
 
         [HttpGet("GetCashbookById/{cashId}")]
@@ -110,6 +91,24 @@ namespace Biomass.Server.Controllers.Api
 			[FromQuery] int pageSize = 20)
 		{
 			var result = await _service.GetEmployeeTransactionsLastMonthAsync(employeeId, page, pageSize);
+			if (!result.Success) return BadRequest(result);
+			return Ok(result);
+		}
+
+		[HttpGet("GetPendingTransactionsByEmployee")]
+		public async Task<IActionResult> GetPendingTransactionsByEmployee(
+			[FromQuery] int employeeId, 
+			[FromQuery] string status)
+		{
+			var result = await _service.GetPendingTransactionsByEmployeeAsync(employeeId, status);
+			if (!result.Success) return BadRequest(result);
+			return Ok(result);
+		}
+
+		[HttpPut("UpdateStatus")]
+		public async Task<IActionResult> UpdateStatus(long cashId, string status)
+		{
+			var result = await _service.UpdateCashbookStatusAsync(cashId, status);
 			if (!result.Success) return BadRequest(result);
 			return Ok(result);
 		}

@@ -10,6 +10,7 @@ namespace Biomass.Server.Interfaces
         public string? LookUpDomain { get; set; }
         public bool? Enabled { get; set; }
         public DateTime Created_at { get; set; }
+        public int Created_by { get; set; }
     }
 
     public class CreateLookupRequest

@@ -17,7 +17,7 @@ namespace Biomass.Server.Controllers.Api
             _lookupService = lookupService;
         }
 
-        [HttpGet]
+        [HttpGet("GetAllLookups")]
         public async Task<ActionResult<ServiceResponse<List<Lookup>>>> GetAllLookups()
         {
             var lookups = await _lookupService.GetAllLookupsAsync();

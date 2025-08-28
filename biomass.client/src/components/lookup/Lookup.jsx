@@ -140,7 +140,7 @@ const Lookup = () => {
     setError('');
     try {
       // Use the unpaginated API to get all lookups
-      const response = await axios.get(`${API_BASE}/GetAllLookupsUnpaginated`);
+      const response = await axios.get(`${API_BASE}/GetAllLookups`);
       if (response.data?.success) {
         const allItems = response.data.result || [];
         setAllLookups(allItems);
@@ -179,7 +179,7 @@ const Lookup = () => {
   const fetchDomains = async () => {
     setDomainsLoading(true);
     try {
-      const response = await axios.get(`${API_BASE}/GetDomains`);
+      const response = await axios.get(`${API_BASE}/by-domain`);
       if (response.data.success) {
         setDomains(response.data.result || []);
       } else {

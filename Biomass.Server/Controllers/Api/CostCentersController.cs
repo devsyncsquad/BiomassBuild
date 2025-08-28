@@ -17,7 +17,7 @@ namespace Biomass.Server.Controllers.Api
             _costCenterService = costCenterService;
         }
 
-        [HttpGet]
+        [HttpGet("GetAllCostCentersView")]
         public async Task<ActionResult<ServiceResponse<List<CostCenterDto>>>> GetAllCostCenters()
         {
             var costCenters = await _costCenterService.GetAllCostCentersAsync();

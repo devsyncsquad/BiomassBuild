@@ -80,7 +80,7 @@ const CostCenters = () => {
     try {
       console.log('Fetching cost centers from API...');
       const apiBaseUrl = getApiBaseUrl();
-      const fullUrl = `${apiBaseUrl}/CostCenters/GetAllCostCentersView`;
+      const fullUrl = `${apiBaseUrl}/cost-centers/GetAllCostCentersView`;
       console.log('API Base URL from config:', apiBaseUrl);
       console.log('Full API URL:', fullUrl);
       console.log('Current window location:', window.location.href);

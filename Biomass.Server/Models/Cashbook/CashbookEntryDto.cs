@@ -10,6 +10,7 @@
         public int? WalletEmployeeId { get; set; }
         public int? CategoryId { get; set; }
         public int? CostCenterId { get; set; }
+        public int? CostCenterSubId { get; set; }
         public int? PaymentModeId { get; set; }
         public string? ReferenceNo { get; set; }
         public string? CounterpartyName { get; set; }

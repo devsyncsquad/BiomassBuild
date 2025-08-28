@@ -1,60 +1,55 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import {
-  getVehicles,
-  getVehicleById,
-  createVehicle,
-  updateVehicle,
-  deleteVehicle
-} from '../utils/vehicleApi';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
-const vehicleKeys = {
-  all: ['vehicles'],
-  lists: () => [...vehicleKeys.all, 'list'],
-  details: (id) => [...vehicleKeys.all, 'detail', id]
-};
-
-export const useVehicles = () => {
-  return useQuery({
-    queryKey: vehicleKeys.lists(),
-    queryFn: getVehicles
+const useVehicles = () => {
+  const [vehicles, setVehicles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [stats, setStats] = useState({
+    total: 0,
+    active: 0,
+    maintenance: 0,
+    inactive: 0
   });
-};
 
-export const useVehicleById = (id) => {
-  return useQuery({
-    queryKey: vehicleKeys.details(id),
-    queryFn: () => getVehicleById(id),
-    enabled: !!id
-  });
-};
-
-export const useCreateVehicle = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: createVehicle,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: vehicleKeys.lists() });
+  const fetchVehicles = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get('https://localhost:7084/api/vehicles');
+      if (response.data.success) {
+        setVehicles(response.data.result);
+        
+        // Calculate stats
+        const vehicleStats = response.data.result.reduce((acc, vehicle) => {
+          acc.total++;
+          switch (vehicle.status.toLowerCase()) {
+            case 'active':
+              acc.active++;
+              break;
+            case 'maintenance':
+              acc.maintenance++;
+              break;
+            case 'inactive':
+              acc.inactive++;
+              break;
+          }
+          return acc;
+        }, { total: 0, active: 0, maintenance: 0, inactive: 0 });
+        
+        setStats(vehicleStats);
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
-  });
+  };
+
+  useEffect(() => {
+    fetchVehicles();
+  }, []);
+
+  return { vehicles, loading, error, stats, refetchVehicles: fetchVehicles };
 };
 
-export const useUpdateVehicle = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ id, ...data }) => updateVehicle(id, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: vehicleKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: vehicleKeys.details(variables.id) });
-    }
-  });
-};
-
-export const useDeleteVehicle = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: deleteVehicle,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: vehicleKeys.lists() });
-    }
-  });
-};
+export default useVehicles;

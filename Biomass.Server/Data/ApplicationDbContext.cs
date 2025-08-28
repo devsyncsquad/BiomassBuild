@@ -395,7 +395,7 @@ namespace Biomass.Server.Data
                 entity.Property(e => e.Status).HasColumnName("status").HasMaxLength(20);
                 entity.Property(e => e.CreatedOn).HasColumnName("createdon");
                 entity.Property(e => e.VehicleRegNumber).HasColumnName("vehicle_reg_number");
-                entity.Property(e => e.VendorId).HasColumnName("vendor_id");
+                entity.Property(e => e.VendorId).HasColumnName("vendorid");
 
                 // Configure one-to-one relationship with Driver
                 entity.HasOne(v => v.Driver)
@@ -419,7 +419,7 @@ namespace Biomass.Server.Data
                 entity.Property(e => e.CreatedOn).HasColumnName("createdon");
 
                 // Add VehicleId foreign key
-                entity.Property<int?>("VehicleId").HasColumnName("vehicle_id");
+                entity.Property<int?>("VehicleId").HasColumnName("vehicleid");
             });
 
             modelBuilder.Entity<MoneyAccount>(entity =>

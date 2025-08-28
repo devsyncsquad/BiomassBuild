@@ -38,11 +38,10 @@ namespace Biomass.Server.Models.Vehicle
         [Column("vehicle_reg_number")]
         public string? VehicleRegNumber { get; set; }
 
-        [Column("vendor_id")]
+        [Column("vendorid")]
         public int? VendorId { get; set; }
 
         // Navigation property for Driver
-        [ForeignKey("VehicleId")]
         public virtual Driver.Driver? Driver { get; set; }
     }
 }

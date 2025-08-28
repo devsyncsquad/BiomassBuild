@@ -39,10 +39,11 @@ namespace Biomass.Server.Models.Driver
         [Column("createdon")]
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
 
-        [Column("vehicle_id")]
+        [Column("vehicleid")]
         public int? VehicleId { get; set; }
 
         // Navigation property for Vehicle
+        [ForeignKey("VehicleId")]
         public virtual Vehicle.Vehicle? Vehicle { get; set; }
     }
 }

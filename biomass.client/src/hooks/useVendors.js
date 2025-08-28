@@ -22,7 +22,7 @@ export const useVendors = () => {
 export const useVendorStats = () => {
   return useQuery({
     queryKey: vendorKeys.stats(),
-    queryFn: () => apiRequest('/api/vendors/stats', {
+    queryFn: () => apiRequest('/vendors/all', {
       method: 'GET'
     })
   });

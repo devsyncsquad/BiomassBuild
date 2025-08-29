@@ -52,7 +52,8 @@ namespace Biomass.Server.Services
 					Remarks = dto.Remarks,
 					Status = dto.Status,
 					//Meta = string.IsNullOrWhiteSpace(dto.MetaJson) ? null : JsonDocument.Parse(dto.MetaJson).RootElement,
-					ReceiptPath = filePath
+					ReceiptPath = filePath,
+					CostCenterSubId=dto.CostCenterSubId
 				};
             try
             {

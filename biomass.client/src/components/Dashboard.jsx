@@ -22,6 +22,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
+import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import './Dashboard.css';
 import { logout, getUserRole, getUserCustomers, getUserAssignedMenus } from '../utils/auth';
 
@@ -35,26 +36,45 @@ const Dashboard = ({ user, onLogout, children }) => {
   const [assignedMenus, setAssignedMenus] = useState([]);
 
   useEffect(() => {
+    console.log('=== DASHBOARD USE_EFFECT DEBUG ===');
+    
     // Get customers from localStorage
     const customersData = localStorage.getItem('customers');
+    console.log('Raw customers data from localStorage:', customersData);
+    
     if (customersData) {
       try {
         const parsedCustomers = JSON.parse(customersData);
+        console.log('Parsed customers:', parsedCustomers);
         setCustomers(parsedCustomers);
         setCustomerCount(parsedCustomers.length);
       } catch (error) {
         console.error('Error parsing customers data:', error);
       }
+    } else {
+      console.log('No customers data found in localStorage');
     }
     
     // Get user role from localStorage
     const role = getUserRole();
+    console.log('User role from localStorage:', role);
     setUserRole(role);
 
     // Get assigned menus from localStorage
     const assignedMenusData = getUserAssignedMenus();
+    console.log('Raw assigned menus data from localStorage:', assignedMenusData);
     console.log('Assigned menus from localStorage:', assignedMenusData);
     setAssignedMenus(assignedMenusData);
+    
+    // Debug: Check all localStorage items
+    console.log('All localStorage items:');
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      const value = localStorage.getItem(key);
+      console.log(`${key}:`, value);
+    }
+    
+    console.log('=== END DASHBOARD USE_EFFECT DEBUG ===');
   }, []);
 
   const handleLogout = () => {
@@ -89,6 +109,9 @@ const Dashboard = ({ user, onLogout, children }) => {
           break;
         case 'lookup-management':
           navigate('/lookup-management');
+          break;
+        case 'vehicle-management':
+          navigate('/vehicle-management');
           break;
         default:
           break;
@@ -144,18 +167,25 @@ const Dashboard = ({ user, onLogout, children }) => {
       route: 'money-account'
     },
     {
-      id: 'cost-centers',
+      id: 7, // Cost Centers
       label: 'Cost Centers',
       icon: <AccountTreeIcon />,
       color: '#795548',
       route: 'cost-centers'
     },
     {
-      id: 'lookup-management',
-      label: 'LookUp Management',
+      id: 8, // Lookup Management
+      label: 'Lookup Management',
       icon: <AccountBalanceIcon />,
       color: '#607D8B',
       route: 'lookup-management'
+    },
+    {
+      id: 9, // Vehicle Management & Driver
+      label: 'Vehicle Management & Driver',
+      icon: <DirectionsCarIcon />,
+      color: '#228B22',
+      route: 'vehicle-management'
     }
   ];
 

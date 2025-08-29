@@ -1,114 +1,107 @@
+using Biomass.Api.Model;
 using Biomass.Server.Interfaces;
+using Biomass.Server.Models;
 using Biomass.Server.Models.Lookup;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Biomass.Server.Controllers.Api
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/lookups")]
     public class LookupsController : ControllerBase
     {
-        private readonly ILookupService _service;
-        public LookupsController(ILookupService service)
+        private readonly ILookupService _lookupService;
+
+        public LookupsController(ILookupService lookupService)
         {
-            _service = service;
+            _lookupService = lookupService;
         }
 
         [HttpGet("GetAllLookups")]
-        public async Task<IActionResult> Get([FromQuery] string? domain, [FromQuery] string? status, [FromQuery] string? search, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        public async Task<ActionResult<ServiceResponse<List<Lookup>>>> GetAllLookups()
         {
-            var response = await _service.GetAsync(domain, status, search, page, pageSize);
-
-            if (!response.Success)
+            var lookups = await _lookupService.GetAllLookupsAsync();
+            return Ok(new ServiceResponse<List<Lookup>>
             {
-                return BadRequest(response);
+                Result = lookups,
+                Message = "Lookups retrieved successfully",
+                Success = true
+            });
+        }
+
+        [HttpPost("by-domain")]
+        public async Task<ActionResult<ServiceResponse<List<Lookup>>>> GetLookupsByDomain([FromBody] LookupByDomainRequest request)
+        {
+            if (string.IsNullOrEmpty(request.Domain))
+            {
+                return BadRequest(new ServiceResponse<List<Lookup>>
+                {
+                    Message = "Domain is required",
+                    Success = false
+                });
             }
 
-            return Ok(response);
+            var lookups = await _lookupService.GetLookupsByDomainAsync(request.Domain);
+            return Ok(new ServiceResponse<List<Lookup>>
+            {
+                Result = lookups,
+                Message = $"Lookups for domain '{request.Domain}' retrieved successfully",
+                Success = true
+            });
         }
 
-        /// <summary>
-        /// Get all lookups without pagination for frontend filtering
-        /// </summary>
-        [HttpGet("GetAllLookupsUnpaginated")]
-        public async Task<IActionResult> GetAllUnpaginated([FromQuery] string? domain, [FromQuery] string? status, [FromQuery] string? search)
+        [HttpPost]
+        public async Task<ActionResult<ServiceResponse<Lookup>>> CreateLookup([FromBody] Lookup lookup)
         {
-            var response = await _service.GetAllUnpaginatedAsync(domain, status, search);
-
-            if (!response.Success)
+            var createdLookup = await _lookupService.CreateLookupAsync(lookup);
+            return Ok(new ServiceResponse<Lookup>
             {
-                return BadRequest(response);
+                Result = createdLookup,
+                Message = "Lookup created successfully",
+                Success = true
+            });
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<ServiceResponse<Lookup>>> UpdateLookup(int id, [FromBody] Lookup lookup)
+        {
+            var updatedLookup = await _lookupService.UpdateLookupAsync(id, lookup);
+            if (updatedLookup == null)
+            {
+                return NotFound(new ServiceResponse<Lookup>
+                {
+                    Message = "Lookup not found",
+                    Success = false
+                });
             }
 
-            return Ok(response);
+            return Ok(new ServiceResponse<Lookup>
+            {
+                Result = updatedLookup,
+                Message = "Lookup updated successfully",
+                Success = true
+            });
         }
 
-        [HttpGet("GetLookupById/{id}")]
-        public async Task<IActionResult> GetById(int id)
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<ServiceResponse<bool>>> DeleteLookup(int id)
         {
-            var result = await _service.GetByIdAsync(id);
-            if (!result.Success) return NotFound(result);
-            return Ok(result);
-        }
+            var result = await _lookupService.DeleteLookupAsync(id);
+            if (!result)
+            {
+                return NotFound(new ServiceResponse<bool>
+                {
+                    Message = "Lookup not found",
+                    Success = false
+                });
+            }
 
-        [HttpPost("CreateLookup")]
-        public async Task<IActionResult> Create([FromBody] CreateLookupRequest request)
-        {
-            var result = await _service.CreateAsync(request);
-            if (!result.Success) return BadRequest(result);
-            return Ok(result);
-        }
-
-        [HttpPut("UpdateLookup/{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] UpdateLookupRequest request)
-        {
-            request.LookupId = id;
-            var result = await _service.UpdateAsync(request);
-            if (!result.Success) return BadRequest(result);
-            return Ok(result);
-        }
-
-        [HttpDelete("DeleteLookup/{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var result = await _service.DeleteAsync(id);
-            if (!result.Success) return NotFound(result);
-            return Ok(result);
-        }
-
-        /// <summary>
-        /// Get lookup statistics (Total, Enabled, Disabled, Pending)
-        /// </summary>
-        [HttpGet("GetStatistics")]
-        public async Task<IActionResult> GetStatistics()
-        {
-            var result = await _service.GetStatisticsAsync();
-            if (!result.Success) return BadRequest(result);
-            return Ok(result);
-        }
-
-        /// <summary>
-        /// Get all distinct domains
-        /// </summary>
-        [HttpGet("GetDomains")]
-        public async Task<IActionResult> GetDomains()
-        {
-            var result = await _service.GetDomainsAsync();
-            if (!result.Success) return BadRequest(result);
-            return Ok(result);
-        }
-
-        /// <summary>
-        /// Get all lookups grouped by domain in a single response
-        /// </summary>
-        [HttpGet("GetLookupsByDomains")]
-        public async Task<IActionResult> GetLookupsByDomains()
-        {
-            var result = await _service.GetLookupsByDomainsAsync();
-            if (!result.Success) return BadRequest(result);
-            return Ok(result);
+            return Ok(new ServiceResponse<bool>
+            {
+                Result = true,
+                Message = "Lookup deleted successfully",
+                Success = true
+            });
         }
     }
 }
-
-

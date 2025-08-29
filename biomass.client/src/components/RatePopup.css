@@ -1,0 +1,289 @@
+/* Rate Popup Styles */
+.rate-popup-container {
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.rate-popup-header {
+  padding: 24px;
+  background: linear-gradient(135deg, #228B22 0%, #32CD32 100%);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.rate-popup-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.rate-tabs {
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #f8f9fa;
+}
+
+.rate-tab {
+  min-height: 48px;
+  font-weight: 500;
+}
+
+.rate-tab-content {
+  padding: 24px;
+  overflow-y: auto;
+}
+
+/* Form Styles */
+.rate-form-section {
+  margin-bottom: 24px;
+}
+
+.rate-form-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.rate-form-subtitle {
+  color: #666;
+  margin-bottom: 16px;
+  font-size: 0.875rem;
+}
+
+.rate-form-grid {
+  margin-top: 16px;
+}
+
+/* Table Styles */
+.rates-table-container {
+  margin-top: 16px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.rates-table {
+  width: 100%;
+}
+
+.rates-table-head {
+  background-color: #f8f9fa;
+}
+
+.rates-table-head .MuiTableCell-head {
+  font-weight: 600;
+  color: #333;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.rates-table-row:hover {
+  background-color: #f5f5f5;
+}
+
+.rates-table-cell {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* Status Chip Styles */
+.status-chip-active {
+  background-color: #4caf50;
+  color: white;
+}
+
+.status-chip-inactive {
+  background-color: #9e9e9e;
+  color: white;
+}
+
+/* Filter Card Styles */
+.filter-card {
+  background-color: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.filter-card-content {
+  padding: 20px;
+}
+
+.filter-title {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #333;
+}
+
+.filter-actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 12px;
+}
+
+/* Button Styles */
+.primary-button {
+  background-color: #228B22;
+  color: white;
+  font-weight: 500;
+}
+
+.primary-button:hover {
+  background-color: #006400;
+}
+
+.secondary-button {
+  border-color: #228B22;
+  color: #228B22;
+}
+
+.secondary-button:hover {
+  border-color: #006400;
+  background-color: rgba(34, 139, 34, 0.04);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .rate-popup-content {
+    flex-direction: column;
+  }
+  
+  .rate-tab-content {
+    padding: 16px;
+  }
+  
+  .rate-form-grid .MuiGrid-item {
+    margin-bottom: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .rate-popup-header {
+    padding: 16px;
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+  
+  .rate-popup-header .MuiBox-root {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .filter-card-content {
+    padding: 16px;
+  }
+  
+  .filter-actions {
+    flex-direction: column;
+  }
+  
+  .filter-actions .MuiButton-root {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .rate-tab-content {
+    padding: 12px;
+  }
+  
+  .rate-form-grid .MuiGrid-item {
+    margin-bottom: 12px;
+  }
+  
+  .rates-table-container {
+    margin-top: 12px;
+  }
+}
+
+/* Loading and Error States */
+.rate-loading {
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #228B22 0%, #32CD32 100%);
+  color: white;
+  border-radius: 8px;
+}
+
+.rate-error {
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  color: white;
+  border-radius: 8px;
+}
+
+.rate-loading-content,
+.rate-error-content {
+  text-align: center;
+}
+
+.rate-loading-content .MuiCircularProgress-root {
+  margin-bottom: 16px;
+}
+
+.rate-error-content .MuiButton-root {
+  margin-top: 16px;
+}
+
+/* Animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rate-form-section {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+/* Scrollbar Styles */
+.rate-tab-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.rate-tab-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.rate-tab-content::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.rate-tab-content::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Table Scrollbar */
+.rates-table-container::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.rates-table-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.rates-table-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.rates-table-container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

@@ -57,14 +57,17 @@ namespace Biomass.Server.Controllers
 
                 // Get user's customers
                 var customers = await GetUserCustomersAsync(user.UserId);
+                Console.WriteLine($"DEBUG: Fetched {customers.Count} customers for user {user.UserId}");
 
                 // Get user's assigned menus based on their role
                 var assignedMenus = await GetUserAssignedMenusByRoleAsync(user.RoleId ?? 0);
+                Console.WriteLine($"DEBUG: Fetched {assignedMenus.Count} assigned menus for role {user.RoleId}");
 
                 // Create enhanced response with customers and assigned menus
                 var enhancedResponse = new EnhancedAuthenticateResponse(baseResponse, customers, assignedMenus);
+                Console.WriteLine($"DEBUG: Created enhanced response with {customers.Count} customers and {assignedMenus.Count} menus");
 
-                return Ok(baseResponse);
+                return Ok(enhancedResponse);
             }
             catch (Exception ex)
             {

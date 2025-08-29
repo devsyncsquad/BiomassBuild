@@ -11,6 +11,8 @@ using Biomass.Server.Models.Employee;
 using Biomass.Server.Models.Cashbook;
 using Biomass.Server.Models.Lookup;
 using Biomass.Server.Models.MoneyAccount;
+using Biomass.Server.Models.Vehicle;
+using Biomass.Server.Models.Driver;
 
 namespace Biomass.Server.Data
 {
@@ -39,10 +41,9 @@ namespace Biomass.Server.Data
         public DbSet<BankAccount> BankAccounts { get; set; }
         public DbSet<Lookup> Lookups { get; set; }
         public DbSet<Vendor> Vendors { get; set; }
-        public DbSet<VendorDocument> VendorDocuments { get; set; }
-        public DbSet<VendorReview> VendorReviews { get; set; }
-        public DbSet<VendorHistory> VendorHistory { get; set; }
-        public DbSet<VendorContact> VendorContacts { get; set; }
+        public DbSet<Vehicle> Vehicles { get; set; }
+        public DbSet<Driver> Drivers { get; set; }
+
         public DbSet<CostCenter> CostCenters { get; set; }
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Cashbook> Cashbooks { get; set; }
@@ -381,6 +382,46 @@ namespace Biomass.Server.Data
             });
 
             // MoneyAccounts
+            // Configure Vehicle entity
+            modelBuilder.Entity<Vehicle>(entity =>
+            {
+                entity.ToTable("vehicles");
+                entity.HasKey(e => e.VehicleId);
+                entity.Property(e => e.VehicleId).HasColumnName("vehicleid");
+                entity.Property(e => e.VehicleNumber).HasColumnName("vehiclenumber").IsRequired().HasMaxLength(50);
+                entity.Property(e => e.VehicleType).HasColumnName("vehicletype").IsRequired().HasMaxLength(50);
+                entity.Property(e => e.Capacity).HasColumnName("capacity").HasColumnType("decimal(10,2)");
+                entity.Property(e => e.FuelType).HasColumnName("fueltype").IsRequired().HasMaxLength(50);
+                entity.Property(e => e.Status).HasColumnName("status").HasMaxLength(20);
+                entity.Property(e => e.CreatedOn).HasColumnName("createdon");
+                entity.Property(e => e.VehicleRegNumber).HasColumnName("vehicle_reg_number");
+                entity.Property(e => e.VendorId).HasColumnName("vendorid");
+
+                // Configure one-to-one relationship with Driver
+                entity.HasOne(v => v.Driver)
+                      .WithOne(d => d.Vehicle)
+                      .HasForeignKey<Driver>(d => d.VehicleId)
+                      .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            // Configure Driver entity
+            modelBuilder.Entity<Driver>(entity =>
+            {
+                entity.ToTable("drivers");
+                entity.HasKey(e => e.DriverId);
+                entity.Property(e => e.DriverId).HasColumnName("driverid");
+                entity.Property(e => e.FullName).HasColumnName("fullname").IsRequired().HasMaxLength(100);
+                entity.Property(e => e.CNIC).HasColumnName("cnic").HasMaxLength(20);
+                entity.Property(e => e.LicenseNumber).HasColumnName("licensenumber").IsRequired().HasMaxLength(50);
+                entity.Property(e => e.PhoneNumber).HasColumnName("phonenumber").HasMaxLength(20);
+                entity.Property(e => e.Address).HasColumnName("address").HasMaxLength(200);
+                entity.Property(e => e.Status).HasColumnName("status").HasMaxLength(20);
+                entity.Property(e => e.CreatedOn).HasColumnName("createdon");
+
+                // Add VehicleId foreign key
+                entity.Property<int?>("VehicleId").HasColumnName("vehicleid");
+            });
+
             modelBuilder.Entity<MoneyAccount>(entity =>
             {
                 entity.ToTable("money_accounts");

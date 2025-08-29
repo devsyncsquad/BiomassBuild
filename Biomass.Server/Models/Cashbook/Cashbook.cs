@@ -42,7 +42,10 @@ namespace Biomass.Server.Models.Cashbook
 		[Column("cost_center_id")]
 		public int? CostCenterId { get; set; }
 
-		[Column("payment_mode_id")]
+        [Column("cost_center_sub_id")]
+        public int? CostCenterSubId { get; set; }
+
+        [Column("payment_mode_id")]
 		public int? PaymentModeId { get; set; }
 
 		[Column("reference_no")]

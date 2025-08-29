@@ -48,8 +48,15 @@ namespace Biomass.Server.Data
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Cashbook> Cashbooks { get; set; }
         public DbSet<MoneyAccount> MoneyAccounts { get; set; }
+        public DbSet<VLocationDto> VLocations { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
+{
+    // Define v_locations view
+    modelBuilder.Entity<VLocationDto>(entity =>
+    {
+        entity.ToView("v_locations");
+        entity.HasNoKey();
+    });
             modelBuilder.Entity<Company>(entity =>
             {
                 entity.ToTable("companies");

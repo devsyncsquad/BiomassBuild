@@ -15,5 +15,9 @@ namespace Biomass.Server.Interfaces
         Task<ServiceResponse<List<CustomerLocationDto>>> SearchLocationsAsync(string searchTerm, string status = "all");
         Task<ServiceResponse<int>> GetLocationCountAsync(int customerId);
         Task<ServiceResponse<LocationCostsDto>> GetLocationCostsForDispatchAsync(int locationId);
+
+        // View-based methods
+        Task<ServiceResponse<List<VLocationDto>>> GetAllLocationsViewAsync();
+        Task<ServiceResponse<List<VLocationDto>>> GetLocationsByCustomerIdViewAsync(int customerId);
     }
 }

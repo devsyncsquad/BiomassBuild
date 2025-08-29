@@ -3,7 +3,6 @@ using Biomass.Server.Data;
 using Biomass.Server.Models.Customer;
 using Biomass.Server.Models;
 using Biomass.Api.Model;
-
 using Biomass.Server.Interfaces;
 
 namespace Biomass.Server.Services
@@ -590,6 +589,53 @@ namespace Biomass.Server.Services
             {
                 response.Success = false;
                 response.Message = $"Error retrieving location costs: {ex.Message}";
+            }
+
+            return response;
+        }
+
+        public async Task<ServiceResponse<List<VLocationDto>>> GetAllLocationsViewAsync()
+        {
+            var response = new ServiceResponse<List<VLocationDto>>();
+
+            try
+            {
+                var locations = await _context.VLocations
+                    .OrderBy(l => l.locationname)
+                    .ToListAsync();
+
+                response.Result = locations;
+                response.Success = true;
+                response.Message = "Locations retrieved successfully from view";
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = $"Error retrieving locations from view: {ex.Message}";
+            }
+
+            return response;
+        }
+
+        public async Task<ServiceResponse<List<VLocationDto>>> GetLocationsByCustomerIdViewAsync(int customerId)
+        {
+            var response = new ServiceResponse<List<VLocationDto>>();
+
+            try
+            {
+                var locations = await _context.VLocations
+                    .Where(l => l.customerid == customerId)
+                    .OrderBy(l => l.locationname)
+                    .ToListAsync();
+
+                response.Result = locations;
+                response.Success = true;
+                response.Message = $"Locations for customer {customerId} retrieved successfully from view";
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = $"Error retrieving locations from view for customer {customerId}: {ex.Message}";
             }
 
             return response;

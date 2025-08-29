@@ -15,14 +15,14 @@ namespace Biomass.Server.Controllers.Api
             _locationService = locationService;
         }
 
-		[HttpGet("GetAllLocations")]
+        [HttpGet("GetAllLocations")]
         public async Task<IActionResult> GetAllLocations()
         {
             var response = await _locationService.GetAllLocationsAsync();
             return Ok(response);
         }
 
-		[HttpGet("GetLocationById/{id}")]
+        [HttpGet("GetLocationById/{id}")]
         public async Task<IActionResult> GetLocationById(int id)
         {
             var response = await _locationService.GetLocationByIdAsync(id);
@@ -31,14 +31,14 @@ namespace Biomass.Server.Controllers.Api
             return Ok(response);
         }
 
-		[HttpGet("GetLocationsByCustomerId/{customerId}")]
+        [HttpGet("GetLocationsByCustomerId/{customerId}")]
         public async Task<IActionResult> GetLocationsByCustomerId(int customerId)
         {
             var response = await _locationService.GetLocationsByCustomerIdAsync(customerId);
             return Ok(response);
         }
 
-		[HttpPost("CreateLocation")]
+        [HttpPost("CreateLocation")]
         public async Task<IActionResult> CreateLocation([FromBody] CreateCustomerLocationRequest request)
         {
             var response = await _locationService.CreateLocationAsync(request);
@@ -47,7 +47,7 @@ namespace Biomass.Server.Controllers.Api
             return CreatedAtAction(nameof(GetLocationById), new { id = response.Result.LocationId }, response);
         }
 
-		[HttpPut("UpdateLocation/{id}")]
+        [HttpPut("UpdateLocation/{id}")]
         public async Task<IActionResult> UpdateLocation(int id, [FromBody] UpdateCustomerLocationRequest request)
         {
             var response = await _locationService.UpdateLocationAsync(id, request);
@@ -56,7 +56,7 @@ namespace Biomass.Server.Controllers.Api
             return Ok(response);
         }
 
-		[HttpDelete("DeleteLocation/{id}")]
+        [HttpDelete("DeleteLocation/{id}")]
         public async Task<IActionResult> DeleteLocation(int id)
         {
             var response = await _locationService.DeleteLocationAsync(id);
@@ -74,18 +74,33 @@ namespace Biomass.Server.Controllers.Api
             return Ok(response);
         }
 
-		[HttpGet("SearchLocations")]
+        [HttpGet("SearchLocations")]
         public async Task<IActionResult> SearchLocations([FromQuery] string searchTerm, [FromQuery] string status = "all")
         {
             var response = await _locationService.SearchLocationsAsync(searchTerm, status);
             return Ok(response);
         }
 
-		[HttpGet("GetLocationCount/{customerId}")]
+        [HttpGet("GetLocationCount/{customerId}")]
         public async Task<IActionResult> GetLocationCount(int customerId)
         {
             var response = await _locationService.GetLocationCountAsync(customerId);
             return Ok(response);
         }
+
+        // New View-based endpoints
+        [HttpGet("GetAllLocationsView")]
+        public async Task<IActionResult> GetAllLocationsView()
+        {
+            var response = await _locationService.GetAllLocationsViewAsync();
+            return Ok(response);
+        }
+
+        [HttpGet("GetLocationsByCustomerIdView/{customerId}")]
+        public async Task<IActionResult> GetLocationsByCustomerIdView(int customerId)
+        {
+            var response = await _locationService.GetLocationsByCustomerIdViewAsync(customerId);
+            return Ok(response);
+        }
     }
-} 
+}

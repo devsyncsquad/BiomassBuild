@@ -2,6 +2,31 @@ using Biomass.Server.Models.Lookup;
 
 namespace Biomass.Server.Interfaces
 {
+    public class LookupDto
+    {
+        public int LookUpId { get; set; }
+        public string LookUpName { get; set; } = string.Empty;
+        public string? LookUpDomain { get; set; }
+        public bool? Enabled { get; set; }
+        public DateTime Created_at { get; set; }
+        public int Created_by { get; set; }
+    }
+
+    public class CreateLookupRequest
+    {
+        public string LookUpName { get; set; } = string.Empty;
+        public string? LookUpDomain { get; set; }
+        public bool? Enabled { get; set; } 
+    }
+
+    public class UpdateLookupRequest
+    {
+        public int LookUpId { get; set; }
+        public string LookUpName { get; set; } = string.Empty;
+        public string? LookUpDomain { get; set; }
+        public bool? Enabled { get; set; }
+    }
+
     public interface ILookupService
     {
         Task<List<Lookup>> GetAllLookupsAsync();

@@ -172,5 +172,12 @@ namespace Biomass.Server.Interfaces
 			int employeeId, int page = 1, int pageSize = 20);
 		Task<ServiceResponse<EmployeeTransactionResponse>> GetEmployeeTransactionsLastMonthAsync(
 			int employeeId, int page = 1, int pageSize = 20);
+		
+		// Pending Transactions
+		Task<ServiceResponse<EmployeeTransactionResponse>> GetPendingTransactionsByEmployeeAsync(
+			int employeeId, string status);
+		
+		// Update Status
+		Task<ServiceResponse<CashbookDto>> UpdateCashbookStatusAsync(long cashId, string newStatus);
 	}
 }

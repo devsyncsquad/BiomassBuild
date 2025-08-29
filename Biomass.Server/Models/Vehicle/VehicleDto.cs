@@ -6,12 +6,12 @@ namespace Biomass.Server.Models.Vehicle
     public class VehicleDto
     {
         public int VehicleId { get; set; }
-        public string VehicleNumber { get; set; }
-        public string VehicleType { get; set; }
+        public string? VehicleNumber { get; set; }
+        public string? VehicleType { get; set; }
         public decimal? Capacity { get; set; }
-        public string FuelType { get; set; }
-        public string Status { get; set; }
-        public DateTime CreatedOn { get; set; }
+        public string? FuelType { get; set; }
+        public string? Status { get; set; }
+        public DateTime? CreatedOn { get; set; }
         public string? VehicleRegNumber { get; set; }
         public int? VendorId { get; set; }
         public Driver.DriverDto? Driver { get; set; }

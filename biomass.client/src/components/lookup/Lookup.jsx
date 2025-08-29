@@ -144,10 +144,15 @@ const Lookup = () => {
       if (response.data?.success) {
         const allItems = response.data.result || [];
         setAllLookups(allItems);
+        
+        // Extract unique domains
+        const uniqueDomains = [...new Set(allItems.map(item => item.lookupDomain))].sort();
+        setDomains(uniqueDomains);
       } else {
         setError(response.data?.message || 'Failed to fetch lookups');
         setAllLookups([]);
         setLookups([]);
+        setDomains([]); // Clear domains on error
         setPagination(prev => ({ ...prev, total: 0 }));
       }
     } catch (err) {
@@ -155,9 +160,11 @@ const Lookup = () => {
       setError(err.response?.data?.message || 'Failed to fetch lookups');
       setAllLookups([]);
       setLookups([]);
+      setDomains([]); // Clear domains on error
       setPagination(prev => ({ ...prev, total: 0 }));
     } finally {
       setLoading(false);
+      setDomainsLoading(false); // Set domains loading to false after fetch
     }
   };
 
@@ -176,24 +183,7 @@ const Lookup = () => {
     });
   };
 
-  const fetchDomains = async () => {
-    setDomainsLoading(true);
-    try {
-      const response = await axios.get(`${API_BASE}/by-domain`);
-      if (response.data.success) {
-        setDomains(response.data.result || []);
-      } else {
-        console.error('Failed to fetch domains:', response.data.message);
-        setDomains([]); // Ensure domains is always an array
-      }
-    } catch (err) {
-      console.error('Failed to fetch domains:', err);
-      setDomains([]); // Ensure domains is always an array on error
-      setError('Failed to load domains. Please refresh the page.');
-    } finally {
-      setDomainsLoading(false);
-    }
-  };
+
 
   const fetchStatistics = async () => {
     try {
@@ -228,7 +218,6 @@ const Lookup = () => {
   // Load data on component mount
   useEffect(() => {
     fetchLookups();
-    fetchDomains();
     fetchStatistics();
   }, []); // Only run once on mount
 
@@ -298,9 +287,29 @@ const Lookup = () => {
   };
 
   // Handle filter changes
-  const handleFilterChange = (field, value) => {
+  const handleFilterChange = async (field, value) => {
     setFilters(prev => ({ ...prev, [field]: value }));
     setPagination(prev => ({ ...prev, page: 0 })); // Reset to first page
+
+    // If changing domain, fetch filtered data
+    if (field === 'domain' && value) {
+      try {
+        const response = await axios.post(`${API_BASE}/by-domain`, {
+          domain: value
+        });
+        if (response.data?.success) {
+          setAllLookups(response.data.result || []);
+        } else {
+          setError(response.data?.message || 'Failed to fetch lookups for domain');
+        }
+      } catch (err) {
+        console.error('Error fetching domain lookups:', err);
+        setError(err.response?.data?.message || 'Failed to fetch lookups for domain');
+      }
+    } else if (field === 'domain' && !value) {
+      // If domain is cleared, fetch all lookups again
+      fetchLookups();
+    }
   };
 
   const handleFilterReset = () => {

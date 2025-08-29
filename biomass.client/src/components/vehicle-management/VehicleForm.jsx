@@ -22,6 +22,9 @@ import axios from 'axios';
 import { useVendors } from '../../hooks/useVendors';
 import { useLookupsByDomain } from '../../hooks/useLookups';
 
+const forestGreen = '#228B22';
+const forestGreenHover = '#1b6b1b';
+
 const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -35,6 +38,7 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
   const vehicleTypes = vehicleTypesResponse?.result || [];
   
   const [formData, setFormData] = useState({
+    vehicleId: '',
     vehicleNumber: '',
     vehicleType: '',
     capacity: '',
@@ -58,6 +62,7 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
   useEffect(() => {
     if (vehicle) {
       setFormData({
+        vehicleId: vehicle.vehicleId || '',
         vehicleNumber: vehicle.vehicleNumber || '',
         vehicleType: vehicle.vehicleType || '',
         capacity: vehicle.capacity || '',
@@ -65,6 +70,9 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
         status: vehicle.status || 'Active',
         vehicleRegNumber: vehicle.vehicleRegNumber || '',
         vendorId: vehicle.vendorId || '',
+        isWeightAllocated: vehicle.isWeightAllocated || false,
+        weightAllowed: vehicle.weightAllowed || '',
+        costCenterId: vehicle.costCenterId || '',
         driver: vehicle.driver ? {
           fullName: vehicle.driver.fullName || '',
           cnic: vehicle.driver.cnic || '',
@@ -116,28 +124,53 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
         vendorId: parseInt(formData.vendorId)
       };
 
-      const response = await axios.post('https://localhost:7084/api/vehicles', submitData);
+      // If vehicle exists, it's an update operation
+      const isUpdate = !!vehicle?.vehicleId;
+      
+      const response = await axios({
+        method: isUpdate ? 'put' : 'post',
+        url: `https://localhost:7084/api/vehicles${isUpdate ? `/${vehicle.vehicleId}` : ''}`,
+        data: {
+          ...submitData,
+          vehicleId: isUpdate ? vehicle.vehicleId : undefined
+        }
+      });
       
       if (response.data.success) {
         onSuccess?.();
         onClose();
       } else {
-        setError(response.data.message || 'Failed to create vehicle');
+        setError(response.data.message || `Failed to ${isUpdate ? 'update' : 'create'} vehicle`);
       }
     } catch (err) {
-      setError(err.message || 'An error occurred while saving the vehicle');
+      setError(err.response?.data?.message || err.message || 'An error occurred while saving the vehicle');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>
+    <Dialog 
+      open={open} 
+      onClose={onClose} 
+      maxWidth="md" 
+      fullWidth
+      PaperProps={{
+        sx: {
+          borderRadius: 2,
+          boxShadow: 3
+        }
+      }}
+    >
+      <DialogTitle sx={{ 
+        bgcolor: forestGreen, 
+        color: 'white',
+        py: 2
+      }}>
         {vehicle ? 'Edit Vehicle' : 'Add New Vehicle'}
       </DialogTitle>
       <form onSubmit={handleSubmit}>
-        <DialogContent>
+        <DialogContent sx={{ p: { xs: 2, sm: 3 } }}>
           {error && (
             <Alert severity="error" sx={{ mb: 2 }}>
               {error}
@@ -367,14 +400,28 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
         </DialogContent>
         
         <DialogActions>
-          <Button onClick={onClose}>Cancel</Button>
+          <Button 
+            onClick={onClose}
+            sx={{
+              color: forestGreen,
+              '&:hover': {
+                bgcolor: 'rgba(34, 139, 34, 0.08)'
+              }
+            }}
+          >
+            Cancel
+          </Button>
           <Button 
             type="submit" 
             variant="contained" 
             disabled={loading}
-            sx={{ bgcolor: '#228B22', '&:hover': { bgcolor: '#1b6b1b' } }}
+            sx={{ 
+              bgcolor: forestGreen, 
+              '&:hover': { bgcolor: forestGreenHover },
+              '&:disabled': { bgcolor: 'rgba(34, 139, 34, 0.5)' }
+            }}
           >
-            {loading ? <CircularProgress size={24} /> : vehicle ? 'Update' : 'Create'}
+            {loading ? <CircularProgress size={24} color="inherit" /> : vehicle ? 'Update' : 'Create'}
           </Button>
         </DialogActions>
       </form>

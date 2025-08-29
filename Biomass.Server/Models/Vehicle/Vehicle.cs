@@ -13,12 +13,12 @@ namespace Biomass.Server.Models.Vehicle
         [Required]
         [StringLength(50)]
         [Column("vehiclenumber")]
-        public string VehicleNumber { get; set; }
+        public string? VehicleNumber { get; set; }
 
         [Required]
         [StringLength(50)]
         [Column("vehicletype")]
-        public string VehicleType { get; set; }
+        public string? VehicleType { get; set; }
 
         [Column("capacity")]
         public decimal? Capacity { get; set; }
@@ -26,14 +26,14 @@ namespace Biomass.Server.Models.Vehicle
         [Required]
         [StringLength(50)]
         [Column("fueltype")]
-        public string FuelType { get; set; }
+        public string? FuelType { get; set; }
 
         [StringLength(20)]
         [Column("status")]
-        public string Status { get; set; } = "Active";
+        public string? Status { get; set; } = "Active";
 
         [Column("createdon")]
-        public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
+        public DateTime? CreatedOn { get; set; } = DateTime.UtcNow;
 
         [Column("vehicle_reg_number")]
         public string? VehicleRegNumber { get; set; }

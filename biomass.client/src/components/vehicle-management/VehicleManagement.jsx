@@ -156,7 +156,7 @@ const VehicleManagement = () => {
           <TableContainer component={Paper} sx={{ mt: 4 }}>
             <Table>
               <TableHead>
-                <TableRow sx={{ bgcolor: '#f5f5f5' }}>
+                <TableRow sx={{ bgcolor: 'green' }}>
                   <TableCell>Vehicle Number</TableCell>
                   <TableCell>Type</TableCell>
                   <TableCell>Capacity</TableCell>

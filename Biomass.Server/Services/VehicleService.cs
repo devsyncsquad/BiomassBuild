@@ -46,6 +46,9 @@ namespace Biomass.Server.Services
                 Status = request.Status,
                 VehicleRegNumber = request.VehicleRegNumber,
                 VendorId = request.VendorId,
+                CostCenterId = request.CostCenterId,
+                IsWeightAllocated = request.IsWeightAllocated,
+                WeightAllowed = request.WeightAllowed,
                 CreatedOn = DateTime.UtcNow
             };
 
@@ -79,6 +82,9 @@ namespace Biomass.Server.Services
             vehicle.Status = request.Status;
             vehicle.VehicleRegNumber = request.VehicleRegNumber;
             vehicle.VendorId = request.VendorId;
+            vehicle.CostCenterId = request.CostCenterId;
+            vehicle.IsWeightAllocated = request.IsWeightAllocated;
+            vehicle.WeightAllowed = request.WeightAllowed;
 
             // Update driver if provided
             if (request.Driver != null && vehicle.Driver != null)
@@ -131,6 +137,9 @@ namespace Biomass.Server.Services
                 CreatedOn = vehicle.CreatedOn,
                 VehicleRegNumber = vehicle.VehicleRegNumber,
                 VendorId = vehicle.VendorId,
+                CostCenterId = vehicle.CostCenterId,
+                IsWeightAllocated = vehicle.IsWeightAllocated,
+                WeightAllowed = vehicle.WeightAllowed,
                 Driver = vehicle.Driver != null ? new DriverDto
                 {
                     DriverId = vehicle.Driver.DriverId,

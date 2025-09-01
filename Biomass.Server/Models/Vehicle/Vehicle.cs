@@ -41,6 +41,15 @@ namespace Biomass.Server.Models.Vehicle
         [Column("vendorid")]
         public int? VendorId { get; set; }
 
+        [Column("cost_center_id")]
+        public int? CostCenterId { get; set; }
+
+        [Column("is_weight_allocated")]
+        public string? IsWeightAllocated { get; set; }
+
+        [Column("weight_allowed")]
+        public int? WeightAllowed { get; set; }
+
         // Navigation property for Driver
         public virtual Driver.Driver? Driver { get; set; }
     }

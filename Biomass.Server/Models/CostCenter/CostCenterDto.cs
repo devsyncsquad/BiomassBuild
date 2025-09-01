@@ -9,5 +9,6 @@ namespace Biomass.Server.Models.CostCenter
         public int? ParentCostCenterId { get; set; }
         public int? CompanyId { get; set; }
         public DateTime? CreatedAt { get; set; }
+        public List<CostCenterDto> Children { get; set; } = new List<CostCenterDto>();
     }
 }

@@ -86,5 +86,45 @@ namespace Biomass.Server.Services
                 CreatedAt = costCenter.CreatedAt
             };
         }
+
+        public async Task<List<CostCenterDto>> GetActiveParentCostCentersAsync(int? companyId = null)
+        {
+            var response = new List<CostCenterDto>();
+            try
+            {
+                // Get all cost centers for the company (or all if no company specified)
+                var allCostCenters = await _context.CostCenters.AsNoTracking()
+                    .Where(c => !companyId.HasValue || c.CompanyId == companyId)
+                    .OrderBy(c => c.Name)
+                    .ToListAsync();
+
+                // Create lookup dictionaries for efficient processing
+                var costCenterLookup = allCostCenters.ToDictionary(c => c.CostCenterId);
+                var dtoLookup = allCostCenters.ToDictionary(c => c.CostCenterId, c => MapToDto(c));
+
+                // Build the hierarchy
+                foreach (var costCenter in allCostCenters)
+                {
+                    if (costCenter.ParentCostCenterId.HasValue && dtoLookup.ContainsKey(costCenter.ParentCostCenterId.Value))
+                    {
+                        dtoLookup[costCenter.ParentCostCenterId.Value].Children.Add(dtoLookup[costCenter.CostCenterId]);
+                    }
+                }
+
+                // Get only active parent cost centers (those without parents)
+                var parentCostCenters = allCostCenters
+                    .Where(c => c.ParentCostCenterId == null && c.IsActive)
+                    .Select(c => dtoLookup[c.CostCenterId])
+                    .ToList();
+
+                response = parentCostCenters;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception if you have logging configured
+                throw;
+            }
+            return response;
+        }
     }
 }

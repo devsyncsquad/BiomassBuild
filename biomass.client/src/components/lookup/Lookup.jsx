@@ -91,7 +91,7 @@ const Lookup = () => {
   };
 
   // API base URL
-  const API_BASE = 'https://localhost:7084/api/lookups';
+  const API_BASE = 'http://100.42.177.77:88/api/lookups';
 
   // Error boundary function
   const handleError = (error, errorInfo) => {

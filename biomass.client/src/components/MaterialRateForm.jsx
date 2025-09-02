@@ -81,7 +81,7 @@ export const MaterialRateForm = ({ open, onClose, customerId, locationId, locati
 
   const loadCustomers = async () => {
     try {
-      const response = await axios.get('https://localhost:7084/api/customers/GetAllCustomers');
+      const response = await axios.get('http://100.42.177.77:88/api/customers/GetAllCustomers');
       if (response.data.success) {
         setCustomers(response.data.result);
       }
@@ -93,7 +93,7 @@ export const MaterialRateForm = ({ open, onClose, customerId, locationId, locati
   const loadLocationsByCustomer = async (customerId) => {
     if (!customerId) return;
     try {
-      const response = await axios.get(`https://localhost:7084/api/customerlocations/GetLocationsByCustomerId/${customerId}`);
+      const response = await axios.get(`http://100.42.177.77:88/api/customerlocations/GetLocationsByCustomerId/${customerId}`);
       if (response.data.success) {
         setLocations(response.data.result);
       }
@@ -143,8 +143,8 @@ export const MaterialRateForm = ({ open, onClose, customerId, locationId, locati
 
     try {
       const url = isEditing 
-        ? `https://localhost:7084/api/materialrates/UpdateMaterialRate/${materialRateData.rateId}`
-        : 'https://localhost:7084/api/materialrates/CreateMaterialRate';
+        ? `http://100.42.177.77:88/api/materialrates/UpdateMaterialRate/${materialRateData.rateId}`
+        : 'http://100.42.177.77:88/api/materialrates/CreateMaterialRate';
       
       const method = isEditing ? 'put' : 'post';
       

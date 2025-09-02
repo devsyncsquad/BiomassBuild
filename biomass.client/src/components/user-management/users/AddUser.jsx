@@ -287,10 +287,10 @@ const AddUser = ({ userData, setUserData }) => {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Person sx={{ fontSize: '2rem' }} />
             <Box>
-              <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
+              <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5, color: 'white' }}>
                 {userData ? 'Edit User' : 'Add New User'}
               </Typography>
-              <Typography variant="body2" sx={{ opacity: 0.9 }}>
+              <Typography variant="body2" sx={{ opacity: 0.9, color: 'white' }}>
                 {userData ? 'Update user information and permissions' : 'Create a new user account with role assignments'}
               </Typography>
             </Box>

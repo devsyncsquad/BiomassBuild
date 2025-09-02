@@ -85,7 +85,7 @@ const CustomerLocations = ({ customer, onClose }) => {
     const fetchLocations = async () => {
       try {
         // Fetch locations for the selected customer
-        const response = await axios.get(`https://localhost:7084/api/customerlocations/GetLocationsByCustomerId/${customer.customerId}`);
+        const response = await axios.get(`http://100.42.177.77:88/api/customerlocations/GetLocationsByCustomerId/${customer.customerId}`);
         if (response.data.success) {
           setLocations(response.data.result);
         }
@@ -93,7 +93,7 @@ const CustomerLocations = ({ customer, onClose }) => {
         console.error('Error fetching locations:', error);
         // Fallback to get all locations if customer-specific fails
         try {
-          const response = await axios.get('https://localhost:7084/api/customerlocations/GetAllLocations');
+          const response = await axios.get('http://100.42.177.77:88/api/customerlocations/GetAllLocations');
           if (response.data.success) {
             setLocations(response.data.result);
           }
@@ -108,7 +108,7 @@ const CustomerLocations = ({ customer, onClose }) => {
 
   const fetchMaterialRates = async (locationId) => {
     try {
-      const response = await axios.get(`https://localhost:7084/api/materialrates/location/${locationId}`);
+      const response = await axios.get(`http://100.42.177.77:88/api/materialrates/location/${locationId}`);
       if (response.data.success) {
         setMaterialRates(response.data.result);
       } else {
@@ -271,7 +271,7 @@ const CustomerLocations = ({ customer, onClose }) => {
   const handleDeleteLocation = async (locationId) => {
     if (window.confirm('Are you sure you want to delete this location?')) {
       try {
-        await axios.delete(`https://localhost:7084/api/customerlocations/DeleteLocation/${locationId}`);
+        await axios.delete(`http://100.42.177.77:88/api/customerlocations/DeleteLocation/${locationId}`);
         setLocations(prev => prev.filter(loc => loc.locationId !== locationId));
       } catch (error) {
         console.error('Error deleting location:', error);

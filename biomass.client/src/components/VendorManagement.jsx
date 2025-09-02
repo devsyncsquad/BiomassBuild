@@ -208,7 +208,7 @@ const VendorManagement = () => {
 
 
   return (
-    <Box sx={{ p: 0, width: '100%', backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
+    <Box sx={{ p: 0, pt: 3, width: '100%', backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
       {/* Header */}
       <Box sx={{ mb: 4, px: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <Box>
@@ -232,7 +232,7 @@ const VendorManagement = () => {
           startIcon={<AddIcon />}
           onClick={handleAddVendor}
           sx={{
-            bgcolor: '#1976d2',
+            bgcolor: 'green',
             color: 'white',
             borderRadius: '8px',
             textTransform: 'none',
@@ -269,10 +269,10 @@ const VendorManagement = () => {
               <BusinessIcon />
             </Box>
             <Box>
-              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+              <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'white' }}>
                 {stats.total}
               </Typography>
-              <Typography variant="body2">Total Vendors</Typography>
+              <Typography variant="body2" sx={{ color: 'white' }}>Total Vendors</Typography>
             </Box>
           </Box>
         </Grid>
@@ -300,7 +300,7 @@ const VendorManagement = () => {
               <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
                 {stats.active}
               </Typography>
-              <Typography variant="body2">Active Vendors</Typography>
+              <Typography variant="body2" sx={{ color: 'white' }}>Active Vendors</Typography>
             </Box>
           </Box>
         </Grid>
@@ -328,7 +328,7 @@ const VendorManagement = () => {
               <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
                 {stats.pending}
               </Typography>
-              <Typography variant="body2">Pending Review</Typography>
+              <Typography variant="body2" sx={{ color: 'white' }}>Pending Review</Typography>
             </Box>
           </Box>
         </Grid>
@@ -356,7 +356,7 @@ const VendorManagement = () => {
               <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
                 {stats.inactive}
               </Typography>
-              <Typography variant="body2">Inactive</Typography>
+              <Typography variant="body2" sx={{ color: 'white' }}>Inactive</Typography>
             </Box>
           </Box>
         </Grid>

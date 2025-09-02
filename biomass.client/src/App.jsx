@@ -308,7 +308,7 @@ const DashboardHome = () => {
   const dashboardItems = [
     {
       title: "Total Users",
-      value: "150",
+      value: "10",
       icon: "👥",
       color: "#2196F3",
     },
@@ -320,19 +320,19 @@ const DashboardHome = () => {
     },
     {
       title: "Companies",
-      value: "25",
+      value: "04",
       icon: "🏢",
       color: "#FF9800",
     },
     {
       title: "Customers",
-      value: "89",
+      value: "8",
       icon: "👤",
       color: "#9C27B0",
     },
     {
       title: "Vendors",
-      value: "248",
+      value: "28",
       icon: "🏪",
       color: "#E91E63",
     },

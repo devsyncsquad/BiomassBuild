@@ -51,7 +51,7 @@ const DispatchScreen = () => {
 
   const loadLocations = async () => {
     try {
-      const response = await axios.get('https://localhost:7084/api/customerlocations/GetAllLocations');
+      const response = await axios.get('http://100.42.177.77:88/api/customerlocations/GetAllLocations');
       if (response.data.success) {
         setLocations(response.data.result);
       }
@@ -68,7 +68,7 @@ const DispatchScreen = () => {
     setError('');
     
     try {
-      const response = await axios.get(`https://localhost:7084/api/customerlocations/GetLocationCostsForDispatch/${locationId}`);
+      const response = await axios.get(`http://100.42.177.77:88/api/customerlocations/GetLocationCostsForDispatch/${locationId}`);
       if (response.data.success) {
         setLocationCosts(response.data.result);
       } else {

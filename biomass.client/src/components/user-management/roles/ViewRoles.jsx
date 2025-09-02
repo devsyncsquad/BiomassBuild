@@ -47,7 +47,7 @@ const ViewRoles = ({ setInitialData }) => {
     try {
       setLoading(true);
       setError('');
-      const response = await axios.get('https://localhost:7084/api/UserManagement/GetRoleList', {
+      const response = await axios.get('http://100.42.177.77:88/api/UserManagement/GetRoleList', {
         headers: getAuthHeaders()
       });
       
@@ -71,7 +71,7 @@ const ViewRoles = ({ setInitialData }) => {
   const handleDeleteRole = async (roleId) => {
     if (window.confirm('Are you sure you want to delete this role?')) {
       try {
-        const response = await axios.delete(`https://localhost:7084/api/UserManagement/DeleteRoleById?roleId=${roleId}`, {
+        const response = await axios.delete(`http://100.42.177.77:88/api/UserManagement/DeleteRoleById?roleId=${roleId}`, {
           headers: getAuthHeaders()
         });
         

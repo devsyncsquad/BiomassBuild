@@ -469,5 +469,10 @@ namespace Biomass.Server.Services
 			// Return relative path for database storage
 			return $"/uploads/cashbook_receipts/{fileName}";
 		}
-	}
+
+        public Task<ServiceResponse<CashbookDto>> UpdateCashbookStatusAsync(long cashId, string newStatus)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

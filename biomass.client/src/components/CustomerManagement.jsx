@@ -89,7 +89,7 @@ const CustomerManagement = () => {
   // Fetch companies from API
   const fetchCompanies = async () => {
     try {
-      const baseUrl = import.meta.env.VITE_LIVE_APP_BASEURL || 'https://localhost:7084/api';
+      const baseUrl = import.meta.env.VITE_LIVE_APP_BASEURL || 'http://100.42.177.77:88/api';
       const response = await axios.get(`${baseUrl}/Companies/GetAllCompanies`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -132,7 +132,7 @@ const CustomerManagement = () => {
   // Fetch customers from API
   const fetchCustomers = async () => {
     try {
-      const baseUrl = import.meta.env.VITE_LIVE_APP_BASEURL || 'https://localhost:7084/api';
+      const baseUrl = import.meta.env.VITE_LIVE_APP_BASEURL || 'http://100.42.177.77:88/api';
       const response = await axios.get(`${baseUrl}/Customers/GetAllCustomers`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -307,7 +307,7 @@ const CustomerManagement = () => {
       };
 
       let response;
-      const baseUrl = import.meta.env.VITE_LIVE_APP_BASEURL || 'https://localhost:7084/api';
+      const baseUrl = import.meta.env.VITE_LIVE_APP_BASEURL || 'http://100.42.177.77:88/api';
       
       if (isEditing) {
         response = await axios.put(`${baseUrl}/Customers/UpdateCustomer/${selectedCustomer.customerId}`, customerData, {
@@ -384,7 +384,7 @@ const CustomerManagement = () => {
   const handleDeleteCustomer = async (customer) => {
     if (window.confirm(`Are you sure you want to delete ${customer.firstName} ${customer.lastName}?`)) {
       try {
-        const baseUrl = import.meta.env.VITE_LIVE_APP_BASEURL || 'https://localhost:7084/api';
+        const baseUrl = import.meta.env.VITE_LIVE_APP_BASEURL || 'http://100.42.177.77:88/api';
         const response = await axios.delete(`${baseUrl}/Customers/DeleteCustomer/${customer.customerId}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,

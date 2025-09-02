@@ -96,7 +96,7 @@ const CompanyManagement = () => {
   const fetchCompanies = async () => {
     try {
       setLoading(true);
-      const iconUrl = import.meta.env.VITE_LIVE_APP_BASEURL || 'https://localhost:7084/api';
+      const iconUrl = import.meta.env.VITE_LIVE_APP_BASEURL || 'http://100.42.177.77:88/api';
       const response = await fetch(`${iconUrl}/Companies/GetAllCompanies`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -538,7 +538,7 @@ const CompanyManagement = () => {
                           fontWeight: 600,
                           border: '2px solid rgba(255,255,255,0.3)'
                         }}
-                        src={company.logoPath ? `${import.meta.env.VITE_LIVE_APP_BASEURL || 'https://localhost:7084/api'}/Companies/${company.companyId}/logo` : null}
+                        src={company.logoPath ? `${import.meta.env.VITE_LIVE_APP_BASEURL || 'http://100.42.177.77:88/api'}/Companies/${company.companyId}/logo` : null}
                       >
                         {getCompanyInitials(company.companyName)}
                       </Avatar>

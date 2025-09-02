@@ -168,8 +168,8 @@ export const CustomerLocationForm = ({ open, onClose, customerId, locationData =
       const isNewLocation = !locationData || !locationData.locationId;
       
       const url = isNewLocation 
-        ? 'https://localhost:7084/api/customerlocations/CreateLocation'
-        : `https://localhost:7084/api/customerlocations/UpdateLocation/${locationData.locationId}`;
+        ? 'http://100.42.177.77:88/api/customerlocations/CreateLocation'
+        : `http://100.42.177.77:88/api/customerlocations/UpdateLocation/${locationData.locationId}`;
       
       const method = isNewLocation ? 'post' : 'put';
       

@@ -119,7 +119,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
     setError('');
 
     try {
-      const iconUrl = import.meta.env.VITE_LIVE_APP_BASEURL || 'https://localhost:7084/api';
+      const iconUrl = import.meta.env.VITE_LIVE_APP_BASEURL || 'http://100.42.177.77:88/api';
       let response;
 
       if (company) {
@@ -343,7 +343,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
                         fontSize: '2rem',
                         fontWeight: 600
                       }}
-                      src={logoPreview || (company?.logoPath ? `${import.meta.env.VITE_LIVE_APP_BASEURL || 'https://localhost:7084/api'}/Companies/${company.companyId}/logo` : null)}
+                      src={logoPreview || (company?.logoPath ? `${import.meta.env.VITE_LIVE_APP_BASEURL || 'http://100.42.177.77:88/api'}/Companies/${company.companyId}/logo` : null)}
                     >
                       {formData.companyName ? (
                         getCompanyInitials(formData.companyName)

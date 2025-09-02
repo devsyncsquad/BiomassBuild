@@ -66,7 +66,7 @@ const Signup = () => {
         roleId: formData.roleId
       };
 
-      const response = await axios.post('https://localhost:7084/api/UserManagement/SaveUser', userData);
+      const response = await axios.post('http://100.42.177.77:88/api/UserManagement/SaveUser', userData);
       
       if (response.data && response.data.success) {
         alert('Account created successfully! Please login.');

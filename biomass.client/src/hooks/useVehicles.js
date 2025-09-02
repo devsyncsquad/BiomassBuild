@@ -15,7 +15,7 @@ const useVehicles = () => {
   const fetchVehicles = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('https://localhost:7084/api/vehicles');
+      const response = await axios.get('http://100.42.177.77:88/api/vehicles');
       if (response.data.success) {
         setVehicles(response.data.result);
         

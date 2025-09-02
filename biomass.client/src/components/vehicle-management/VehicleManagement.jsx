@@ -98,8 +98,8 @@ const VehicleManagement = () => {
               <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 <CarIcon sx={{ fontSize: 40 }} />
                 <Box>
-                  <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{stats.total}</Typography>
-                  <Typography>Total Vehicles</Typography>
+                  <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'white' }}>{stats.total}</Typography>
+                  <Typography sx={{ color: 'white' }}>Total Vehicles</Typography>
                 </Box>
               </CardContent>
             </Card>
@@ -109,8 +109,8 @@ const VehicleManagement = () => {
               <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 <DriverIcon sx={{ fontSize: 40 }} />
                 <Box>
-                  <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{stats.active}</Typography>
-                  <Typography>Active</Typography>
+                  <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'white' }}>{stats.active}</Typography>
+                  <Typography sx={{ color: 'white' }}>Active</Typography>
                 </Box>
               </CardContent>
             </Card>
@@ -120,8 +120,8 @@ const VehicleManagement = () => {
               <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 <MaintenanceIcon sx={{ fontSize: 40 }} />
                 <Box>
-                  <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{stats.maintenance}</Typography>
-                  <Typography>Maintenance</Typography>
+                  <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'white' }}>{stats.maintenance}</Typography>
+                  <Typography sx={{ color: 'white' }}>Maintenance</Typography>
                 </Box>
               </CardContent>
             </Card>
@@ -131,8 +131,8 @@ const VehicleManagement = () => {
               <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 <InactiveIcon sx={{ fontSize: 40 }} />
                 <Box>
-                  <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{stats.inactive}</Typography>
-                  <Typography>Inactive</Typography>
+                  <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'white' }}>{stats.inactive}</Typography>
+                  <Typography sx={{ color: 'white' }}>Inactive</Typography>
                 </Box>
               </CardContent>
             </Card>

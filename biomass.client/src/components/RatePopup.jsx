@@ -93,7 +93,7 @@ const RatePopup = ({ open, onClose, locationId, locationName, customerId, custom
 
   const loadCustomers = async () => {
     try {
-      const response = await axios.get('https://localhost:7084/api/customers/GetAllCustomers');
+      const response = await axios.get('http://100.42.177.77:88/api/customers/GetAllCustomers');
       if (response.data.success) {
         setCustomers(response.data.result);
       }
@@ -105,7 +105,7 @@ const RatePopup = ({ open, onClose, locationId, locationName, customerId, custom
   const loadLocationsByCustomer = async (customerId) => {
     if (!customerId) return;
     try {
-      const response = await axios.get(`https://localhost:7084/api/customerlocations/GetLocationsByCustomerId/${customerId}`);
+      const response = await axios.get(`http://100.42.177.77:88/api/customerlocations/GetLocationsByCustomerId/${customerId}`);
       if (response.data.success) {
         setLocations(response.data.result);
       }
@@ -117,7 +117,7 @@ const RatePopup = ({ open, onClose, locationId, locationName, customerId, custom
   const loadRatesByLocation = async (locationId) => {
     if (!locationId) return;
     try {
-      const response = await axios.get(`https://localhost:7084/api/materialrates/GetMaterialRatesByLocationId/${locationId}`);
+      const response = await axios.get(`http://100.42.177.77:88/api/materialrates/GetMaterialRatesByLocationId/${locationId}`);
       if (response.data.success) {
         setRates(response.data.result);
       }
@@ -128,7 +128,7 @@ const RatePopup = ({ open, onClose, locationId, locationName, customerId, custom
 
   const loadAllRates = async () => {
     try {
-      const response = await axios.get('https://localhost:7084/api/materialrates/GetAllMaterialRates');
+      const response = await axios.get('http://100.42.177.77:88/api/materialrates/GetAllMaterialRates');
       if (response.data.success) {
         setRates(response.data.result);
       }
@@ -145,7 +145,7 @@ const RatePopup = ({ open, onClose, locationId, locationName, customerId, custom
     }
 
     try {
-      const response = await axios.get('https://localhost:7084/api/materialrates/CheckExistingActiveRates', {
+      const response = await axios.get('http://100.42.177.77:88/api/materialrates/CheckExistingActiveRates', {
         params: {
           customerId: formData.customerId,
           locationId: formData.locationId,
@@ -223,8 +223,8 @@ const RatePopup = ({ open, onClose, locationId, locationName, customerId, custom
 
     try {
       const url = isEditing 
-        ? `https://localhost:7084/api/materialrates/UpdateMaterialRate/${editingRate.rateId}`
-        : 'https://localhost:7084/api/materialrates/CreateMaterialRate';
+        ? `http://100.42.177.77:88/api/materialrates/UpdateMaterialRate/${editingRate.rateId}`
+        : 'http://100.42.177.77:88/api/materialrates/CreateMaterialRate';
       
       const method = isEditing ? 'put' : 'post';
       

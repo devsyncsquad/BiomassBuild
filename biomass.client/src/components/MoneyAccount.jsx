@@ -109,7 +109,7 @@ const MoneyAccount = () => {
       setLoading(true);
       setError(null);
       
-      const baseUrl = import.meta.env.VITE_LIVE_APP_BASEURL || 'https://localhost:7084/api';
+      const baseUrl = import.meta.env.VITE_LIVE_APP_BASEURL || 'http://100.42.177.77:88/api';
       const response = await axios.get(`${baseUrl}/MoneyAccount/GetAllMoneyAccount`, {
         params: {
           page,
@@ -198,7 +198,7 @@ const MoneyAccount = () => {
   const handleViewAccount = async (account) => {
     try {
       setLoading(true);
-      const baseUrl = import.meta.env.VITE_LIVE_APP_BASEURL || 'https://localhost:7084/api';
+      const baseUrl = import.meta.env.VITE_LIVE_APP_BASEURL || 'http://100.42.177.77:88/api';
       const response = await axios.get(`${baseUrl}/MoneyAccount/GetById/${account.moneyAccountId}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -264,7 +264,7 @@ const MoneyAccount = () => {
       setLoading(true);
       setError(null);
 
-      const baseUrl = import.meta.env.VITE_LIVE_APP_BASEURL || 'https://localhost:7084/api';
+      const baseUrl = import.meta.env.VITE_LIVE_APP_BASEURL || 'http://100.42.177.77:88/api';
       let response;
 
       if (isEditMode && selectedAccount) {
@@ -359,7 +359,7 @@ const MoneyAccount = () => {
 
     try {
       setLoading(true);
-      const baseUrl = import.meta.env.VITE_LIVE_APP_BASEURL || 'https://localhost:7084/api';
+      const baseUrl = import.meta.env.VITE_LIVE_APP_BASEURL || 'http://100.42.177.77:88/api';
       const response = await axios.delete(`${baseUrl}/MoneyAccount/DeleteMoneyAccount/${accountToDelete.moneyAccountId}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -385,7 +385,7 @@ const MoneyAccount = () => {
   const handleSetDefault = async (account) => {
     try {
       setLoading(true);
-      const baseUrl = import.meta.env.VITE_LIVE_APP_BASEURL || 'https://localhost:7084/api';
+      const baseUrl = import.meta.env.VITE_LIVE_APP_BASEURL || 'http://100.42.177.77:88/api';
       const response = await axios.put(`${baseUrl}/MoneyAccount/SetDefault/${account.moneyAccountId}`, {}, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,

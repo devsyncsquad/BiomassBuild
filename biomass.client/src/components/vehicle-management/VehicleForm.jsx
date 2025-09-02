@@ -129,7 +129,7 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
       
       const response = await axios({
         method: isUpdate ? 'put' : 'post',
-        url: `https://localhost:7084/api/vehicles${isUpdate ? `/${vehicle.vehicleId}` : ''}`,
+        url: `http://100.42.177.77:88/api/vehicles${isUpdate ? `/${vehicle.vehicleId}` : ''}`,
         data: {
           ...submitData,
           vehicleId: isUpdate ? vehicle.vehicleId : undefined

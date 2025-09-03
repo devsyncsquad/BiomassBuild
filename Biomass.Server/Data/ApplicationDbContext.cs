@@ -13,6 +13,7 @@ using Biomass.Server.Models.Lookup;
 using Biomass.Server.Models.MoneyAccount;
 using Biomass.Server.Models.Vehicle;
 using Biomass.Server.Models.Driver;
+using Biomass.Server.Models.Dispatch;
 
 namespace Biomass.Server.Data
 {
@@ -48,6 +49,7 @@ namespace Biomass.Server.Data
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Cashbook> Cashbooks { get; set; }
         public DbSet<MoneyAccount> MoneyAccounts { get; set; }
+        public DbSet<Dispatch> Dispatches { get; set; }
         public DbSet<VLocationDto> VLocations { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
 {
@@ -487,6 +489,49 @@ namespace Biomass.Server.Data
                 entity.Property(e => e.Meta).HasColumnName("meta").HasColumnType("jsonb");
                 entity.Property(e => e.Status).HasColumnName("status").HasMaxLength(20);
                 entity.Property(e => e.ReceiptPath).HasColumnName("receipt_path").HasMaxLength(500);
+            });
+
+            // Configure Dispatch entity
+            modelBuilder.Entity<Dispatch>(entity =>
+            {
+                entity.ToTable("dispatches");
+                entity.HasKey(e => e.DispatchId);
+                entity.Property(e => e.DispatchId).HasColumnName("dispatchid");
+                entity.Property(e => e.VehicleId).HasColumnName("vehicleid").IsRequired();
+                entity.Property(e => e.LocationId).HasColumnName("locationid").IsRequired();
+                entity.Property(e => e.MaterialType).HasColumnName("materialtype").HasMaxLength(100);
+                entity.Property(e => e.MaterialRate).HasColumnName("materialrate").HasColumnType("numeric(18,2)");
+                entity.Property(e => e.SlipNumber).HasColumnName("slipnumber").HasMaxLength(50);
+                entity.Property(e => e.SlipPicture).HasColumnName("slippicture").HasMaxLength(255);
+                entity.Property(e => e.FirstWeight).HasColumnName("firstweight").HasColumnType("numeric(18,2)");
+                entity.Property(e => e.SecondWeight).HasColumnName("secondweight").HasColumnType("numeric(18,2)");
+                entity.Property(e => e.NetWeight).HasColumnName("netweight").HasColumnType("numeric(18,2)");
+                entity.Property(e => e.LoaderCharges).HasColumnName("loadercharges").HasColumnType("numeric(18,2)");
+                entity.Property(e => e.LoaderChargesAuto).HasColumnName("loaderchargesauto");
+                entity.Property(e => e.LoaderChargesType).HasColumnName("loaderchargestype").HasMaxLength(20);
+                entity.Property(e => e.LaborCharges).HasColumnName("laborcharges").HasColumnType("numeric(18,2)");
+                entity.Property(e => e.LaborChargesAuto).HasColumnName("laborchargesauto");
+                entity.Property(e => e.LaborChargesType).HasColumnName("laborchargestype").HasMaxLength(20);
+                entity.Property(e => e.TransporterRate).HasColumnName("transporterrate").HasColumnType("numeric(18,2)");
+                entity.Property(e => e.TransporterRateAuto).HasColumnName("transporterrateauto");
+                entity.Property(e => e.TransporterChargesType).HasColumnName("transporterchargestype").HasMaxLength(20);
+                entity.Property(e => e.Amount).HasColumnName("amount").HasColumnType("numeric(18,2)");
+                entity.Property(e => e.TotalDeduction).HasColumnName("totaldeduction").HasColumnType("numeric(18,2)");
+                entity.Property(e => e.CreatedBy).HasColumnName("createdby");
+                entity.Property(e => e.CreatedOn).HasColumnName("createdon");
+                entity.Property(e => e.Status).HasColumnName("status").HasMaxLength(20);
+                entity.Property(e => e.PayableWeight).HasColumnName("payable_weight");
+
+                // Configure foreign key relationships
+                entity.HasOne(d => d.Vehicle)
+                      .WithMany()
+                      .HasForeignKey(d => d.VehicleId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(d => d.Location)
+                      .WithMany()
+                      .HasForeignKey(d => d.LocationId)
+                      .OnDelete(DeleteBehavior.Restrict);
             });
         }
     }

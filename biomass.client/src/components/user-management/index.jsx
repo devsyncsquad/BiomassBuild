@@ -48,72 +48,7 @@ const UserManagement = () => {
           bgcolor: "background.default",
         }}
       >
-        <Box
-          sx={{
-            background: "linear-gradient(135deg, #228B22 0%, #006400 100%)",
-            color: "white",
-            p: 4,
-            mb: 3,
-            borderRadius: "0 0 24px 24px",
-            boxShadow: "0 8px 32px rgba(34,139,34,0.2)",
-            position: "relative",
-            overflow: "hidden",
-          }}
-        >
-          {/* Background Pattern */}
-          <Box
-            sx={{
-              position: "absolute",
-              top: 0,
-              right: 0,
-              width: "200px",
-              height: "200px",
-              background:
-                "radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)",
-              borderRadius: "50%",
-              transform: "translate(50%, -50%)",
-            }}
-          />
-          <Box
-            sx={{
-              position: "absolute",
-              bottom: 0,
-              left: 0,
-              width: "150px",
-              height: "150px",
-              background:
-                "radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%)",
-              borderRadius: "50%",
-              transform: "translate(-50%, 50%)",
-            }}
-          />
-
-          <Box
-            sx={{
-              color: "white",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              position: "relative",
-              zIndex: 1,
-            }}
-          >
-            <Box>
-              <Typography
-                variant='h4'
-                gutterBottom
-                sx={{
-                  color: "white",
-                  fontWeight: 700,
-                  mb: 1,
-                  textShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                }}
-              >
-                User Management
-              </Typography>
-            </Box>
-          </Box>
-        </Box>
+      
         {/* <SectionHeader title='User Management' /> */}
 
         {/* Tabs Section */}

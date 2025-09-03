@@ -606,9 +606,7 @@ const CustomerLocations = ({ customer, onClose }) => {
                         >
                           <Avatar
                             sx={{
-                              bgcolor: getTypeColor(
-                                location.locationType || "Warehouse"
-                              ),
+                              bgcolor: "#28C76F",
                               width: 40,
                               height: 40,
                               fontSize: "1rem",

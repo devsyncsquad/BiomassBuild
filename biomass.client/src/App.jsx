@@ -5,10 +5,11 @@ import {
   Route,
   useNavigate,
 } from "react-router-dom";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { SnackbarProvider } from "notistack";
 import Dashboard from "./components/Dashboard";
+import DashboardEnhanced from "./components/DashboardEnhanced";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 import CompanyManagement from "./components/CompanyManagement";
@@ -30,231 +31,9 @@ import {
   Button,
 } from "@mui/material";
 import { isAuthenticated, getCurrentUser, logout } from "./utils/auth";
+import { theme, AppLayout } from "./theme/components";
 
-// Create a professional theme based on Vendor Management styling
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: "#2563eb",
-      light: "#3b82f6",
-      dark: "#1d4ed8",
-    },
-    secondary: {
-      main: "#7c3aed",
-      light: "#8b5cf6",
-      dark: "#6d28d9",
-    },
-    background: {
-      default: "#f5f7fa",
-      paper: "#ffffff",
-    },
-    text: {
-      primary: "#1f2937",
-      secondary: "#6b7280",
-    },
-  },
-  typography: {
-    fontFamily:
-      '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
-    h1: {
-      fontSize: "1.5rem",
-      fontWeight: 700,
-      color: "#1f2937",
-    },
-    h2: {
-      fontSize: "1.25rem",
-      fontWeight: 600,
-      color: "#1f2937",
-    },
-    h3: {
-      fontSize: "1.125rem",
-      fontWeight: 600,
-      color: "#2563eb",
-    },
-    h4: {
-      fontSize: "1rem",
-      fontWeight: 600,
-      color: "#1f2937",
-    },
-    h5: {
-      fontSize: "0.875rem",
-      fontWeight: 600,
-      color: "#1f2937",
-    },
-    h6: {
-      fontSize: "0.8rem",
-      fontWeight: 600,
-      color: "#1f2937",
-    },
-    body1: {
-      fontSize: "0.8rem",
-      color: "#374151",
-    },
-    body2: {
-      fontSize: "0.75rem",
-      color: "#6b7280",
-    },
-    button: {
-      fontSize: "0.8rem",
-      fontWeight: 600,
-      textTransform: "none",
-    },
-  },
-  shape: {
-    borderRadius: 8,
-  },
-  spacing: 4, // Reduce base spacing unit from 8 to 4
-  components: {
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
-          transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-          "&:hover": {
-            transform: "translateY(-2px)",
-            boxShadow: "0 8px 20px rgba(0, 0, 0, 0.1)",
-          },
-        },
-      },
-    },
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 6,
-          textTransform: "none",
-          fontWeight: 600,
-          boxShadow: "none",
-          "&:hover": {
-            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
-          },
-        },
-        contained: {
-          "&:hover": {
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
-          },
-        },
-        sizeSmall: {
-          fontSize: "0.75rem",
-          padding: "4px 12px",
-        },
-      },
-    },
-    MuiTextField: {
-      styleOverrides: {
-        root: {
-          "& .MuiOutlinedInput-root": {
-            borderRadius: 6,
-            "&:hover .MuiOutlinedInput-notchedOutline": {
-              borderColor: "#2563eb",
-            },
-            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-              borderColor: "#2563eb",
-              borderWidth: 2,
-            },
-          },
-          "& .MuiInputLabel-root": {
-            fontSize: "0.8rem",
-          },
-        },
-      },
-    },
-    MuiTable: {
-      styleOverrides: {
-        root: {
-          "& .MuiTableHead-root": {
-            background: "linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)",
-            "& .MuiTableCell-root": {
-              color: "white",
-              fontWeight: 600,
-              fontSize: "0.8rem",
-              borderBottom: "none",
-              padding: "8px 12px",
-            },
-          },
-          "& .MuiTableBody-root .MuiTableCell-root": {
-            fontSize: "0.8rem",
-            padding: "8px 12px",
-            borderBottom: "1px solid #f3f4f6",
-          },
-          "& .MuiTableRow-root:hover": {
-            backgroundColor: "#f8fafc",
-          },
-        },
-      },
-    },
-    MuiChip: {
-      styleOverrides: {
-        root: {
-          borderRadius: 4,
-          fontSize: "0.7rem",
-          fontWeight: 600,
-          padding: "2px 6px",
-          transition: "all 0.2s ease",
-          "&:hover": {
-            transform: "scale(1.05)",
-          },
-        },
-        sizeSmall: {
-          fontSize: "0.65rem",
-          height: 20,
-        },
-      },
-    },
-    MuiDialog: {
-      styleOverrides: {
-        paper: {
-          borderRadius: 12,
-          boxShadow: "0 12px 24px rgba(0, 0, 0, 0.15)",
-        },
-      },
-    },
-    MuiTabs: {
-      styleOverrides: {
-        root: {
-          "& .MuiTab-root": {
-            fontSize: "0.8rem",
-            fontWeight: 600,
-            textTransform: "none",
-            minHeight: 40,
-          },
-          "& .MuiTab-root.Mui-selected": {
-            color: "#2563eb",
-          },
-          "& .MuiTabs-indicator": {
-            background: "linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)",
-            height: 2,
-          },
-        },
-      },
-    },
-    MuiIconButton: {
-      styleOverrides: {
-        root: {
-          padding: 4,
-          "&.MuiIconButton-sizeSmall": {
-            padding: 2,
-          },
-        },
-      },
-    },
-    MuiAvatar: {
-      styleOverrides: {
-        root: {
-          fontSize: "0.8rem",
-        },
-      },
-    },
-    MuiAlert: {
-      styleOverrides: {
-        root: {
-          fontSize: "0.8rem",
-          padding: "8px 12px",
-        },
-      },
-    },
-  },
-});
+// Using Vuexy-inspired theme from design system
 
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
@@ -265,7 +44,7 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
-// Layout component that wraps content with Dashboard sidebar
+// Layout component that wraps content with AppLayout
 const Layout = ({ children }) => {
   const [user, setUser] = useState(() => {
     return isAuthenticated() ? getCurrentUser() : null;
@@ -295,9 +74,9 @@ const Layout = ({ children }) => {
   }
 
   return (
-    <Dashboard user={user} onLogout={handleLogout}>
+    <AppLayout user={user} onLogout={handleLogout}>
       {children}
-    </Dashboard>
+    </AppLayout>
   );
 };
 
@@ -630,7 +409,7 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Layout>
-                    <DashboardHome />
+                    <DashboardEnhanced />
                   </Layout>
                 </ProtectedRoute>
               }

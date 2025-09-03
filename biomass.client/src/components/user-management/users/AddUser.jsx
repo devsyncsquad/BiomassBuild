@@ -314,7 +314,7 @@ const AddUser = ({ userData, setUserData }) => {
             <Box>
               <Typography
                 variant='h5'
-                sx={{ fontWeight: 700, mb: 0.5, color: "white" }}
+                sx={{ fontWeight: 500, mb: 0.5, color: "white" }}
               >
                 {userData ? "Edit User" : "Add New User"}
               </Typography>

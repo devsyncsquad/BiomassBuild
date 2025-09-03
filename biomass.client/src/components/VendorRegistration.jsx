@@ -218,13 +218,14 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave, onEdit 
       PaperProps={{
         sx: {
           borderRadius: 3,
-          minHeight: '80vh'
+          minHeight: '80vh',
+          backgroundColor: '#f8f9fa',
         }
       }}
     >
       <DialogTitle 
         sx={{ 
-          background: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
+          background: 'linear-gradient(135deg, #228B22 0%, #228B22 100%)',
           color: 'white',
           display: 'flex',
           justifyContent: 'space-between',
@@ -496,9 +497,9 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave, onEdit 
               variant="contained"
               onClick={() => onEdit(vendor)}
               sx={{
-                background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+                background: 'linear-gradient(135deg, #228B22 0%, #006400 100%)',
                 '&:hover': {
-                  background: 'linear-gradient(135deg, #1d4ed8 0%, #6d28d9 100%)',
+                  background: 'linear-gradient(135deg, #1b6b1b 0%, #004d00 100%)',
                 }
               }}
             >
@@ -509,9 +510,9 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave, onEdit 
               variant="contained"
               onClick={handleSave}
               sx={{
-                background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+                background: 'linear-gradient(135deg, #228B22 0%, #006400 100%)',
                 '&:hover': {
-                  background: 'linear-gradient(135deg, #1d4ed8 0%, #6d28d9 100%)',
+                  background: 'linear-gradient(135deg, #1b6b1b 0%, #004d00 100%)',
                 }
               }}
             >

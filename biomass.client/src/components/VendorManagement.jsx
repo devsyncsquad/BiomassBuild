@@ -42,6 +42,9 @@ import {
   useVendorStats,
 } from "../hooks/useVendors";
 import { debounce } from "lodash";
+import { colors, borderRadius } from "../theme/theme";
+import { green } from "@mui/material/colors";
+import { dark } from "@mui/material/styles/createPalette";
 
 const VendorManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -247,7 +250,7 @@ const VendorManagement = () => {
         sx={{
           background: "linear-gradient(135deg, #228B22 0%, #006400 100%)",
           color: "white",
-          p: 4,
+          p: 3,
           mb: 3,
           borderRadius: "0 0 24px 24px",
           boxShadow: "0 8px 32px rgba(34,139,34,0.2)",
@@ -307,12 +310,13 @@ const VendorManagement = () => {
               Vendor Management
             </Typography>
             <Typography
-              variant='h6'
+              variant='body1'
               sx={{
                 color: "white",
                 opacity: 0.9,
                 fontWeight: 300,
                 textShadow: "0 1px 2px rgba(0,0,0,0.1)",
+                fontSize: "0.9rem",
               }}
             >
               Manage your vendor relationships, track performance, and
@@ -382,149 +386,7 @@ const VendorManagement = () => {
         </Button>
       </Box> */}
 
-      {/* Statistics Cards */}
-      <Grid container spacing={3} sx={{ mb: 4, px: 3 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Box
-            sx={{
-              bgcolor: "#228B22",
-              borderRadius: 2,
-              p: 2.5,
-              color: "white",
-              display: "flex",
-              alignItems: "center",
-              gap: 2,
-              boxShadow: "0 2px 4px rgba(34, 139, 34, 0.2)",
-            }}
-          >
-            <Box
-              sx={{
-                bgcolor: "rgba(255, 255, 255, 0.1)",
-                borderRadius: 1,
-                p: 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <BusinessIcon />
-            </Box>
-            <Box>
-              <Typography
-                variant='h4'
-                sx={{ fontWeight: "bold", color: "white" }}
-              >
-                {stats.total}
-              </Typography>
-              <Typography variant='body2' sx={{ color: "white" }}>
-                Total Vendors
-              </Typography>
-            </Box>
-          </Box>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Box
-            sx={{
-              bgcolor: "#2e7d32",
-              borderRadius: 2,
-              p: 2,
-              color: "white",
-              display: "flex",
-              alignItems: "center",
-              gap: 2,
-            }}
-          >
-            <Box
-              sx={{
-                bgcolor: "rgba(255, 255, 255, 0.1)",
-                borderRadius: 1,
-                p: 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <CheckCircleIcon />
-            </Box>
-            <Box>
-              <Typography variant='h4' sx={{ fontWeight: "bold" }}>
-                {stats.active}
-              </Typography>
-              <Typography variant='body2' sx={{ color: "white" }}>
-                Active Vendors
-              </Typography>
-            </Box>
-          </Box>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Box
-            sx={{
-              bgcolor: "#ff9800",
-              borderRadius: 2,
-              p: 2,
-              color: "white",
-              display: "flex",
-              alignItems: "center",
-              gap: 2,
-            }}
-          >
-            <Box
-              sx={{
-                bgcolor: "rgba(255, 255, 255, 0.1)",
-                borderRadius: 1,
-                p: 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <WarningIcon />
-            </Box>
-            <Box>
-              <Typography variant='h4' sx={{ fontWeight: "bold" }}>
-                {stats.pending}
-              </Typography>
-              <Typography variant='body2' sx={{ color: "white" }}>
-                Pending Review
-              </Typography>
-            </Box>
-          </Box>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Box
-            sx={{
-              bgcolor: "#d32f2f",
-              borderRadius: 2,
-              p: 2,
-              color: "white",
-              display: "flex",
-              alignItems: "center",
-              gap: 2,
-            }}
-          >
-            <Box
-              sx={{
-                bgcolor: "rgba(255, 255, 255, 0.1)",
-                borderRadius: 1,
-                p: 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <CancelIcon />
-            </Box>
-            <Box>
-              <Typography variant='h4' sx={{ fontWeight: "bold" }}>
-                {stats.inactive}
-              </Typography>
-              <Typography variant='body2' sx={{ color: "white" }}>
-                Inactive
-              </Typography>
-            </Box>
-          </Box>
-        </Grid>
-      </Grid>
+     
 
       {/* Search and Filter Section */}
       <Box sx={{ mb: 3, px: 3 }}>
@@ -538,97 +400,28 @@ const VendorManagement = () => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position='start'>
-                      <SearchIcon sx={{ color: "#666" }} />
+                      <SearchIcon sx={{ color: colors.text.secondary }} />
                     </InputAdornment>
                   ),
                 }}
                 sx={{
                   "& .MuiOutlinedInput-root": {
-                    backgroundColor: "white",
-                    borderRadius: "8px",
+                    backgroundColor: colors.background.paper,
+                    borderRadius: borderRadius.md,
                     "& fieldset": {
-                      borderColor: "rgba(0,0,0,0.1)",
+                      borderColor: colors.gray[200],
                     },
                     "&:hover fieldset": {
-                      borderColor: "#228B22",
+                      borderColor: colors.primary.main,
                     },
                     "&.Mui-focused fieldset": {
-                      borderColor: "#228B22",
+                      borderColor: colors.primary.main,
                     },
                   },
                 }}
               />
-              <Button
-                variant='contained'
-                color='success'
-                startIcon={<CheckCircleIcon />}
-                onClick={() => handleStatusChange("Active")}
-                sx={{
-                  backgroundColor:
-                    selectedStatus === "Active" ? "#2e7d32" : "#e0e0e0",
-                  color: selectedStatus === "Active" ? "white" : "black",
-                  borderRadius: "8px",
-                  textTransform: "none",
-                }}
-              >
-                Active
-              </Button>
-              <Button
-                variant='contained'
-                color='warning'
-                startIcon={<WarningIcon />}
-                onClick={() => handleStatusChange("Pending")}
-                sx={{
-                  backgroundColor:
-                    selectedStatus === "Pending" ? "#ed6c02" : "#e0e0e0",
-                  color: selectedStatus === "Pending" ? "white" : "black",
-                  borderRadius: "8px",
-                  textTransform: "none",
-                }}
-              >
-                Pending
-              </Button>
-              <Button
-                variant='contained'
-                color='error'
-                startIcon={<CancelIcon />}
-                onClick={() => handleStatusChange("Inactive")}
-                sx={{
-                  backgroundColor:
-                    selectedStatus === "Inactive" ? "#d32f2f" : "#e0e0e0",
-                  color: selectedStatus === "Inactive" ? "white" : "black",
-                  borderRadius: "8px",
-                  textTransform: "none",
-                }}
-              >
-                Inactive
-              </Button>
-              <Box sx={{ display: "flex", gap: 1, marginLeft: "auto" }}>
-                <IconButton
-                  onClick={() => setViewMode("grid")}
-                  sx={{
-                    bgcolor: viewMode === "grid" ? "#228B22" : "transparent",
-                    color: viewMode === "grid" ? "white" : "inherit",
-                    "&:hover": {
-                      bgcolor: viewMode === "grid" ? "#1b5e20" : "#e0e0e0",
-                    },
-                  }}
-                >
-                  <GridViewIcon />
-                </IconButton>
-                <IconButton
-                  onClick={() => setViewMode("list")}
-                  sx={{
-                    bgcolor: viewMode === "list" ? "#228B22" : "transparent",
-                    color: viewMode === "list" ? "white" : "inherit",
-                    "&:hover": {
-                      bgcolor: viewMode === "list" ? "#1b5e20" : "#e0e0e0",
-                    },
-                  }}
-                >
-                  <ViewListIcon />
-                </IconButton>
-              </Box>
+             
+             
             </Box>
           </Grid>
         </Grid>
@@ -640,9 +433,9 @@ const VendorManagement = () => {
           <Grid item xs={12} sm={6} md={4} key={vendor.vendorId}>
             <Card
               sx={{
-                bgcolor: "white",
-                borderRadius: 2,
-                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                bgcolor: colors.background.paper,
+                borderRadius: borderRadius.lg,
+                boxShadow: `0 1px 3px ${colors.gray[200]}`,
                 transition: "all 0.2s",
                 height: "100%",
                 display: "flex",
@@ -658,8 +451,8 @@ const VendorManagement = () => {
                   flex: 1, // Take remaining space
                   display: "flex",
                   flexDirection: "column",
-                  bgcolor: "white",
-                  color: "#228B22",
+                  bgcolor: colors.background.paper,
+                  color: colors.primary.main,
                 }}
               >
                 <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
@@ -667,10 +460,10 @@ const VendorManagement = () => {
                     sx={{
                       bgcolor:
                         vendor.status === "Active"
-                          ? "#2e7d32"
+                          ? colors.success.main
                           : vendor.status === "Pending"
-                          ? "#ff9800"
-                          : "#d32f2f",
+                          ? colors.warning.main
+                          : colors.error.main,
                       mr: 2,
                     }}
                   >
@@ -681,7 +474,7 @@ const VendorManagement = () => {
                       variant='h6'
                       sx={{
                         fontWeight: 600,
-                        color: "#333",
+                        color: colors.text.primary,
                         fontSize: "1rem",
                         mb: 0.5,
                       }}
@@ -691,7 +484,7 @@ const VendorManagement = () => {
                     <Typography
                       variant='body2'
                       sx={{
-                        color: "#666",
+                        color: colors.text.secondary,
                         fontSize: "0.875rem",
                       }}
                     >
@@ -722,7 +515,7 @@ const VendorManagement = () => {
                   sx={{
                     mb: 2,
                     mt: "auto",
-                    borderTop: "1px solid rgba(0,0,0,0.1)",
+                    borderTop: `1px solid ${colors.gray[200]}`,
                     pt: 2,
                   }}
                 >
@@ -730,7 +523,7 @@ const VendorManagement = () => {
                     variant='body2'
                     sx={{
                       mb: 0.5,
-                      color: "#666",
+                      color: colors.text.secondary,
                       fontSize: "0.875rem",
                     }}
                   >
@@ -741,7 +534,7 @@ const VendorManagement = () => {
                       variant='body2'
                       sx={{
                         mb: 0.5,
-                        color: "#666",
+                        color: colors.text.secondary,
                         fontSize: "0.875rem",
                       }}
                     >
@@ -751,7 +544,7 @@ const VendorManagement = () => {
                   <Typography
                     variant='body2'
                     sx={{
-                      color: "#666",
+                      color: colors.text.secondary,
                       fontSize: "0.875rem",
                     }}
                   >
@@ -766,12 +559,12 @@ const VendorManagement = () => {
                     fullWidth
                     onClick={() => handleViewDetails(vendor)}
                     sx={{
-                      bgcolor: "#228B22",
+                      bgcolor: '#228B22',
                       color: "white",
                       fontWeight: 500,
                       fontSize: "0.875rem",
                       "&:hover": {
-                        bgcolor: "#1b6b1b",
+                        bgcolor: '#1b6b1b',
                       },
                     }}
                   >
@@ -789,8 +582,8 @@ const VendorManagement = () => {
         sx={{
           mt: 6,
           p: 3,
-          bgcolor: "white",
-          borderRadius: 2,
+          bgcolor: colors.background.paper,
+          borderRadius: borderRadius.lg,
           boxShadow: 1,
           mx: 3,
         }}

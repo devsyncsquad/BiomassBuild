@@ -340,10 +340,113 @@ const DashboardHome = () => {
 
   return (
     <Box sx={{ p: 0 }}>
-      <Typography variant='h4' gutterBottom sx={{ p: 3, pb: 1 }}>
+      {/* <Typography variant='h4' gutterBottom sx={{ p: 3, pb: 1 }}>
         Dashboard Overview
-      </Typography>
+      </Typography> */}
+      <Box
+        sx={{
+          background: "linear-gradient(135deg, #228B22 0%, #006400 100%)",
+          color: "white",
+          p: 4,
+          mb: 3,
+          borderRadius: "0 0 24px 24px",
+          boxShadow: "0 8px 32px rgba(34,139,34,0.2)",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        {/* Background Pattern */}
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            width: "200px",
+            height: "200px",
+            background:
+              "radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)",
+            borderRadius: "50%",
+            transform: "translate(50%, -50%)",
+          }}
+        />
+        <Box
+          sx={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            width: "150px",
+            height: "150px",
+            background:
+              "radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%)",
+            borderRadius: "50%",
+            transform: "translate(-50%, 50%)",
+          }}
+        />
 
+        <Box
+          sx={{
+            color: "white",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            position: "relative",
+            zIndex: 1,
+          }}
+        >
+          <Box>
+            <Typography
+              variant='h4'
+              gutterBottom
+              sx={{
+                color: "white",
+                fontWeight: 700,
+                mb: 1,
+                textShadow: "0 2px 4px rgba(0,0,0,0.1)",
+              }}
+            >
+              Dashboard
+            </Typography>
+            {/* <Typography
+              variant='h6'
+              sx={{
+                color: "white",
+                opacity: 0.9,
+                fontWeight: 300,
+                textShadow: "0 1px 2px rgba(0,0,0,0.1)",
+              }}
+            >
+              Manage your vendor relationships, track performance, and
+              streamline procurement processes.
+            </Typography> */}
+          </Box>
+          {/* <Button
+            variant='contained'
+            startIcon={<AddIcon />}
+            onClick={handleAddVendor}
+            size='large'
+            sx={{
+              borderRadius: 3,
+              px: 4,
+              py: 1.5,
+              fontSize: "1rem",
+              fontWeight: 600,
+              background: "rgba(255,255,255,0.2)",
+              backdropFilter: "blur(10px)",
+              border: "1px solid rgba(255,255,255,0.3)",
+              color: "white",
+              boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
+              "&:hover": {
+                background: "rgba(255,255,255,0.3)",
+                transform: "translateY(-2px)",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
+              },
+              transition: "all 0.3s ease",
+            }}
+          >
+            Add New Vendor
+          </Button> */}
+        </Box>
+      </Box>
       <Grid container spacing={3} sx={{ mb: 4, px: 3 }}>
         {dashboardItems.map((item, index) => (
           <Grid item xs={12} sm={6} md={3} key={index}>

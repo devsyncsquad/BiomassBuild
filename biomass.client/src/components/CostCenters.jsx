@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import {
   Box,
   Button,
@@ -29,22 +29,22 @@ import {
   TablePagination,
   TextField,
   Typography,
-  Chip
-} from '@mui/material';
+  Chip,
+} from "@mui/material";
 import {
   Add as AddIcon,
   Edit as EditIcon,
   FilterList as FilterIcon,
-  AccountTree as AccountTreeIcon
-} from '@mui/icons-material';
-import { useSnackbar } from 'notistack';
-import { getApiBaseUrl } from '../config/config';
+  AccountTree as AccountTreeIcon,
+} from "@mui/icons-material";
+import { useSnackbar } from "notistack";
+import { getApiBaseUrl } from "../config/config";
 
 const CostCenters = () => {
   const { enqueueSnackbar } = useSnackbar();
   const [costCenters, setCostCenters] = useState([]);
   const [filteredCostCenters, setFilteredCostCenters] = useState([]);
-  const [filterType, setFilterType] = useState('all');
+  const [filterType, setFilterType] = useState("all");
   const [openDialog, setOpenDialog] = useState(false);
   const [editingCostCenter, setEditingCostCenter] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -57,9 +57,9 @@ const CostCenters = () => {
 
   // Form state
   const [formData, setFormData] = useState({
-    name: '',
+    name: "",
     parentCostCenterId: null,
-    hasParent: false
+    hasParent: false,
   });
 
   useEffect(() => {
@@ -78,39 +78,49 @@ const CostCenters = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      console.log('Fetching cost centers from API...');
+      console.log("Fetching cost centers from API...");
       const apiBaseUrl = getApiBaseUrl();
       const fullUrl = `${apiBaseUrl}/cost-centers/GetAllCostCentersView`;
-      console.log('API Base URL from config:', apiBaseUrl);
-      console.log('Full API URL:', fullUrl);
-      console.log('Current window location:', window.location.href);
-      
+      console.log("API Base URL from config:", apiBaseUrl);
+      console.log("Full API URL:", fullUrl);
+      console.log("Current window location:", window.location.href);
+
       const response = await axios.get(fullUrl);
-      console.log('API Response:', response);
-      console.log('Response data:', response.data);
-      console.log('Response status:', response.status);
-      
+      console.log("API Response:", response);
+      console.log("Response data:", response.data);
+      console.log("Response status:", response.status);
+
       // The API returns { "result": [...] } directly, not wrapped in success property
       if (response.data?.result && Array.isArray(response.data.result)) {
-        console.log('Setting cost centers:', response.data.result);
+        console.log("Setting cost centers:", response.data.result);
         setCostCenters(response.data.result || []);
       } else {
-        console.log('API returned no result array');
-        console.log('API data structure:', response.data);
-        enqueueSnackbar('No cost center data received from API', { variant: 'warning' });
+        console.log("API returned no result array");
+        console.log("API data structure:", response.data);
+        enqueueSnackbar("No cost center data received from API", {
+          variant: "warning",
+        });
       }
     } catch (error) {
-      console.error('Error loading cost centers:', error);
-      console.error('Error response:', error.response);
-      console.error('Error message:', error.message);
-      console.error('Error config:', error.config);
-      
-      if (error.code === 'ERR_NETWORK') {
-        enqueueSnackbar('Network error: Unable to connect to API server. Check if backend is running on port 7084.', { variant: 'error' });
+      console.error("Error loading cost centers:", error);
+      console.error("Error response:", error.response);
+      console.error("Error message:", error.message);
+      console.error("Error config:", error.config);
+
+      if (error.code === "ERR_NETWORK") {
+        enqueueSnackbar(
+          "Network error: Unable to connect to API server. Check if backend is running on port 7084.",
+          { variant: "error" }
+        );
       } else if (error.response?.status === 404) {
-        enqueueSnackbar('API endpoint not found. Check if the backend route exists.', { variant: 'error' });
+        enqueueSnackbar(
+          "API endpoint not found. Check if the backend route exists.",
+          { variant: "error" }
+        );
       } else {
-        enqueueSnackbar(`Error loading cost centers: ${error.message}`, { variant: 'error' });
+        enqueueSnackbar(`Error loading cost centers: ${error.message}`, {
+          variant: "error",
+        });
       }
     } finally {
       setLoading(false);
@@ -118,25 +128,25 @@ const CostCenters = () => {
   };
 
   const applyFilter = () => {
-    console.log('Applying filter. Filter type:', filterType);
-    console.log('Total cost centers:', costCenters.length);
-    console.log('Cost centers data:', costCenters);
-    
+    console.log("Applying filter. Filter type:", filterType);
+    console.log("Total cost centers:", costCenters.length);
+    console.log("Cost centers data:", costCenters);
+
     let filtered = [...costCenters];
-    
+
     switch (filterType) {
-      case 'parent':
-        filtered = costCenters.filter(cc => !cc.isChild); // Changed from is_child to isChild
+      case "parent":
+        filtered = costCenters.filter((cc) => !cc.isChild); // Changed from is_child to isChild
         break;
-      case 'child':
-        filtered = costCenters.filter(cc => cc.isChild); // Changed from is_child to isChild
+      case "child":
+        filtered = costCenters.filter((cc) => cc.isChild); // Changed from is_child to isChild
         break;
       default:
         filtered = costCenters;
         break;
     }
-    
-    console.log('Filtered results:', filtered);
+
+    console.log("Filtered results:", filtered);
     setFilteredCostCenters(filtered);
   };
 
@@ -161,9 +171,9 @@ const CostCenters = () => {
     setIsEditMode(false);
     setEditingCostCenter(null);
     setFormData({
-      name: '',
+      name: "",
       parentCostCenterId: null,
-      hasParent: false
+      hasParent: false,
     });
     setOpenDialog(true);
   };
@@ -174,7 +184,7 @@ const CostCenters = () => {
     setFormData({
       name: costCenter.name,
       parentCostCenterId: costCenter.parentCostCenterId, // Changed from parent_cost_center_id
-      hasParent: !!costCenter.parentCostCenterId
+      hasParent: !!costCenter.parentCostCenterId,
     });
     setOpenDialog(true);
   };
@@ -184,15 +194,15 @@ const CostCenters = () => {
     setEditingCostCenter(null);
     setIsEditMode(false);
     setFormData({
-      name: '',
+      name: "",
       parentCostCenterId: null,
-      hasParent: false
+      hasParent: false,
     });
   };
 
   const generateCode = (name, costCenterId) => {
-    if (!name || !costCenterId) return '';
-    
+    if (!name || !costCenterId) return "";
+
     // Get first 3 letters of name, uppercase
     const abbreviation = name.substring(0, 3).toUpperCase();
     return `${abbreviation}_${costCenterId}`;
@@ -200,73 +210,107 @@ const CostCenters = () => {
 
   const handleSave = async () => {
     if (!formData.name.trim()) {
-      enqueueSnackbar('Name is required', { variant: 'warning' });
+      enqueueSnackbar("Name is required", { variant: "warning" });
       return;
     }
 
     setSaving(true);
     try {
       const apiBaseUrl = getApiBaseUrl();
-      
+
       if (isEditMode) {
         // Update existing cost center
         const updateData = {
           costCenterId: editingCostCenter.costCenterId,
           name: formData.name.trim(),
-          parentCostCenterId: formData.hasParent ? formData.parentCostCenterId : null,
+          parentCostCenterId: formData.hasParent
+            ? formData.parentCostCenterId
+            : null,
           isActive: editingCostCenter.isActive,
-          code: editingCostCenter.code // Keep existing code
+          code: editingCostCenter.code, // Keep existing code
         };
 
-        console.log('Updating cost center:', updateData);
-        const response = await axios.put(`${apiBaseUrl}/CostCenters/UpdateCostCenter/${editingCostCenter.costCenterId}`, updateData);
-        
+        console.log("Updating cost center:", updateData);
+        const response = await axios.put(
+          `${apiBaseUrl}/CostCenters/UpdateCostCenter/${editingCostCenter.costCenterId}`,
+          updateData
+        );
+
         if (response.data?.success) {
           // Update local state with the response data
           const updatedCostCenter = response.data.result;
-          setCostCenters(prev => prev.map(cc => 
-            cc.costCenterId === editingCostCenter.costCenterId ? updatedCostCenter : cc
-          ));
-          
-          enqueueSnackbar('Cost center updated successfully', { variant: 'success' });
+          setCostCenters((prev) =>
+            prev.map((cc) =>
+              cc.costCenterId === editingCostCenter.costCenterId
+                ? updatedCostCenter
+                : cc
+            )
+          );
+
+          enqueueSnackbar("Cost center updated successfully", {
+            variant: "success",
+          });
         } else {
-          enqueueSnackbar(response.data?.message || 'Failed to update cost center', { variant: 'error' });
+          enqueueSnackbar(
+            response.data?.message || "Failed to update cost center",
+            { variant: "error" }
+          );
         }
       } else {
         // Create new cost center
         const createData = {
           name: formData.name.trim(),
-          parentCostCenterId: formData.hasParent ? formData.parentCostCenterId : null,
-          isActive: true
+          parentCostCenterId: formData.hasParent
+            ? formData.parentCostCenterId
+            : null,
+          isActive: true,
         };
 
-        console.log('Creating cost center:', createData);
-        const response = await axios.post(`${apiBaseUrl}/CostCenters/CreateCostCenter`, createData);
-        
+        console.log("Creating cost center:", createData);
+        const response = await axios.post(
+          `${apiBaseUrl}/CostCenters/CreateCostCenter`,
+          createData
+        );
+
         if (response.data?.success) {
           // Add new cost center to local state
           const newCostCenter = response.data.result;
-          setCostCenters(prev => [...prev, newCostCenter]);
-          
-          enqueueSnackbar('Cost center created successfully', { variant: 'success' });
+          setCostCenters((prev) => [...prev, newCostCenter]);
+
+          enqueueSnackbar("Cost center created successfully", {
+            variant: "success",
+          });
         } else {
-          enqueueSnackbar(response.data?.message || 'Failed to create cost center', { variant: 'error' });
+          enqueueSnackbar(
+            response.data?.message || "Failed to create cost center",
+            { variant: "error" }
+          );
         }
       }
 
       handleCloseDialog();
     } catch (error) {
-      console.error('Error saving cost center:', error);
-      console.error('Error response:', error.response);
-      
+      console.error("Error saving cost center:", error);
+      console.error("Error response:", error.response);
+
       if (error.response?.status === 400) {
-        enqueueSnackbar(error.response.data?.message || 'Validation error. Please check your input.', { variant: 'error' });
+        enqueueSnackbar(
+          error.response.data?.message ||
+            "Validation error. Please check your input.",
+          { variant: "error" }
+        );
       } else if (error.response?.status === 404) {
-        enqueueSnackbar('Cost center not found. It may have been deleted.', { variant: 'error' });
-      } else if (error.code === 'ERR_NETWORK') {
-        enqueueSnackbar('Network error: Unable to connect to API server.', { variant: 'error' });
+        enqueueSnackbar("Cost center not found. It may have been deleted.", {
+          variant: "error",
+        });
+      } else if (error.code === "ERR_NETWORK") {
+        enqueueSnackbar("Network error: Unable to connect to API server.", {
+          variant: "error",
+        });
       } else {
-        enqueueSnackbar(`Error saving cost center: ${error.message}`, { variant: 'error' });
+        enqueueSnackbar(`Error saving cost center: ${error.message}`, {
+          variant: "error",
+        });
       }
     } finally {
       setSaving(false);
@@ -274,21 +318,124 @@ const CostCenters = () => {
   };
 
   const getParentCostCenters = () => {
-    return costCenters.filter(cc => !cc.isChild); // Changed from is_child
+    return costCenters.filter((cc) => !cc.isChild); // Changed from is_child
   };
 
   const getStatusColor = (isChild) => {
-    return isChild ? 'warning' : 'success';
+    return isChild ? "warning" : "success";
   };
 
   const getStatusLabel = (isChild) => {
-    return isChild ? 'Child' : 'Parent';
+    return isChild ? "Child" : "Parent";
   };
 
   return (
-    <Box sx={{ p: 3, backgroundColor: '#f8fffa', minHeight: '100vh' }}>
+    <Box sx={{ p: 0, backgroundColor: "#f8fffa", minHeight: "100vh" }}>
       {/* Header */}
-      <Box sx={{ mb: 4 }}>
+      <Box
+        sx={{
+          background: "linear-gradient(135deg, #228B22 0%, #006400 100%)",
+          color: "white",
+          p: 4,
+          mb: 3,
+          borderRadius: "0 0 24px 24px",
+          boxShadow: "0 8px 32px rgba(34,139,34,0.2)",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        {/* Background Pattern */}
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            width: "200px",
+            height: "200px",
+            background:
+              "radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)",
+            borderRadius: "50%",
+            transform: "translate(50%, -50%)",
+          }}
+        />
+        <Box
+          sx={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            width: "150px",
+            height: "150px",
+            background:
+              "radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%)",
+            borderRadius: "50%",
+            transform: "translate(-50%, 50%)",
+          }}
+        />
+
+        <Box
+          sx={{
+            color: "white",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            position: "relative",
+            zIndex: 1,
+          }}
+        >
+          <Box>
+            <Typography
+              variant='h4'
+              gutterBottom
+              sx={{
+                color: "white",
+                fontWeight: 700,
+                mb: 1,
+                textShadow: "0 2px 4px rgba(0,0,0,0.1)",
+              }}
+            >
+              Cost Centers
+            </Typography>
+            <Typography
+              variant='h6'
+              sx={{
+                color: "white",
+                opacity: 0.9,
+                fontWeight: 300,
+                textShadow: "0 1px 2px rgba(0,0,0,0.1)",
+              }}
+            >
+              Manage your cost center hierarchy and organizational structure
+            </Typography>
+          </Box>
+          {/* <Button
+            variant='contained'
+            startIcon={<AddIcon />}
+            onClick={handleAddVendor}
+            size='large'
+            sx={{
+              borderRadius: 3,
+              px: 4,
+              py: 1.5,
+              fontSize: "1rem",
+              fontWeight: 600,
+              background: "rgba(255,255,255,0.2)",
+              backdropFilter: "blur(10px)",
+              border: "1px solid rgba(255,255,255,0.3)",
+              color: "white",
+              boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
+              "&:hover": {
+                background: "rgba(255,255,255,0.3)",
+                transform: "translateY(-2px)",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
+              },
+              transition: "all 0.3s ease",
+            }}
+          >
+            Add New Vendor
+          </Button> */}
+        </Box>
+      </Box>
+      {/* <Box sx={{ mb: 4 }}>
         <Typography 
           variant="h3" 
           component="h1" 
@@ -306,41 +453,44 @@ const CostCenters = () => {
         <Typography variant="h6" color="#228B22" sx={{ mb: 3 }}>
           Manage your cost center hierarchy and organizational structure
         </Typography>
-      </Box>
+      </Box> */}
 
       {/* Top Section Controls */}
       <Card sx={{ mb: 3, boxShadow: 2 }}>
         <CardContent>
-          <Grid container spacing={3} alignItems="center">
+          <Grid container spacing={3} alignItems='center'>
             <Grid item xs={12} md={4}>
               <FormControl fullWidth>
                 <InputLabel>Filter Type</InputLabel>
                 <Select
                   value={filterType}
                   onChange={(e) => setFilterType(e.target.value)}
-                  label="Filter Type"
+                  label='Filter Type'
                 >
-                  <MenuItem value="all">All</MenuItem>
-                  <MenuItem value="parent">Parent</MenuItem>
-                  <MenuItem value="child">Child</MenuItem>
+                  <MenuItem value='all'>All</MenuItem>
+                  <MenuItem value='parent'>Parent</MenuItem>
+                  <MenuItem value='child'>Child</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
             <Grid item xs={12} md={4}>
-              <Typography variant="body2" color="text.secondary">
-                Showing {filteredCostCenters.length} of {costCenters.length} cost centers
+              <Typography variant='body2' color='text.secondary'>
+                Showing {filteredCostCenters.length} of {costCenters.length}{" "}
+                cost centers
               </Typography>
             </Grid>
-            <Grid item xs={12} md={4} sx={{ textAlign: 'right' }}>
+            <Grid item xs={12} md={4} sx={{ textAlign: "right" }}>
               <Button
-                variant="contained"
+                variant='contained'
                 startIcon={<AddIcon />}
                 onClick={handleAddCostCenter}
                 sx={{
-                  background: 'linear-gradient(135deg, #228B22 0%, #006400 100%)',
-                  '&:hover': {
-                    background: 'linear-gradient(135deg, #006400 0%, #004d00 100%)',
-                  }
+                  background:
+                    "linear-gradient(135deg, #228B22 0%, #006400 100%)",
+                  "&:hover": {
+                    background:
+                      "linear-gradient(135deg, #006400 0%, #004d00 100%)",
+                  },
                 }}
               >
                 Add Cost Centers
@@ -354,83 +504,96 @@ const CostCenters = () => {
       <Card sx={{ boxShadow: 2 }}>
         <CardContent sx={{ p: 0 }}>
           {loading ? (
-            <Box sx={{ p: 4, textAlign: 'center' }}>
-              <Typography variant="h6" color="text.secondary">
+            <Box sx={{ p: 4, textAlign: "center" }}>
+              <Typography variant='h6' color='text.secondary'>
                 Loading cost centers...
               </Typography>
             </Box>
           ) : costCenters.length === 0 ? (
-            <Box sx={{ p: 4, textAlign: 'center' }}>
-              <Typography variant="h6" color="text.secondary">
+            <Box sx={{ p: 4, textAlign: "center" }}>
+              <Typography variant='h6' color='text.secondary'>
                 No cost centers found
               </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                The API returned an empty result. Check the console for debugging information.
+              <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
+                The API returned an empty result. Check the console for
+                debugging information.
               </Typography>
             </Box>
           ) : (
             <TableContainer>
               <Table>
                 <TableHead>
-                  <TableRow sx={{ backgroundColor: '#228B22' }}>
-                    <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Code</TableCell>
-                    <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Name</TableCell>
-                    <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Status</TableCell>
-                    <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Parent</TableCell>
-                    <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Created</TableCell>
-                    <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Actions</TableCell>
+                  <TableRow sx={{ backgroundColor: "#228B22" }}>
+                    <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                      Code
+                    </TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                      Name
+                    </TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                      Status
+                    </TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                      Parent
+                    </TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                      Created
+                    </TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                      Actions
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {getPaginatedData().map((costCenter) => (
                     <TableRow key={costCenter.costCenterId} hover>
                       <TableCell>
-                        <Chip 
-                          label={costCenter.code} 
-                          variant="outlined" 
-                          color="primary"
-                          size="small"
+                        <Chip
+                          label={costCenter.code}
+                          variant='outlined'
+                          color='primary'
+                          size='small'
                         />
                       </TableCell>
                       <TableCell>
-                        <Typography variant="body2" fontWeight="medium">
+                        <Typography variant='body2' fontWeight='medium'>
                           {costCenter.name}
                         </Typography>
                       </TableCell>
                       <TableCell>
-                        <Chip 
+                        <Chip
                           label={getStatusLabel(costCenter.isChild)}
                           color={getStatusColor(costCenter.isChild)}
-                          size="small"
+                          size='small'
                           icon={<AccountTreeIcon />}
                         />
                       </TableCell>
                       <TableCell>
                         {costCenter.parentName ? (
-                          <Chip 
-                            label={costCenter.parentName} 
-                            variant="outlined" 
-                            size="small"
-                            color="secondary"
+                          <Chip
+                            label={costCenter.parentName}
+                            variant='outlined'
+                            size='small'
+                            color='secondary'
                           />
                         ) : (
-                          <Typography variant="body2" color="text.secondary">
+                          <Typography variant='body2' color='text.secondary'>
                             -
                           </Typography>
                         )}
                       </TableCell>
                       <TableCell>
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography variant='body2' color='text.secondary'>
                           {costCenter.createdAt}
                         </Typography>
                       </TableCell>
                       <TableCell>
                         <Button
-                          size="small"
-                          variant="outlined"
+                          size='small'
+                          variant='outlined'
                           startIcon={<EditIcon />}
                           onClick={() => handleEditCostCenter(costCenter)}
-                          sx={{ color: '#228B22', borderColor: '#228B22' }}
+                          sx={{ color: "#228B22", borderColor: "#228B22" }}
                         >
                           Edit
                         </Button>
@@ -441,7 +604,7 @@ const CostCenters = () => {
               </Table>
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25]}
-                component="div"
+                component='div'
                 count={filteredCostCenters.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
@@ -453,30 +616,30 @@ const CostCenters = () => {
         </CardContent>
       </Card>
 
-     
-
       {/* Add/Edit Dialog */}
-      <Dialog 
-        open={openDialog} 
+      <Dialog
+        open={openDialog}
         onClose={handleCloseDialog}
-        maxWidth="md"
+        maxWidth='md'
         fullWidth
         PaperProps={{
           sx: {
             borderRadius: 3,
-            boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
-          }
+            boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
+          },
         }}
       >
-        <DialogTitle sx={{ 
-          bgcolor: '#228B22', 
-          color: 'white',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          <Typography variant="h6">
-            {isEditMode ? 'Edit Cost Center' : 'Add New Cost Center'}
+        <DialogTitle
+          sx={{
+            bgcolor: "#228B22",
+            color: "white",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Typography variant='h6'>
+            {isEditMode ? "Edit Cost Center" : "Add New Cost Center"}
           </Typography>
         </DialogTitle>
 
@@ -486,12 +649,14 @@ const CostCenters = () => {
             <Grid item xs={6}>
               <TextField
                 fullWidth
-                label="Name *"
+                label='Name *'
                 value={formData.name}
-                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                variant="outlined"
-                size="medium"
-                placeholder="Enter cost center name"
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, name: e.target.value }))
+                }
+                variant='outlined'
+                size='medium'
+                placeholder='Enter cost center name'
               />
             </Grid>
 
@@ -501,15 +666,19 @@ const CostCenters = () => {
                 control={
                   <Checkbox
                     checked={formData.hasParent}
-                    onChange={(e) => setFormData(prev => ({ 
-                      ...prev, 
-                      hasParent: e.target.checked,
-                      parentCostCenterId: e.target.checked ? prev.parentCostCenterId : null
-                    }))}
-                    sx={{ color: '#228B22' }}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        hasParent: e.target.checked,
+                        parentCostCenterId: e.target.checked
+                          ? prev.parentCostCenterId
+                          : null,
+                      }))
+                    }
+                    sx={{ color: "#228B22" }}
                   />
                 }
-                label="Has Parent Cost Center"
+                label='Has Parent Cost Center'
               />
             </Grid>
 
@@ -518,15 +687,20 @@ const CostCenters = () => {
                 <FormControl fullWidth>
                   <InputLabel>Parent Cost Center</InputLabel>
                   <Select
-                    value={formData.parentCostCenterId || ''}
-                    onChange={(e) => setFormData(prev => ({ 
-                      ...prev, 
-                      parentCostCenterId: e.target.value 
-                    }))}
-                    label="Parent Cost Center"
+                    value={formData.parentCostCenterId || ""}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        parentCostCenterId: e.target.value,
+                      }))
+                    }
+                    label='Parent Cost Center'
                   >
                     {getParentCostCenters().map((parent) => (
-                      <MenuItem key={parent.costCenterId} value={parent.costCenterId}>
+                      <MenuItem
+                        key={parent.costCenterId}
+                        value={parent.costCenterId}
+                      >
                         {parent.name} ({parent.code})
                       </MenuItem>
                     ))}
@@ -538,9 +712,15 @@ const CostCenters = () => {
             {/* Auto-generated Code Preview */}
             {formData.name && (
               <Grid item xs={12}>
-                <Paper sx={{ p: 2, bgcolor: '#f5f5f5' }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Auto-generated Code: <strong>{generateCode(formData.name, isEditMode ? editingCostCenter?.costCenterId : 'NEW')}</strong>
+                <Paper sx={{ p: 2, bgcolor: "#f5f5f5" }}>
+                  <Typography variant='body2' color='text.secondary'>
+                    Auto-generated Code:{" "}
+                    <strong>
+                      {generateCode(
+                        formData.name,
+                        isEditMode ? editingCostCenter?.costCenterId : "NEW"
+                      )}
+                    </strong>
                   </Typography>
                 </Paper>
               </Grid>
@@ -549,21 +729,26 @@ const CostCenters = () => {
         </DialogContent>
 
         <DialogActions sx={{ p: 3, pt: 1 }}>
-          <Button onClick={handleCloseDialog} variant="outlined" disabled={saving}>
+          <Button
+            onClick={handleCloseDialog}
+            variant='outlined'
+            disabled={saving}
+          >
             Cancel
           </Button>
-          <Button 
-            onClick={handleSave} 
-            variant="contained"
+          <Button
+            onClick={handleSave}
+            variant='contained'
             disabled={saving}
             sx={{
-              background: 'linear-gradient(135deg, #228B22 0%, #006400 100%)',
-              '&:hover': {
-                background: 'linear-gradient(135deg, #006400 0%, #004d00 100%)',
-              }
+              background: "linear-gradient(135deg, #228B22 0%, #006400 100%)",
+              "&:hover": {
+                background: "linear-gradient(135deg, #006400 0%, #004d00 100%)",
+              },
             }}
           >
-            {saving ? 'Saving...' : (isEditMode ? 'Update' : 'Create')} Cost Center
+            {saving ? "Saving..." : isEditMode ? "Update" : "Create"} Cost
+            Center
           </Button>
         </DialogActions>
       </Dialog>
@@ -572,5 +757,3 @@ const CostCenters = () => {
 };
 
 export default CostCenters;
-
-

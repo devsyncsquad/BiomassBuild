@@ -16,7 +16,9 @@ import {
   Chip,
   Paper,
   IconButton,
-  FormHelperText
+  FormHelperText,
+  FormControlLabel,
+  Checkbox
 } from '@mui/material';
 import {
   Close as CloseIcon,
@@ -35,6 +37,8 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave, onEdit 
     phone3: '',
     cnic: '',
     status: 'Active',
+    isVehicleLoader: false,
+    isLabour: false,
     vendorCnicFrontPic: null,
     vendorCnicBackPic: null
   });
@@ -55,11 +59,16 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave, onEdit 
         phone3: vendor.phone3 || '',
         cnic: vendor.cnic || '',
         status: vendor.status || 'Active',
+        isVehicleLoader: vendor.isVehicleLoader || false,
+        isLabour: vendor.isLabour || false,
         vendorCnicFrontPic: vendor.vendorCnicFrontPic || null,
         vendorCnicBackPic: vendor.vendorCnicBackPic || null
       });
-      setCnicFrontPreview(vendor.vendorCnicFrontPic || '');
-      setCnicBackPreview(vendor.vendorCnicBackPic || '');
+      
+      // Set image previews for existing images (handle relative URLs)
+      const baseUrl = import.meta.env.VITE_LIVE_APP_BASEURL || "https://localhost:7084";
+      setCnicFrontPreview(vendor.vendorCnicFrontPic ? `${baseUrl}${vendor.vendorCnicFrontPic}` : '');
+      setCnicBackPreview(vendor.vendorCnicBackPic ? `${baseUrl}${vendor.vendorCnicBackPic}` : '');
     } else if (!vendor && open) {
       // Reset form for new vendor
       setFormData({
@@ -70,6 +79,8 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave, onEdit 
         phone3: '',
         cnic: '',
         status: 'Active',
+        isVehicleLoader: false,
+        isLabour: false,
         vendorCnicFrontPic: null,
         vendorCnicBackPic: null
       });
@@ -166,9 +177,9 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave, onEdit 
       // Create preview
       const reader = new FileReader();
       reader.onload = (e) => {
-        if (field === 'cnicFront') {
+        if (field === 'vendorCnicFrontPic') {
           setCnicFrontPreview(e.target.result);
-        } else if (field === 'cnicBack') {
+        } else if (field === 'vendorCnicBackPic') {
           setCnicBackPreview(e.target.result);
         }
       };
@@ -178,17 +189,31 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave, onEdit 
 
   const handleSave = async () => {
     if (validateForm()) {
+      // Create FormData for file upload
+      const formDataToSend = new FormData();
+      
+      // Add all form fields
+      formDataToSend.append('vendorName', formData.vendorName);
+      formDataToSend.append('address', formData.address);
+      formDataToSend.append('phone1', formData.phone1);
+      formDataToSend.append('phone2', formData.phone2 || '');
+      formDataToSend.append('phone3', formData.phone3 || '');
+      formDataToSend.append('cnic', formData.cnic);
+      formDataToSend.append('status', formData.status);
+      formDataToSend.append('isVehicleLoader', formData.isVehicleLoader);
+      formDataToSend.append('isLabour', formData.isLabour);
+
+      // Add files if they exist
+      if (formData.vendorCnicFrontPic instanceof File) {
+        formDataToSend.append('vendorCnicFrontPic', formData.vendorCnicFrontPic);
+      }
+      if (formData.vendorCnicBackPic instanceof File) {
+        formDataToSend.append('vendorCnicBackPic', formData.vendorCnicBackPic);
+      }
+
       const vendorData = {
         vendorId: vendor?.vendorId,  // Include vendorId for updates
-        vendorName: formData.vendorName,
-        address: formData.address,
-        phone1: formData.phone1,
-        phone2: formData.phone2 || '',
-        phone3: formData.phone3 || '',
-        cnic: formData.cnic,
-        status: formData.status,
-        vendorCnicFrontPic: formData.vendorCnicFrontPic,
-        vendorCnicBackPic: formData.vendorCnicBackPic
+        formData: formDataToSend
       };
 
       try {
@@ -319,6 +344,39 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave, onEdit 
               InputProps={{
                 readOnly: isReadOnly
               }}
+            />
+          </Grid>
+
+          {/* Service Type Section */}
+          <Grid item xs={12}>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', color: '#6366F1' }}>
+              Service Type
+            </Typography>
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={formData.isVehicleLoader}
+                  onChange={(e) => handleInputChange('isVehicleLoader', e.target.checked)}
+                  disabled={isReadOnly}
+                />
+              }
+              label="Vehicle Loader"
+            />
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={formData.isLabour}
+                  onChange={(e) => handleInputChange('isLabour', e.target.checked)}
+                  disabled={isReadOnly}
+                />
+              }
+              label="Labour"
             />
           </Grid>
 

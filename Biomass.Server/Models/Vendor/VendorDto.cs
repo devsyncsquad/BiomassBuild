@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Http;
+
 namespace Biomass.Server.Models.Vendor
 {
     public class VendorDto
@@ -12,6 +14,8 @@ namespace Biomass.Server.Models.Vendor
         public string? VendorCnicBackPic { get; set; }
         public string? Cnic { get; set; }
         public string? Status { get; set; }
+        public bool? IsVehicleLoader { get; set; }
+        public bool? IsLabour { get; set; }
     }
 
     public class CreateVendorRequest
@@ -22,6 +26,11 @@ namespace Biomass.Server.Models.Vendor
         public string? Phone2 { get; set; }
         public string? Phone3 { get; set; }
         public string? Cnic { get; set; }
+        public string? Status { get; set; }
+        public bool? IsVehicleLoader { get; set; }
+        public bool? IsLabour { get; set; }
+        public IFormFile? VendorCnicFrontPic { get; set; }
+        public IFormFile? VendorCnicBackPic { get; set; }
     }
 
     public class UpdateVendorRequest
@@ -33,5 +42,9 @@ namespace Biomass.Server.Models.Vendor
         public string? Phone3 { get; set; }
         public string? Cnic { get; set; }
         public string? Status { get; set; }
+        public bool? IsVehicleLoader { get; set; }
+        public bool? IsLabour { get; set; }
+        public IFormFile? VendorCnicFrontPic { get; set; }
+        public IFormFile? VendorCnicBackPic { get; set; }
     }
 }

@@ -24,8 +24,13 @@ export const apiRequest = async (endpoint, options = {}) => {
   const baseUrl = getBaseUrl();
   const url = `${baseUrl}${endpoint}`;
 
+  // Don't set Content-Type for FormData, let the browser set it with boundary
+  const headers = options.body instanceof FormData 
+    ? { Authorization: `Bearer ${localStorage.getItem("token")}` }
+    : getHeaders();
+
   const defaultOptions = {
-    headers: getHeaders(),
+    headers,
     ...options,
   };
 

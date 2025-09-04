@@ -96,7 +96,7 @@ const VendorManagement = () => {
       if (isEditMode && selectedVendor) {
         await updateVendorMutation.mutateAsync({
           id: selectedVendor.vendorId,
-          ...vendorData,
+          formData: vendorData.formData,
         });
         setSnackbar({
           open: true,
@@ -104,7 +104,7 @@ const VendorManagement = () => {
           severity: "success",
         });
       } else {
-        await createVendorMutation.mutateAsync(vendorData);
+        await createVendorMutation.mutateAsync(vendorData.formData);
         setSnackbar({
           open: true,
           message: "Vendor created successfully",
@@ -510,6 +510,49 @@ const VendorManagement = () => {
                     }}
                   />
                 </Box>
+
+                {/* Service Type Indicators */}
+                {(vendor.isVehicleLoader || vendor.isLabour) && (
+                  <Box sx={{ mb: 2 }}>
+                    <Typography
+                      variant='body2'
+                      sx={{
+                        color: colors.text.secondary,
+                        fontSize: "0.75rem",
+                        mb: 0.5,
+                        fontWeight: 500,
+                      }}
+                    >
+                      Services:
+                    </Typography>
+                    <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap" }}>
+                      {vendor.isVehicleLoader && (
+                        <Chip
+                          label="Vehicle Loader"
+                          size="small"
+                          sx={{
+                            fontSize: "0.7rem",
+                            height: "20px",
+                            bgcolor: colors.primary.light,
+                            color: "white",
+                          }}
+                        />
+                      )}
+                      {vendor.isLabour && (
+                        <Chip
+                          label="Labour"
+                          size="small"
+                          sx={{
+                            fontSize: "0.7rem",
+                            height: "20px",
+                            bgcolor: colors.info.light,
+                            color: "white",
+                          }}
+                        />
+                      )}
+                    </Box>
+                  </Box>
+                )}
 
                 <Box
                   sx={{

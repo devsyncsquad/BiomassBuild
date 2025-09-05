@@ -59,12 +59,12 @@ namespace Biomass.Server.Services
 
                 if (request.VendorCnicFrontPic != null)
                 {
-                    frontPicPath = await _fileService.SaveFileAsync(request.VendorCnicFrontPic, "uploads/vendors/cnic");
+                    frontPicPath = await _fileService.SaveCnicImageAsync(request.VendorCnicFrontPic, "uploads/vendors/cnic", "front");
                 }
 
                 if (request.VendorCnicBackPic != null)
                 {
-                    backPicPath = await _fileService.SaveFileAsync(request.VendorCnicBackPic, "uploads/vendors/cnic");
+                    backPicPath = await _fileService.SaveCnicImageAsync(request.VendorCnicBackPic, "uploads/vendors/cnic", "back");
                 }
 
                 var vendor = new Vendor
@@ -109,7 +109,7 @@ namespace Biomass.Server.Services
                     {
                         await _fileService.DeleteFileAsync(vendor.VendorCnicFrontPic);
                     }
-                    vendor.VendorCnicFrontPic = await _fileService.SaveFileAsync(request.VendorCnicFrontPic, "uploads/vendors/cnic");
+                    vendor.VendorCnicFrontPic = await _fileService.SaveCnicImageAsync(request.VendorCnicFrontPic, "uploads/vendors/cnic", "front");
                 }
 
                 if (request.VendorCnicBackPic != null)
@@ -119,7 +119,7 @@ namespace Biomass.Server.Services
                     {
                         await _fileService.DeleteFileAsync(vendor.VendorCnicBackPic);
                     }
-                    vendor.VendorCnicBackPic = await _fileService.SaveFileAsync(request.VendorCnicBackPic, "uploads/vendors/cnic");
+                    vendor.VendorCnicBackPic = await _fileService.SaveCnicImageAsync(request.VendorCnicBackPic, "uploads/vendors/cnic", "back");
                 }
 
                 // Update other fields

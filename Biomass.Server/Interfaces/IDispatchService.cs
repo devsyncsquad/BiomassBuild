@@ -6,7 +6,7 @@ namespace Biomass.Server.Interfaces
     {
         Task<List<DispatchDto>> GetDispatchesAsync();
         Task<DispatchDto?> GetDispatchByIdAsync(int id);
-        Task<DispatchDto> CreateDispatchAsync(CreateDispatchRequest request);
+        Task<int> CreateDispatchAsync(CreateDispatchRequest request);
         Task<DispatchDto?> UpdateDispatchAsync(int id, UpdateDispatchRequest request);
         Task<bool> DeleteDispatchAsync(int id);
     }

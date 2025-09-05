@@ -51,12 +51,12 @@ namespace Biomass.Server.Controllers.Api
         }
 
         [HttpPost]
-        public async Task<ActionResult<ServiceResponse<DispatchDto>>> CreateDispatch([FromBody] CreateDispatchRequest request)
+        public async Task<ActionResult<ServiceResponse<int>>> CreateDispatch([FromBody] CreateDispatchRequest request)
         {
-            var dispatch = await _dispatchService.CreateDispatchAsync(request);
-            return Ok(new ServiceResponse<DispatchDto>
+            var dispatchId = await _dispatchService.CreateDispatchAsync(request);
+            return CreatedAtAction(nameof(GetDispatch), new { id = dispatchId }, new ServiceResponse<int>
             {
-                Result = dispatch,
+                Result = dispatchId,
                 Message = "Dispatch created successfully",
                 Success = true
             });

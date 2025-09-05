@@ -1,5 +1,6 @@
 using Biomass.Server.Data;
 using Biomass.Server.Interfaces;
+using Biomass.Server.Models;
 using Biomass.Server.Models.Dispatch;
 using Biomass.Server.Models.Vehicle;
 using Microsoft.EntityFrameworkCore;
@@ -36,48 +37,113 @@ namespace Biomass.Server.Services
             return dispatch != null ? MapToDto(dispatch) : null;
         }
 
-        public async Task<DispatchDto> CreateDispatchAsync(CreateDispatchRequest request)
+        public async Task<int> CreateDispatchAsync(CreateDispatchRequest request)
         {
-            var dispatch = new Dispatch
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                VehicleId = request.VehicleId,
-                LocationId = request.LocationId,
-                MaterialType = request.MaterialType,
-                MaterialRate = request.MaterialRate,
-                SlipNumber = request.SlipNumber,
-                SlipPicture = request.SlipPicture,
-                FirstWeight = request.FirstWeight,
-                SecondWeight = request.SecondWeight,
-                NetWeight = request.NetWeight,
-                LoaderCharges = request.LoaderCharges,
-                LoaderChargesAuto = request.LoaderChargesAuto,
-                LoaderChargesType = request.LoaderChargesType,
-                LaborCharges = request.LaborCharges,
-                LaborChargesAuto = request.LaborChargesAuto,
-                LaborChargesType = request.LaborChargesType,
-                TransporterRate = request.TransporterRate,
-                TransporterRateAuto = request.TransporterRateAuto,
-                TransporterChargesType = request.TransporterChargesType,
-                Amount = request.Amount,
-                TotalDeduction = request.TotalDeduction,
-                CreatedBy = request.CreatedBy,
-                Status = request.Status,
-                PayableWeight = request.PayableWeight,
-                CreatedOn = DateTime.UtcNow
-            };
+                // Find transporter vendor where both is_vehicle_loader and is_labour are null
+                var transporterVendor = await _context.Vendors
+                    .Where(v => v.IsVehicleLoader == null && v.IsLabour == null && v.Status == "Active")
+                    .FirstOrDefaultAsync();
 
-            _context.Dispatches.Add(dispatch);
-            await _context.SaveChangesAsync();
+                if (transporterVendor == null)
+                {
+                    throw new InvalidOperationException("No transporter vendor found. A vendor with both is_vehicle_loader and is_labour set to null is required.");
+                }
 
-            // Reload with navigation properties
-            await _context.Entry(dispatch)
-                .Reference(d => d.Vehicle)
-                .LoadAsync();
-            await _context.Entry(dispatch)
-                .Reference(d => d.Location)
-                .LoadAsync();
+                // Create the dispatch record
+                var dispatch = new Dispatch
+                {
+                    VehicleId = request.VehicleId,
+                    LocationId = request.LocationId,
+                    MaterialType = request.MaterialType,
+                    MaterialRate = request.MaterialRate,
+                    SlipNumber = request.SlipNumber,
+                    SlipPicture = request.SlipPicture,
+                    FirstWeight = request.FirstWeight,
+                    SecondWeight = request.SecondWeight,
+                    NetWeight = request.NetWeight,
+                    LoaderCharges = request.LoaderCharges,
+                    LoaderChargesAuto = request.LoaderChargesAuto,
+                    LoaderChargesType = request.LoaderChargesType,
+                    LaborCharges = request.LaborCharges,
+                    LaborChargesAuto = request.LaborChargesAuto,
+                    LaborChargesType = request.LaborChargesType,
+                    TransporterRate = request.TransporterRate,
+                    TransporterRateAuto = request.TransporterRateAuto,
+                    TransporterChargesType = request.TransporterChargesType,
+                    Amount = request.Amount,
+                    TotalDeduction = request.TotalDeduction,
+                    CreatedBy = request.CreatedBy,
+                    Status = request.Status,
+                    PayableWeight = request.PayableWeight,
+                    BucketVendorId = request.BucketVendorId,
+                    LabourVendorId = request.LabourVendorId,
+                    CreatedOn = DateTime.UtcNow
+                };
 
-            return MapToDto(dispatch);
+                _context.Dispatches.Add(dispatch);
+                await _context.SaveChangesAsync();
+
+                // Create AP Ledger entries for each vendor with specific charge amounts
+                var apLedgerEntries = new List<ApLedger>
+                {
+                    // Bucket vendor - use loader charges
+                    new ApLedger
+                    {
+                        VendorId = request.BucketVendorId,
+                        HappenedAt = DateTime.UtcNow,
+                        EntryKind = "Bill",
+                        Amount = request.LoaderCharges ?? 0,
+                        Currency = "PKR",
+                        DispatchId = dispatch.DispatchId,
+                        Remarks = request.Remarks,
+                        CreatedBy = request.CreatedBy,
+                        CreatedAt = DateTime.UtcNow,
+                        ReferenceNo = request.VehicleId,
+                    },
+                    // Labour vendor - use labor charges
+                    new ApLedger
+                    {
+                        VendorId = request.LabourVendorId,
+                        HappenedAt = DateTime.UtcNow,
+                        EntryKind = "Bill",
+                        Amount = request.LaborCharges ?? 0,
+                        Currency = "PKR",
+                        DispatchId = dispatch.DispatchId,
+                        Remarks = request.Remarks,
+                        CreatedBy = request.CreatedBy,
+                        CreatedAt = DateTime.UtcNow,
+                        ReferenceNo = request.VehicleId,
+                    },
+                    // Transporter vendor - use transporter rate
+                    new ApLedger
+                    {
+                        VendorId = transporterVendor.VendorId,
+                        HappenedAt = DateTime.UtcNow,
+                        EntryKind = "Bill",
+                        Amount = request.TransporterRate ?? 0,
+                        Currency = "PKR",
+                        DispatchId = dispatch.DispatchId,
+                        Remarks = request.Remarks,
+                        CreatedBy = request.CreatedBy,
+                        CreatedAt = DateTime.UtcNow,
+                        ReferenceNo = request.VehicleId,
+                    }
+                };
+
+                _context.ApLedgers.AddRange(apLedgerEntries);
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+                return dispatch.DispatchId;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
         public async Task<DispatchDto?> UpdateDispatchAsync(int id, UpdateDispatchRequest request)

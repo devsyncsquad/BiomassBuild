@@ -48,7 +48,8 @@ namespace Biomass.Server.Models.Dispatch
         [StringLength(100)]
         public string? MaterialType { get; set; }
 
-        public decimal? MaterialRate { get; set; }
+        [Required]
+        public decimal MaterialRate { get; set; }
 
         [StringLength(50)]
         public string? SlipNumber { get; set; }
@@ -60,7 +61,8 @@ namespace Biomass.Server.Models.Dispatch
 
         public decimal? SecondWeight { get; set; }
 
-        public decimal? NetWeight { get; set; }
+        [Required]
+        public decimal NetWeight { get; set; }
 
         public decimal? LoaderCharges { get; set; }
 
@@ -83,11 +85,21 @@ namespace Biomass.Server.Models.Dispatch
         [StringLength(20)]
         public string? TransporterChargesType { get; set; }
 
-        public decimal? Amount { get; set; }
+        [Required]
+        public decimal Amount { get; set; }
 
         public decimal? TotalDeduction { get; set; }
 
-        public int? CreatedBy { get; set; }
+        [Required]
+        public int BucketVendorId { get; set; }
+
+        [Required]
+        public int LabourVendorId { get; set; }
+
+        public string? Remarks { get; set; }
+
+        [Required]
+        public int CreatedBy { get; set; }
 
         [StringLength(20)]
         public string? Status { get; set; } = "Active";

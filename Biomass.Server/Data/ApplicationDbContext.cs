@@ -50,6 +50,7 @@ namespace Biomass.Server.Data
         public DbSet<Cashbook> Cashbooks { get; set; }
         public DbSet<MoneyAccount> MoneyAccounts { get; set; }
         public DbSet<Dispatch> Dispatches { get; set; }
+        public DbSet<ApLedger> ApLedgers { get; set; }
         public DbSet<VLocationDto> VLocations { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
 {
@@ -521,6 +522,8 @@ namespace Biomass.Server.Data
                 entity.Property(e => e.CreatedOn).HasColumnName("createdon");
                 entity.Property(e => e.Status).HasColumnName("status").HasMaxLength(20);
                 entity.Property(e => e.PayableWeight).HasColumnName("payable_weight");
+                entity.Property(e => e.BucketVendorId).HasColumnName("bucket_vendor_id");
+                entity.Property(e => e.LabourVendorId).HasColumnName("labour_vendor_id");
 
                 // Configure foreign key relationships
                 entity.HasOne(d => d.Vehicle)
@@ -531,6 +534,51 @@ namespace Biomass.Server.Data
                 entity.HasOne(d => d.Location)
                       .WithMany()
                       .HasForeignKey(d => d.LocationId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(d => d.BucketVendor)
+                      .WithMany()
+                      .HasForeignKey(d => d.BucketVendorId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(d => d.LabourVendor)
+                      .WithMany()
+                      .HasForeignKey(d => d.LabourVendorId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // Configure ApLedger entity
+            modelBuilder.Entity<ApLedger>(entity =>
+            {
+                entity.ToTable("ap_ledger");
+                entity.HasKey(e => e.ApEntryId);
+                entity.Property(e => e.ApEntryId).HasColumnName("ap_entry_id");
+                entity.Property(e => e.VendorId).HasColumnName("vendor_id").IsRequired();
+                entity.Property(e => e.HappenedAt).HasColumnName("happened_at").IsRequired();
+                entity.Property(e => e.EntryKind).HasColumnName("entry_kind").IsRequired().HasMaxLength(50);
+                entity.Property(e => e.Amount).HasColumnName("amount").IsRequired().HasColumnType("numeric(18,2)");
+                entity.Property(e => e.Currency).HasColumnName("currency").IsRequired().HasMaxLength(10);
+                entity.Property(e => e.DispatchId).HasColumnName("dispatchid");
+                entity.Property(e => e.CashId).HasColumnName("cash_id");
+                entity.Property(e => e.ReferenceNo).HasColumnName("reference_no").HasMaxLength(100);
+                entity.Property(e => e.Remarks).HasColumnName("remarks");
+                entity.Property(e => e.CreatedBy).HasColumnName("created_by");
+                entity.Property(e => e.CreatedAt).HasColumnName("created_at").IsRequired();
+
+                // Configure foreign key relationships
+                entity.HasOne(a => a.Vendor)
+                      .WithMany()
+                      .HasForeignKey(a => a.VendorId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(a => a.Dispatch)
+                      .WithMany()
+                      .HasForeignKey(a => a.DispatchId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(a => a.Cashbook)
+                      .WithMany()
+                      .HasForeignKey(a => a.CashId)
                       .OnDelete(DeleteBehavior.Restrict);
             });
         }

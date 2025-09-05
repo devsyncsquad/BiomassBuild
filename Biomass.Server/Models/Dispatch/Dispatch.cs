@@ -92,8 +92,16 @@ namespace Biomass.Server.Models.Dispatch
         [Column("payable_weight")]
         public int? PayableWeight { get; set; }
 
+        [Column("bucket_vendor_id")]
+        public int? BucketVendorId { get; set; }
+
+        [Column("labour_vendor_id")]
+        public int? LabourVendorId { get; set; }
+
         // Navigation properties
         public virtual Vehicle.Vehicle? Vehicle { get; set; }
         public virtual CustomerLocation? Location { get; set; }
+        public virtual Vendor.Vendor? BucketVendor { get; set; }
+        public virtual Vendor.Vendor? LabourVendor { get; set; }
     }
 }

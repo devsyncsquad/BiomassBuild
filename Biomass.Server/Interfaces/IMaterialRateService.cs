@@ -13,6 +13,6 @@ namespace Biomass.Server.Services.Interfaces
         Task<ServiceResponse<bool>> DeleteMaterialRateAsync(int rateId);
         Task<ServiceResponse<List<MaterialRateDto>>> GetMaterialRatesByDateRangeAsync(DateTime startDate, DateTime endDate);
         Task<ServiceResponse<List<MaterialRateDto>>> GetMaterialRatesByLocationIdAsync(int locationId);
-        Task<ServiceResponse<List<MaterialRateDto>>> CheckExistingActiveRatesAsync(int customerId, int locationId, string materialType, DateTime effectiveDate);
+        Task<ServiceResponse<List<MaterialRateDto>>> CheckExistingActiveRatesAsync(int customerId, int locationId, string materialType, string effectiveDate);
     }
 }

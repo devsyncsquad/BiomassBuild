@@ -17,13 +17,16 @@ namespace Biomass.Server.Models.Customer
         public int LocationId { get; set; }
         
         [Column("effectivedate")]
-        public DateTime EffectiveDate { get; set; }
+        public string? EffectiveDate { get; set; }
         
         [Column("company_rate", TypeName = "decimal(10,2)")]
         public decimal CompanyRate { get; set; }
         
         [Column("transporter_rate", TypeName = "decimal(10,2)")]
         public decimal TransporterRate { get; set; }
+        
+        [Column("diesel_rate", TypeName = "decimal(18,2)")]
+        public decimal? DieselRate { get; set; }
         
         [Column("route")]
         [StringLength(100)]
@@ -56,9 +59,10 @@ namespace Biomass.Server.Models.Customer
         public int RateId { get; set; }
         public int CustomerId { get; set; }
         public int LocationId { get; set; }
-        public DateTime EffectiveDate { get; set; }
+        public string? EffectiveDate { get; set; }
         public decimal CompanyRate { get; set; }
         public decimal TransporterRate { get; set; }
+        public decimal? DieselRate { get; set; }
         public string? Route { get; set; }
         public string? MaterialType { get; set; }
         public string Status { get; set; } = string.Empty;
@@ -77,11 +81,7 @@ namespace Biomass.Server.Models.Customer
         [Required]
         public decimal TransporterRate { get; set; }
 
-        [Required]
-        public decimal DispatchWeight { get; set; }
-
-        [Required]
-        public decimal ReceivingWeight { get; set; }
+        public decimal? DieselRate { get; set; }
         
         public string? Route { get; set; }
         public string? MaterialType { get; set; }
@@ -96,7 +96,7 @@ namespace Biomass.Server.Models.Customer
         public int LocationId { get; set; }
         
         [Required]
-        public DateTime EffectiveDate { get; set; }
+        public string? EffectiveDate { get; set; }
     }
 
     public class UpdateMaterialRateRequest : MaterialRateRequestBase

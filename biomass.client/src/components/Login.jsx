@@ -414,29 +414,7 @@ const Login = ({ onLoginSuccess }) => {
               ) : (
                 'Sign In'
               )}
-            </Button>
-
-            {/* Sign up link */}
-            <Box sx={{ textAlign: 'center', mt: 4 }}>
-              <Typography variant="body2" color="text.secondary" sx={{ fontSize: '1rem' }}>
-                Don't have an account?{' '}
-                <Button
-                  onClick={() => navigate('/signup')}
-                  sx={{
-                    textTransform: 'none',
-                    fontWeight: 700,
-                    color: '#228B22',
-                    fontSize: '1rem',
-                    '&:hover': {
-                      background: 'rgba(34, 139, 34, 0.1)',
-                      borderRadius: '8px'
-                    }
-                  }}
-                >
-                  Create one
-                </Button>
-              </Typography>
-            </Box>
+            </Button>    
           </Box>
 
           {/* Footer */}
@@ -473,10 +451,10 @@ const Login = ({ onLoginSuccess }) => {
         }}
       >
         <Typography variant="body2" sx={{ fontWeight: 700, color: '#228B22', mb: 0.5 }}>
-          AI-Driven Safety for You
+          The smarter way to manage alternative energy.
         </Typography>
         <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
-          Powered by Biomass
+          Powered by SyncSquad
         </Typography>
       </Box>
 

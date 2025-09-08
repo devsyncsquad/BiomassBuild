@@ -44,5 +44,11 @@ namespace Biomass.Server.Models.Vendor
         [Column("status")]
         [StringLength(10)]
         public string Status { get; set; } = "Active";
+
+        [Column("is_vehicle_loader")]
+        public bool? IsVehicleLoader { get; set; } = false;
+
+        [Column("is_labour")]
+        public bool? IsLabour { get; set; } = false;
     }
 }

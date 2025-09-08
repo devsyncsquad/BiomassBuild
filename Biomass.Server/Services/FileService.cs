@@ -1,5 +1,6 @@
 using Biomass.Server.Interfaces;
 using Microsoft.AspNetCore.Http;
+using System;
 
 namespace Biomass.Server.Services
 {
@@ -104,6 +105,46 @@ namespace Biomass.Server.Services
                 return false;
 
             return file.Length <= maxSizeInBytes;
+        }
+
+        public async Task<string> SaveCnicImageAsync(IFormFile file, string folderPath, string imageType)
+        {
+            if (file == null || file.Length == 0)
+                return null;
+
+            // Get the web root path, fallback to content root if web root is null
+            var webRootPath = _environment.WebRootPath;
+            if (string.IsNullOrEmpty(webRootPath))
+            {
+                webRootPath = Path.Combine(_environment.ContentRootPath, "wwwroot");
+                // Create wwwroot directory if it doesn't exist
+                if (!Directory.Exists(webRootPath))
+                {
+                    Directory.CreateDirectory(webRootPath);
+                }
+            }
+
+            // Create directory if it doesn't exist
+            var uploadPath = Path.Combine(webRootPath, folderPath);
+            if (!Directory.Exists(uploadPath))
+            {
+                Directory.CreateDirectory(uploadPath);
+            }
+
+            // Generate filename with format: Cnic_front_ddmmyyyyhhss or Cnic_back_ddmmyyyyhhss
+            var now = DateTime.Now;
+            var timestamp = now.ToString("ddMMyyyyHHmmss");
+            var fileExtension = Path.GetExtension(file.FileName);
+            var fileName = $"Cnic_{imageType}_{timestamp}{fileExtension}";
+            var filePath = Path.Combine(uploadPath, fileName);
+
+            // Save file
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            return fileName;
         }
 
         public string GetWebRootPath()

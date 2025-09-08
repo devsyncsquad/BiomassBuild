@@ -1,11 +1,13 @@
 # Environment Setup for Biomass Portal
 
 ## Overview
+
 This document explains how to configure environment variables for different deployment environments.
 
 ## Environment Variables
 
 ### API Configuration
+
 The application uses the following environment variable for API configuration:
 
 ```bash
@@ -19,12 +21,14 @@ VITE_LIVE_APP_BASEURL=https://localhost:7084/api
 ### Option 1: Environment File (Recommended for Development)
 
 1. Create a `.env` file in the root directory of the project:
+
 ```bash
 # .env
 VITE_LIVE_APP_BASEURL=https://localhost:7084/api
 ```
 
 2. For production, create a `.env.production` file:
+
 ```bash
 # .env.production
 VITE_LIVE_APP_BASEURL=https://your-production-domain.com/api
@@ -35,16 +39,19 @@ VITE_LIVE_APP_BASEURL=https://your-production-domain.com/api
 Set the environment variable in your system:
 
 **Windows (PowerShell):**
+
 ```powershell
 $env:VITE_LIVE_APP_BASEURL="https://localhost:7084/api"
 ```
 
 **Windows (Command Prompt):**
+
 ```cmd
 set VITE_LIVE_APP_BASEURL=https://localhost:7084/api
 ```
 
 **Linux/macOS:**
+
 ```bash
 export VITE_LIVE_APP_BASEURL="https://localhost:7084/api"
 ```
@@ -65,6 +72,7 @@ Add environment variables to your npm scripts in `package.json`:
 ## Current Configuration
 
 The application is currently configured to use:
+
 - **Development**: `https://localhost:7084/api`
 - **Fallback**: If no environment variable is set, it defaults to the development URL
 
@@ -81,13 +89,16 @@ With the current configuration, the following endpoints are available:
 ## Troubleshooting
 
 ### Environment Variable Not Working?
+
 1. Make sure the variable name starts with `VITE_`
 2. Restart your development server after setting environment variables
 3. Check that the `.env` file is in the correct location (project root)
 4. Verify the variable is accessible in the browser console
 
 ### Checking Current Configuration
+
 You can check the current API base URL in the browser console:
+
 ```javascript
 console.log(import.meta.env.VITE_LIVE_APP_BASEURL);
 ```
@@ -101,16 +112,19 @@ console.log(import.meta.env.VITE_LIVE_APP_BASEURL);
 ## Deployment
 
 ### Development
+
 ```bash
 npm run dev
 ```
 
 ### Production Build
+
 ```bash
 npm run build
 ```
 
 ### Production with Custom API URL
+
 ```bash
 VITE_LIVE_APP_BASEURL=https://your-production-domain.com/api npm run build
 ```
@@ -118,6 +132,7 @@ VITE_LIVE_APP_BASEURL=https://your-production-domain.com/api npm run build
 ## Support
 
 If you encounter issues with environment configuration, check:
+
 1. Vite documentation on environment variables
 2. Your deployment platform's environment variable configuration
 3. The browser console for any configuration errors

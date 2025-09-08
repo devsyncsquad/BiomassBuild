@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -21,8 +21,8 @@ import {
   CardContent,
   Divider,
   Fade,
-  Zoom
-} from '@mui/material';
+  Zoom,
+} from "@mui/material";
 import {
   Search as SearchIcon,
   Business as BusinessIcon,
@@ -33,40 +33,49 @@ import {
   People as PeopleIcon,
   Work as WorkIcon,
   Phone as PhoneIcon,
-  Email as EmailIcon
-} from '@mui/icons-material';
-import CompanyForm from './CompanyForm';
-import './CompanyManagement.css';
+  Email as EmailIcon,
+} from "@mui/icons-material";
+import CompanyForm from "./CompanyForm";
+import "./CompanyManagement.css";
 
 const CompanyManagement = () => {
   const [companies, setCompanies] = useState([]);
   const [filteredCompanies, setFilteredCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isViewMode, setIsViewMode] = useState(false);
-  
+
   // Snackbar states
   const [snackbar, setSnackbar] = useState({
     open: false,
-    message: '',
-    severity: 'success'
+    message: "",
+    severity: "success",
   });
-  
+
   // Filter states
   const [filters, setFilters] = useState({
-    industry: '',
-    companySize: '',
-    location: '',
-    search: ''
+    industry: "",
+    companySize: "",
+    location: "",
+    search: "",
   });
 
   // Enhanced company colors with better contrast
   const companyColors = [
-    '#228B22', '#388e3c', '#f57c00', '#7b1fa2', 
-    '#d32f2f', '#0097a7', '#5d4037', '#455a64',
-    '#1565c0', '#2e7d32', '#ef6c00', '#6a1b9a'
+    "#228B22",
+    "#388e3c",
+    "#f57c00",
+    "#7b1fa2",
+    "#d32f2f",
+    "#0097a7",
+    "#5d4037",
+    "#455a64",
+    "#1565c0",
+    "#2e7d32",
+    "#ef6c00",
+    "#6a1b9a",
   ];
 
   useEffect(() => {
@@ -77,47 +86,48 @@ const CompanyManagement = () => {
     applyFilters();
   }, [companies, filters]);
 
-  const showSnackbar = (message, severity = 'success') => {
-    console.log('showSnackbar called with:', message, severity);
+  const showSnackbar = (message, severity = "success") => {
+    console.log("showSnackbar called with:", message, severity);
     setSnackbar({
       open: true,
       message,
-      severity
+      severity,
     });
   };
 
   const hideSnackbar = () => {
-    setSnackbar(prev => ({
+    setSnackbar((prev) => ({
       ...prev,
-      open: false
+      open: false,
     }));
   };
 
   const fetchCompanies = async () => {
     try {
       setLoading(true);
-      const iconUrl = import.meta.env.VITE_LIVE_APP_BASEURL || 'https://localhost:7084/api';
+      const iconUrl =
+        import.meta.env.VITE_LIVE_APP_BASEURL || "https://localhost:7084/api";
       const response = await fetch(`${iconUrl}/Companies/GetAllCompanies`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch companies');
+        throw new Error("Failed to fetch companies");
       }
 
       const data = await response.json();
-      
+
       if (data.success) {
         setCompanies(data.result || []);
       } else {
-        throw new Error(data.message || 'Failed to fetch companies');
+        throw new Error(data.message || "Failed to fetch companies");
       }
     } catch (error) {
-      console.error('Error fetching companies:', error);
-      setError('Failed to load companies. Please try again.');
+      console.error("Error fetching companies:", error);
+      setError("Failed to load companies. Please try again.");
       // For demo purposes, use sample data
       setCompanies(getSampleCompanies());
     } finally {
@@ -128,48 +138,52 @@ const CompanyManagement = () => {
   const getSampleCompanies = () => [
     {
       companyId: 1,
-      companyName: 'BSP (Bullah Shah)',
-      companyDescription: 'Leading energy solutions provider specializing in renewable energy and sustainable power generation',
-      ntn: '123456789',
-      contactPersonName: 'Ahmed Khan',
-      contactPersonPhone: '+92-300-1234567',
-      industry: 'Energy',
-      companySize: 'Large',
-      location: 'Karachi'
+      companyName: "BSP (Bullah Shah)",
+      companyDescription:
+        "Leading energy solutions provider specializing in renewable energy and sustainable power generation",
+      ntn: "123456789",
+      contactPersonName: "Ahmed Khan",
+      contactPersonPhone: "+92-300-1234567",
+      industry: "Energy",
+      companySize: "Large",
+      location: "Karachi",
     },
     {
       companyId: 2,
-      companyName: 'Sapphaler',
-      companyDescription: 'Healthcare technology platform improving patient care through innovative digital solutions',
-      ntn: '987654321',
-      contactPersonName: 'Fatima Ali',
-      contactPersonPhone: '+92-300-9876543',
-      industry: 'Healthcare',
-      companySize: 'Medium',
-      location: 'Lahore'
+      companyName: "Sapphaler",
+      companyDescription:
+        "Healthcare technology platform improving patient care through innovative digital solutions",
+      ntn: "987654321",
+      contactPersonName: "Fatima Ali",
+      contactPersonPhone: "+92-300-9876543",
+      industry: "Healthcare",
+      companySize: "Medium",
+      location: "Lahore",
     },
     {
       companyId: 3,
-      companyName: 'Nishat',
-      companyDescription: 'Digital banking solutions for modern businesses and consumers with cutting-edge fintech',
-      ntn: '456789123',
-      contactPersonName: 'Usman Malik',
-      contactPersonPhone: '+92-300-4567891',
-      industry: 'Banking',
-      companySize: 'Large',
-      location: 'Islamabad'
+      companyName: "Nishat",
+      companyDescription:
+        "Digital banking solutions for modern businesses and consumers with cutting-edge fintech",
+      ntn: "456789123",
+      contactPersonName: "Usman Malik",
+      contactPersonPhone: "+92-300-4567891",
+      industry: "Banking",
+      companySize: "Large",
+      location: "Islamabad",
     },
     {
       companyId: 4,
-      companyName: 'Ithad Chemicals',
-      companyDescription: 'E-commerce platform connecting vendors with global customers worldwide',
-      ntn: '789123456',
-      contactPersonName: 'Ayesha Hassan',
-      contactPersonPhone: '+92-300-7891234',
-      industry: 'Manufacturing',
-      companySize: 'Medium',
-      location: 'Faisalabad'
-    }
+      companyName: "Ithad Chemicals",
+      companyDescription:
+        "E-commerce platform connecting vendors with global customers worldwide",
+      ntn: "789123456",
+      contactPersonName: "Ayesha Hassan",
+      contactPersonPhone: "+92-300-7891234",
+      industry: "Manufacturing",
+      companySize: "Medium",
+      location: "Faisalabad",
+    },
   ];
 
   const applyFilters = () => {
@@ -177,41 +191,48 @@ const CompanyManagement = () => {
 
     if (filters.search) {
       const searchTerm = filters.search.toLowerCase();
-      filtered = filtered.filter(company =>
-        company.companyName.toLowerCase().includes(searchTerm) ||
-        company.companyDescription.toLowerCase().includes(searchTerm) ||
-        company.contactPersonName.toLowerCase().includes(searchTerm)
+      filtered = filtered.filter(
+        (company) =>
+          company.companyName.toLowerCase().includes(searchTerm) ||
+          company.companyDescription.toLowerCase().includes(searchTerm) ||
+          company.contactPersonName.toLowerCase().includes(searchTerm)
       );
     }
 
     if (filters.industry) {
-      filtered = filtered.filter(company => company.industry === filters.industry);
+      filtered = filtered.filter(
+        (company) => company.industry === filters.industry
+      );
     }
 
     if (filters.companySize) {
-      filtered = filtered.filter(company => company.companySize === filters.companySize);
+      filtered = filtered.filter(
+        (company) => company.companySize === filters.companySize
+      );
     }
 
     if (filters.location) {
-      filtered = filtered.filter(company => company.location === filters.location);
+      filtered = filtered.filter(
+        (company) => company.location === filters.location
+      );
     }
 
     setFilteredCompanies(filtered);
   };
 
   const handleFilterChange = (field, value) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const clearFilters = () => {
     setFilters({
-      industry: '',
-      companySize: '',
-      location: '',
-      search: ''
+      industry: "",
+      companySize: "",
+      location: "",
+      search: "",
     });
   };
 
@@ -234,17 +255,17 @@ const CompanyManagement = () => {
   };
 
   const handleCompanySaved = () => {
-    console.log('Company saved, showing snackbar...');
+    console.log("Company saved, showing snackbar...");
     handleFormClose();
     fetchCompanies();
-    showSnackbar('Company saved successfully!');
+    showSnackbar("Company saved successfully!");
   };
 
   const getCompanyInitials = (companyName) => {
     return companyName
-      .split(' ')
-      .map(word => word.charAt(0))
-      .join('')
+      .split(" ")
+      .map((word) => word.charAt(0))
+      .join("")
       .toUpperCase()
       .substring(0, 2);
   };
@@ -255,29 +276,37 @@ const CompanyManagement = () => {
 
   const getIndustryIcon = (industry) => {
     switch (industry) {
-      case 'Technology': return <WorkIcon />;
-      case 'Healthcare': return <BusinessIcon />;
-      case 'Finance': return <BusinessIcon />;
-      case 'Manufacturing': return <WorkIcon />;
-      case 'Energy': return <WorkIcon />;
-      case 'Retail': return <BusinessIcon />;
-      case 'Education': return <BusinessIcon />;
-      default: return <BusinessIcon />;
+      case "Technology":
+        return <WorkIcon />;
+      case "Healthcare":
+        return <BusinessIcon />;
+      case "Finance":
+        return <BusinessIcon />;
+      case "Manufacturing":
+        return <WorkIcon />;
+      case "Energy":
+        return <WorkIcon />;
+      case "Retail":
+        return <BusinessIcon />;
+      case "Education":
+        return <BusinessIcon />;
+      default:
+        return <BusinessIcon />;
     }
   };
 
   if (loading) {
     return (
-      <Box 
-        display="flex" 
-        flexDirection="column"
-        justifyContent="center" 
-        alignItems="center" 
-        minHeight="60vh"
+      <Box
+        display='flex'
+        flexDirection='column'
+        justifyContent='center'
+        alignItems='center'
+        minHeight='60vh'
         gap={3}
       >
         <CircularProgress size={60} thickness={4} />
-        <Typography variant="h6" color="text.secondary">
+        <Typography variant='h6' color='text.secondary'>
           Loading companies...
         </Typography>
       </Box>
@@ -285,44 +314,59 @@ const CompanyManagement = () => {
   }
 
   return (
-    <Box sx={{ p: 0, backgroundColor: '#f8fffa', minHeight: '100vh' }}>
+    <Box sx={{ p: 0, backgroundColor: "#f8fffa", minHeight: "100vh" }}>
       {/* Enhanced Header */}
-      <Box sx={{ 
-        background: 'linear-gradient(135deg, #228B22 0%, #006400 100%)',
-        color: 'white',
-        p: 4,
-        mb: 3,
-        borderRadius: '0 0 24px 24px',
-        boxShadow: '0 8px 32px rgba(34,139,34,0.2)'
-      }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Box
+        sx={{
+          background: "linear-gradient(135deg, #228B22 0%, #006400 100%)",
+          color: "white",
+          p: 4,
+          mb: 3,
+          borderRadius: "0 0 24px 24px",
+          boxShadow: "0 8px 32px rgba(34,139,34,0.2)",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <Box>
-            <Typography variant="h4" gutterBottom sx={{color: 'white', fontWeight: 700, mb: 1 }}>
+            <Typography
+              variant='h4'
+              gutterBottom
+              sx={{ color: "white", fontWeight: 700, mb: 1 }}
+            >
               Companies Directory
             </Typography>
-            <Typography variant="h6" sx={{color: 'white', opacity: 0.9, fontWeight: 300 }}>
+            <Typography
+              variant='h6'
+              sx={{ color: "white", opacity: 0.9, fontWeight: 300 }}
+            >
               Discover and explore companies in your industry
             </Typography>
           </Box>
           <Button
-            variant="contained"
+            variant='contained'
             startIcon={<AddIcon />}
             onClick={handleAddCompany}
-            size="large"
-            sx={{ 
+            size='large'
+            sx={{
               borderRadius: 3,
               px: 4,
               py: 1.5,
-              fontSize: '1rem',
+              fontSize: "1rem",
               fontWeight: 600,
-              bgcolor: '#228B22',
-              boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
-              '&:hover': {
-                bgcolor: '#006400',
-                transform: 'translateY(-2px)',
-                boxShadow: '0 8px 24px rgba(0,0,0,0.3)'
+              bgcolor: "#228B22",
+              boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
+              "&:hover": {
+                bgcolor: "#006400",
+                transform: "translateY(-2px)",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
               },
-              transition: 'all 0.3s ease'
+              transition: "all 0.3s ease",
             }}
           >
             Add Company
@@ -332,33 +376,42 @@ const CompanyManagement = () => {
 
       {/* Enhanced Filters Section */}
       <Box sx={{ mb: 4, px: 3 }}>
-        <Card sx={{ 
-          borderRadius: 4, 
-          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-          overflow: 'visible'
-        }}>
+        <Card
+          sx={{
+            borderRadius: 4,
+            boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+            overflow: "visible",
+          }}
+        >
           <CardContent sx={{ p: 3 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                          <FilterIcon sx={{ mr: 2, fontSize: '1.5rem', color: '#228B22' }} />
-            <Typography variant="h5" sx={{ fontWeight: 600, color: '#228B22' }}>
-              Search & Filters
-            </Typography>
+            <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
+              <FilterIcon
+                sx={{ mr: 2, fontSize: "1.5rem", color: "#228B22" }}
+              />
+              <Typography
+                variant='h5'
+                sx={{ fontWeight: 600, color: "#228B22" }}
+              >
+                Search & Filters
+              </Typography>
             </Box>
-            
+
             <Grid container spacing={3}>
               <Grid item xs={12} sm={6} md={3}>
                 <TextField
                   fullWidth
-                  label="Industry"
+                  label='Industry'
                   value={filters.industry}
-                  onChange={(e) => handleFilterChange('industry', e.target.value)}
-                  size="medium"
-                  variant="outlined"
+                  onChange={(e) =>
+                    handleFilterChange("industry", e.target.value)
+                  }
+                  size='medium'
+                  variant='outlined'
                   sx={{
-                    '& .MuiOutlinedInput-root': {
+                    "& .MuiOutlinedInput-root": {
                       borderRadius: 2,
-                      '&:hover fieldset': {
-                        borderColor: '#228B22',
+                      "&:hover fieldset": {
+                        borderColor: "#228B22",
                       },
                     },
                   }}
@@ -367,16 +420,18 @@ const CompanyManagement = () => {
               <Grid item xs={12} sm={6} md={3}>
                 <TextField
                   fullWidth
-                  label="Company Size"
+                  label='Company Size'
                   value={filters.companySize}
-                  onChange={(e) => handleFilterChange('companySize', e.target.value)}
-                  size="medium"
-                  variant="outlined"
+                  onChange={(e) =>
+                    handleFilterChange("companySize", e.target.value)
+                  }
+                  size='medium'
+                  variant='outlined'
                   sx={{
-                    '& .MuiOutlinedInput-root': {
+                    "& .MuiOutlinedInput-root": {
                       borderRadius: 2,
-                      '&:hover fieldset': {
-                        borderColor: '#228B22',
+                      "&:hover fieldset": {
+                        borderColor: "#228B22",
                       },
                     },
                   }}
@@ -385,16 +440,18 @@ const CompanyManagement = () => {
               <Grid item xs={12} sm={6} md={3}>
                 <TextField
                   fullWidth
-                  label="Location"
+                  label='Location'
                   value={filters.location}
-                  onChange={(e) => handleFilterChange('location', e.target.value)}
-                  size="medium"
-                  variant="outlined"
+                  onChange={(e) =>
+                    handleFilterChange("location", e.target.value)
+                  }
+                  size='medium'
+                  variant='outlined'
                   sx={{
-                    '& .MuiOutlinedInput-root': {
+                    "& .MuiOutlinedInput-root": {
                       borderRadius: 2,
-                      '&:hover fieldset': {
-                        borderColor: '#228B22',
+                      "&:hover fieldset": {
+                        borderColor: "#228B22",
                       },
                     },
                   }}
@@ -403,65 +460,65 @@ const CompanyManagement = () => {
               <Grid item xs={12} sm={6} md={3}>
                 <TextField
                   fullWidth
-                  label="Search Companies"
-                  placeholder="Search by name, description..."
+                  label='Search Companies'
+                  placeholder='Search by name, description...'
                   value={filters.search}
-                  onChange={(e) => handleFilterChange('search', e.target.value)}
-                  size="medium"
-                  variant="outlined"
+                  onChange={(e) => handleFilterChange("search", e.target.value)}
+                  size='medium'
+                  variant='outlined'
                   InputProps={{
                     startAdornment: (
-                      <InputAdornment position="start">
-                        <SearchIcon sx={{ color: '#228B22' }} />
+                      <InputAdornment position='start'>
+                        <SearchIcon sx={{ color: "#228B22" }} />
                       </InputAdornment>
                     ),
                   }}
                   sx={{
-                    '& .MuiOutlinedInput-root': {
+                    "& .MuiOutlinedInput-root": {
                       borderRadius: 2,
-                      '&:hover fieldset': {
-                        borderColor: '#228B22',
+                      "&:hover fieldset": {
+                        borderColor: "#228B22",
                       },
                     },
                   }}
                 />
               </Grid>
             </Grid>
-            
-            <Box sx={{ display: 'flex', gap: 2, mt: 3, flexWrap: 'wrap' }}>
-              <Button 
-                variant="contained" 
-                onClick={applyFilters} 
-                size="large"
-                sx={{ 
+
+            <Box sx={{ display: "flex", gap: 2, mt: 3, flexWrap: "wrap" }}>
+              <Button
+                variant='contained'
+                onClick={applyFilters}
+                size='large'
+                sx={{
                   borderRadius: 2,
                   px: 4,
                   py: 1.5,
                   fontWeight: 600,
-                  bgcolor: '#228B22',
-                  '&:hover': {
-                    bgcolor: '#006400'
-                  }
+                  bgcolor: "#228B22",
+                  "&:hover": {
+                    bgcolor: "#006400",
+                  },
                 }}
               >
                 Apply Filters
               </Button>
-              <Button 
-                variant="outlined" 
-                onClick={clearFilters} 
-                size="large"
-                sx={{ 
+              <Button
+                variant='outlined'
+                onClick={clearFilters}
+                size='large'
+                sx={{
                   borderRadius: 2,
                   px: 4,
                   py: 1.5,
                   fontWeight: 600,
-                  borderColor: '#228B22',
-                  color: '#228B22',
-                  '&:hover': {
-                    borderColor: '#006400',
-                    color: '#006400',
-                    bgcolor: 'rgba(34, 139, 34, 0.04)'
-                  }
+                  borderColor: "#228B22",
+                  color: "#228B22",
+                  "&:hover": {
+                    borderColor: "#006400",
+                    color: "#006400",
+                    bgcolor: "rgba(34, 139, 34, 0.04)",
+                  },
                 }}
               >
                 Clear All
@@ -472,19 +529,27 @@ const CompanyManagement = () => {
       </Box>
 
       {/* Enhanced Results Count */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, px: 3 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Typography variant="h6" sx={{ fontWeight: 600, color: '#228B22' }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+          px: 3,
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Typography variant='h6' sx={{ fontWeight: 600, color: "#228B22" }}>
             Results
           </Typography>
-          <Chip 
+          <Chip
             label={`${filteredCompanies.length} of ${companies.length} companies`}
-            sx={{ 
+            sx={{
               fontWeight: 500,
-              color: '#228B22',
-              borderColor: '#228B22'
+              color: "#228B22",
+              borderColor: "#228B22",
             }}
-            variant="outlined"
+            variant='outlined'
           />
         </Box>
       </Box>
@@ -492,7 +557,7 @@ const CompanyManagement = () => {
       {/* Error Alert */}
       {error && (
         <Box sx={{ px: 3, mb: 3 }}>
-          <Alert severity="error" sx={{ borderRadius: 2, fontSize: '0.9rem' }}>
+          <Alert severity='error' sx={{ borderRadius: 2, fontSize: "0.9rem" }}>
             {error}
           </Alert>
         </Box>
@@ -504,88 +569,177 @@ const CompanyManagement = () => {
           {filteredCompanies.map((company, index) => (
             <Grid item xs={12} sm={6} md={4} lg={3} key={company.companyId}>
               <Zoom in={true} style={{ transitionDelay: `${index * 100}ms` }}>
-                <Card 
-                  sx={{ 
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
+                <Card
+                  sx={{
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
                     borderRadius: 3,
-                    boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-                    transition: 'all 0.3s ease',
-                    cursor: 'pointer',
-                    '&:hover': {
-                      transform: 'translateY(-8px)',
-                      boxShadow: '0 12px 40px rgba(0,0,0,0.15)',
-                    }
+                    boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+                    transition: "all 0.3s ease",
+                    cursor: "pointer",
+                    "&:hover": {
+                      transform: "translateY(-8px)",
+                      boxShadow: "0 12px 40px rgba(0,0,0,0.15)",
+                    },
                   }}
                   onClick={() => handleViewDetails(company)}
                 >
                   {/* Company Header */}
-                  <Box sx={{ 
-                    p: 3, 
-                    background: `linear-gradient(135deg, ${getCompanyColor(company.companyId)} 0%, ${getCompanyColor(company.companyId)}dd 100%)`,
-                    color: 'white',
-                    borderRadius: '12px 12px 0 0'
-                  }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <Box
+                    sx={{
+                      p: 3,
+                      background: `linear-gradient(135deg, ${getCompanyColor(
+                        company.companyId
+                      )} 0%, ${getCompanyColor(company.companyId)}dd 100%)`,
+                      color: "white",
+                      borderRadius: "12px 12px 0 0",
+                    }}
+                  >
+                    <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                       <Avatar
                         sx={{
-                          bgcolor: 'rgba(255,255,255,0.2)',
+                          bgcolor: "rgba(255,255,255,0.2)",
                           width: 50,
                           height: 50,
                           mr: 2,
-                          fontSize: '1.2rem',
+                          fontSize: "1.2rem",
                           fontWeight: 600,
-                          border: '2px solid rgba(255,255,255,0.3)'
+                          border: "2px solid rgba(255,255,255,0.3)",
                         }}
-                        src={company.logoPath ? `${import.meta.env.VITE_LIVE_APP_BASEURL || 'https://localhost:7084/api'}/Companies/${company.companyId}/logo` : null}
+                        src={
+                          company.logoPath
+                            ? `${
+                                import.meta.env.VITE_LIVE_APP_BASEURL ||
+                                "https://localhost:7084/api"
+                              }/Companies/${company.companyId}/logo`
+                            : null
+                        }
                       >
                         {getCompanyInitials(company.companyName)}
                       </Avatar>
                       <Box sx={{ flexGrow: 1 }}>
-                        <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5, fontSize: '1.1rem', color: 'white' }}>
+                        <Typography
+                          variant='h6'
+                          sx={{
+                            fontWeight: 700,
+                            mb: 0.5,
+                            fontSize: "1.1rem",
+                            color: "white",
+                          }}
+                        >
                           {company.companyName}
                         </Typography>
-                        <Typography variant="body2" sx={{ opacity: 0.9, fontSize: '0.85rem', color: 'white', fontWeight: 500 }}>
-                          {company.industry || 'Industry not specified'}
+                        <Typography
+                          variant='body2'
+                          sx={{
+                            opacity: 0.9,
+                            fontSize: "0.85rem",
+                            color: "white",
+                            fontWeight: 500,
+                          }}
+                        >
+                          {company.industry || "Industry not specified"}
                         </Typography>
                       </Box>
                     </Box>
                   </Box>
 
                   {/* Company Content */}
-                  <CardContent sx={{ p: 3, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 3, lineHeight: 1.6 }}>
+                  <CardContent
+                    sx={{
+                      p: 3,
+                      flexGrow: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <Typography
+                      variant='body2'
+                      color='text.secondary'
+                      sx={{ mb: 3, lineHeight: 1.6 }}
+                    >
                       {company.companyDescription}
                     </Typography>
 
                     <Box sx={{ mb: 3, flexGrow: 1 }}>
                       {/* Company Details */}
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
-                        <LocationIcon sx={{ mr: 1, fontSize: '1rem', color: 'text.secondary' }} />
-                        <Typography variant="body2" sx={{ fontSize: '0.85rem', color: 'text.secondary' }}>
-                          {company.location || 'Location not specified'}
-                        </Typography>
-                      </Box>
-                      
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
-                        <PeopleIcon sx={{ mr: 1, fontSize: '1rem', color: 'text.secondary' }} />
-                        <Typography variant="body2" sx={{ fontSize: '0.85rem', color: 'text.secondary' }}>
-                          {company.companySize || 'Size not specified'}
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", mb: 1.5 }}
+                      >
+                        <LocationIcon
+                          sx={{
+                            mr: 1,
+                            fontSize: "1rem",
+                            color: "text.secondary",
+                          }}
+                        />
+                        <Typography
+                          variant='body2'
+                          sx={{ fontSize: "0.85rem", color: "text.secondary" }}
+                        >
+                          {company.location || "Location not specified"}
                         </Typography>
                       </Box>
 
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
-                        <PhoneIcon sx={{ mr: 1, fontSize: '1rem', color: 'text.secondary' }} />
-                        <Typography variant="body2" sx={{ fontSize: '0.85rem', color: 'text.secondary' }}>
-                          {company.contactPersonPhone || 'Phone not specified'}
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", mb: 1.5 }}
+                      >
+                        <PeopleIcon
+                          sx={{
+                            mr: 1,
+                            fontSize: "1rem",
+                            color: "text.secondary",
+                          }}
+                        />
+                        <Typography
+                          variant='body2'
+                          sx={{ fontSize: "0.85rem", color: "text.secondary" }}
+                        >
+                          {company.companySize || "Size not specified"}
+                        </Typography>
+                      </Box>
+
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", mb: 1.5 }}
+                      >
+                        <PhoneIcon
+                          sx={{
+                            mr: 1,
+                            fontSize: "1rem",
+                            color: "text.secondary",
+                          }}
+                        />
+                        <Typography
+                          variant='body2'
+                          sx={{ fontSize: "0.85rem", color: "text.secondary" }}
+                        >
+                          {company.contactPersonPhone || "Phone not specified"}
                         </Typography>
                       </Box>
 
                       {company.ntn && (
-                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
-                          <BusinessIcon sx={{ mr: 1, fontSize: '1rem', color: 'text.secondary' }} />
-                          <Typography variant="body2" sx={{ fontSize: '0.85rem', color: 'text.secondary' }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            mb: 1.5,
+                          }}
+                        >
+                          <BusinessIcon
+                            sx={{
+                              mr: 1,
+                              fontSize: "1rem",
+                              color: "text.secondary",
+                            }}
+                          />
+                          <Typography
+                            variant='body2'
+                            sx={{
+                              fontSize: "0.85rem",
+                              color: "text.secondary",
+                            }}
+                          >
                             NTN: {company.ntn}
                           </Typography>
                         </Box>
@@ -594,25 +748,25 @@ const CompanyManagement = () => {
 
                     {/* Action Button */}
                     <Button
-                      variant="outlined"
+                      variant='outlined'
                       fullWidth
                       startIcon={<VisibilityIcon />}
-                      size="medium"
-                      sx={{ 
+                      size='medium'
+                      sx={{
                         borderRadius: 2,
                         py: 1.5,
                         fontWeight: 600,
                         borderWidth: 2,
-                        borderColor: '#228B22',
-                        color: '#228B22',
-                        '&:hover': {
+                        borderColor: "#228B22",
+                        color: "#228B22",
+                        "&:hover": {
                           borderWidth: 2,
-                          borderColor: '#006400',
-                          color: '#006400',
-                          bgcolor: 'rgba(34, 139, 34, 0.04)',
-                          transform: 'scale(1.02)'
+                          borderColor: "#006400",
+                          color: "#006400",
+                          bgcolor: "rgba(34, 139, 34, 0.04)",
+                          transform: "scale(1.02)",
                         },
-                        transition: 'all 0.2s ease'
+                        transition: "all 0.2s ease",
                       }}
                     >
                       View Details
@@ -626,31 +780,40 @@ const CompanyManagement = () => {
 
         {/* Empty State */}
         {filteredCompanies.length === 0 && !loading && (
-          <Box sx={{ 
-            textAlign: 'center', 
-            py: 8,
-            px: 3
-          }}>
-            <BusinessIcon sx={{ fontSize: 80, color: 'text.secondary', mb: 2, opacity: 0.5 }} />
-            <Typography variant="h5" color="text.secondary" sx={{ mb: 1 }}>
+          <Box
+            sx={{
+              textAlign: "center",
+              py: 8,
+              px: 3,
+            }}
+          >
+            <BusinessIcon
+              sx={{
+                fontSize: 80,
+                color: "text.secondary",
+                mb: 2,
+                opacity: 0.5,
+              }}
+            />
+            <Typography variant='h5' color='text.secondary' sx={{ mb: 1 }}>
               No companies found
             </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+            <Typography variant='body1' color='text.secondary' sx={{ mb: 3 }}>
               Try adjusting your filters or add a new company to get started.
             </Typography>
             <Button
-              variant="contained"
+              variant='contained'
               startIcon={<AddIcon />}
               onClick={handleAddCompany}
-              size="large"
-              sx={{ 
-                borderRadius: 2, 
-                px: 4, 
+              size='large'
+              sx={{
+                borderRadius: 2,
+                px: 4,
                 py: 1.5,
-                bgcolor: '#228B22',
-                '&:hover': {
-                  bgcolor: '#006400'
-                }
+                bgcolor: "#228B22",
+                "&:hover": {
+                  bgcolor: "#006400",
+                },
               }}
             >
               Add First Company
@@ -663,10 +826,10 @@ const CompanyManagement = () => {
       <Dialog
         open={isFormOpen}
         onClose={handleFormClose}
-        maxWidth="md"
+        maxWidth='md'
         fullWidth
         PaperProps={{
-          sx: { borderRadius: 4, overflow: 'hidden' }
+          sx: { borderRadius: 4, overflow: "hidden" },
         }}
       >
         <CompanyForm
@@ -682,31 +845,31 @@ const CompanyManagement = () => {
         open={snackbar.open}
         autoHideDuration={4000}
         onClose={hideSnackbar}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         TransitionComponent={Fade}
       >
-        <Alert 
-          onClose={hideSnackbar} 
-          severity={snackbar.severity} 
-          sx={{ 
-            width: '100%',
+        <Alert
+          onClose={hideSnackbar}
+          severity={snackbar.severity}
+          sx={{
+            width: "100%",
             borderRadius: 2,
-            boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-            '& .MuiAlert-icon': {
-              fontSize: '1.5rem'
-            }
+            boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
+            "& .MuiAlert-icon": {
+              fontSize: "1.5rem",
+            },
           }}
         >
           {snackbar.message}
         </Alert>
       </Snackbar>
-      
+
       {/* Debug info */}
-      <div style={{ display: 'none' }}>
+      <div style={{ display: "none" }}>
         Snackbar state: {JSON.stringify(snackbar)}
       </div>
     </Box>
   );
 };
 
-export default CompanyManagement; 
+export default CompanyManagement;

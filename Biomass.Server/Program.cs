@@ -47,6 +47,7 @@ builder.Services.AddScoped<ICashbookService, CashbookService>();
 builder.Services.AddScoped<IMoneyAccountService, MoneyAccountService>();
 builder.Services.AddScoped<IVehicleService, VehicleService>();
 builder.Services.AddScoped<IDriverService, DriverService>();
+builder.Services.AddScoped<IDispatchService, DispatchService>();
 //builder.Services.AddScoped<IUserService, Us>();
 //builder.Services.AddScoped<IAuthService, AuthService>();
 

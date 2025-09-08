@@ -7,24 +7,24 @@ export const config = {
     // Base URL for API calls
     // For development: 'https://localhost:7084/api'
     // For production: 'https://your-production-domain.com/api'
-    baseUrl: 'https://localhost:7084/api',
-    
+    baseUrl: "https://localhost:7084/api",
+
     // Timeout for API requests (in milliseconds)
     timeout: 30000,
-    
+
     // Retry configuration
     retry: {
       attempts: 3,
-      delay: 1000
-    }
+      delay: 1000,
+    },
   },
-  
+
   // Application Configuration
   app: {
-    name: 'Biomass Portal',
-    version: '1.0.0',
-    environment: process.env.NODE_ENV || 'development'
-  }
+    name: "Biomass Portal",
+    version: "1.0.0",
+    environment: process.env.NODE_ENV || "development",
+  },
 };
 
 // Helper function to get API base URL
@@ -33,7 +33,7 @@ export const getApiBaseUrl = () => {
   if (import.meta.env.VITE_LIVE_APP_BASEURL) {
     return import.meta.env.VITE_LIVE_APP_BASEURL;
   }
-  
+
   // Fallback to config file
   return config.api.baseUrl;
 };

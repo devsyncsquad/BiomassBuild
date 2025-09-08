@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -12,9 +12,6 @@ import {
   Button,
   Alert,
   Snackbar,
-  Avatar,
-  Divider,
-  Paper,
   Table,
   TableBody,
   TableCell,
@@ -23,28 +20,19 @@ import {
   TableRow,
   TablePagination,
   Checkbox,
-  IconButton,
   TextField,
   InputAdornment,
-  Toolbar,
   Chip,
-  CircularProgress
-} from '@mui/material';
-import {
-  Assignment,
-  Security,
-  Menu,
-  Search,
-  GetApp,
-  ViewColumn,
-  Delete,
-  Save
-} from '@mui/icons-material';
+  CircularProgress,
+} from "@mui/material";
+import { Security, Menu, Search, Save } from "@mui/icons-material";
 
 // Utility Imports
-import { getAuthHeaders, getCurrentUser } from '../../../utils/auth';
+import { getAuthHeaders, getCurrentUser } from "../../../utils/auth";
+import SectionHeader from "../shared/SectionHeader";
+import CardContainer from "../shared/CardContainer";
 
-const baseUrl = import.meta.env.VITE_APP_BASE_URL || 'https://localhost:7084';
+const baseUrl = import.meta.env.VITE_APP_BASE_URL || "https://localhost:7084";
 
 const AssignMenus = () => {
   // State management
@@ -53,10 +41,14 @@ const AssignMenus = () => {
   const [menuRoles, setMenuRoles] = useState([]);
   const [userMenuRoles, setUserMenuRoles] = useState([]); // Menus assigned to current user
   const [loading, setLoading] = useState(true);
-  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
   // Selection states
-  const [selectedRole, setSelectedRole] = useState('');
+  const [selectedRole, setSelectedRole] = useState("");
   const [selectedUnassignedMenus, setSelectedUnassignedMenus] = useState([]);
   const [selectedAssignedMenus, setSelectedAssignedMenus] = useState([]);
 
@@ -64,8 +56,8 @@ const AssignMenus = () => {
   const [unassignedPage, setUnassignedPage] = useState(0);
   const [assignedPage, setAssignedPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(100);
-  const [unassignedSearchTerm, setUnassignedSearchTerm] = useState('');
-  const [assignedSearchTerm, setAssignedSearchTerm] = useState('');
+  const [unassignedSearchTerm, setUnassignedSearchTerm] = useState("");
+  const [assignedSearchTerm, setAssignedSearchTerm] = useState("");
 
   // Get current user
   const user = getCurrentUser();
@@ -83,19 +75,20 @@ const AssignMenus = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      
+
       // Fetch all data in parallel
-      const [rolesResponse, menusResponse, menuRolesResponse] = await Promise.all([
-        fetch(`${baseUrl}/api/UserManagement/GetRoleList`, {
-          headers: getAuthHeaders()
-        }),
-        fetch(`${baseUrl}/api/UserManagement/GetMenuList`, {
-          headers: getAuthHeaders()
-        }),
-        fetch(`${baseUrl}/api/UserManagement/GetMenuRoleList`, {
-          headers: getAuthHeaders()
-        })
-      ]);
+      const [rolesResponse, menusResponse, menuRolesResponse] =
+        await Promise.all([
+          fetch(`${baseUrl}/api/UserManagement/GetRoleList`, {
+            headers: getAuthHeaders(),
+          }),
+          fetch(`${baseUrl}/api/UserManagement/GetMenuList`, {
+            headers: getAuthHeaders(),
+          }),
+          fetch(`${baseUrl}/api/UserManagement/GetMenuRoleList`, {
+            headers: getAuthHeaders(),
+          }),
+        ]);
 
       // Parse responses
       const rolesData = await rolesResponse.json();
@@ -111,10 +104,10 @@ const AssignMenus = () => {
         await fetchUserMenuAssignments();
       }
 
-      showSnackbar('Data loaded successfully', 'success');
+      showSnackbar("Data loaded successfully", "success");
     } catch (error) {
-      console.error('Error fetching data:', error);
-      showSnackbar('Failed to load data. Using sample data.', 'warning');
+      console.error("Error fetching data:", error);
+      showSnackbar("Failed to load data. Using sample data.", "warning");
       // Use sample data
       setRoles(getSampleRoles());
       setMenus(getSampleMenus());
@@ -128,20 +121,30 @@ const AssignMenus = () => {
   const fetchUserMenuAssignments = async () => {
     try {
       // Get user's role first
-      const userRoleResponse = await fetch(`${baseUrl}/api/UserManagement/GetUserRolesByUserId?userId=${user.empId}`, {
-        headers: getAuthHeaders()
-      });
-      
+      const userRoleResponse = await fetch(
+        `${baseUrl}/api/UserManagement/GetUserRolesByUserId?userId=${user.empId}`,
+        {
+          headers: getAuthHeaders(),
+        }
+      );
+
       if (userRoleResponse.ok) {
         const userRoleData = await userRoleResponse.json();
-        if (userRoleData.success && userRoleData.result && userRoleData.result.length > 0) {
+        if (
+          userRoleData.success &&
+          userRoleData.result &&
+          userRoleData.result.length > 0
+        ) {
           const userRole = userRoleData.result[0]; // Get first role
-          
+
           // Fetch menus for this role
-          const userMenusResponse = await fetch(`${baseUrl}/api/UserManagement/GetMenuRolesByRoleId?roleId=${userRole.roleId}`, {
-            headers: getAuthHeaders()
-          });
-          
+          const userMenusResponse = await fetch(
+            `${baseUrl}/api/UserManagement/GetMenuRolesByRoleId?roleId=${userRole.roleId}`,
+            {
+              headers: getAuthHeaders(),
+            }
+          );
+
           if (userMenusResponse.ok) {
             const userMenusData = await userMenusResponse.json();
             if (userMenusData.success) {
@@ -151,18 +154,21 @@ const AssignMenus = () => {
         }
       }
     } catch (error) {
-      console.error('Error fetching user menu assignments:', error);
+      console.error("Error fetching user menu assignments:", error);
     }
   };
 
   const fetchMenuAssignments = async () => {
     if (!selectedRole) return;
-    
+
     try {
-      const response = await fetch(`${baseUrl}/api/UserManagement/GetMenuRoleList?roleId=${selectedRole}`, {
-        headers: getAuthHeaders()
-      });
-      
+      const response = await fetch(
+        `${baseUrl}/api/UserManagement/GetMenuRoleList?roleId=${selectedRole}`,
+        {
+          headers: getAuthHeaders(),
+        }
+      );
+
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
@@ -170,7 +176,7 @@ const AssignMenus = () => {
         }
       }
     } catch (error) {
-      console.error('Error fetching menu assignments:', error);
+      console.error("Error fetching menu assignments:", error);
     }
   };
 
@@ -184,24 +190,24 @@ const AssignMenus = () => {
 
   const handleSaveAssignments = async () => {
     if (!selectedRole) {
-      showSnackbar('Please select a role first', 'error');
+      showSnackbar("Please select a role first", "error");
       return;
     }
 
     try {
       // Assign selected unassigned menus
       if (selectedUnassignedMenus.length > 0) {
-        const assignPromises = selectedUnassignedMenus.map(menuId => 
+        const assignPromises = selectedUnassignedMenus.map((menuId) =>
           fetch(`${baseUrl}/api/UserManagement/SaveMenuRole`, {
-            method: 'POST',
+            method: "POST",
             headers: {
               ...getAuthHeaders(),
-              'Content-Type': 'application/json'
+              "Content-Type": "application/json",
             },
             body: JSON.stringify({
               roleId: parseInt(selectedRole),
-              menuId: parseInt(menuId)
-            })
+              menuId: parseInt(menuId),
+            }),
           })
         );
 
@@ -210,13 +216,18 @@ const AssignMenus = () => {
 
       // Unassign selected assigned menus
       if (selectedAssignedMenus.length > 0) {
-        const unassignPromises = selectedAssignedMenus.map(menuId => {
-          const menuRole = menuRoles.find(mr => mr.menuId === menuId && mr.roleId === parseInt(selectedRole));
+        const unassignPromises = selectedAssignedMenus.map((menuId) => {
+          const menuRole = menuRoles.find(
+            (mr) => mr.menuId === menuId && mr.roleId === parseInt(selectedRole)
+          );
           if (menuRole) {
-            return fetch(`${baseUrl}/api/UserManagement/DeleteMenuRoleById?roleId=${selectedRole}&menuId=${menuId}`, {
-              method: 'DELETE',
-              headers: getAuthHeaders()
-            });
+            return fetch(
+              `${baseUrl}/api/UserManagement/DeleteMenuRoleById?roleId=${selectedRole}&menuId=${menuId}`,
+              {
+                method: "DELETE",
+                headers: getAuthHeaders(),
+              }
+            );
           }
           return Promise.resolve();
         });
@@ -224,40 +235,42 @@ const AssignMenus = () => {
         await Promise.all(unassignPromises);
       }
 
-      showSnackbar('Menu assignments updated successfully', 'success');
+      showSnackbar("Menu assignments updated successfully", "success");
       setSelectedUnassignedMenus([]);
       setSelectedAssignedMenus([]);
       fetchMenuAssignments();
-      
+
       // Refresh user's menu assignments if they're editing their own role
       if (user?.empId) {
         await fetchUserMenuAssignments();
       }
     } catch (error) {
-      console.error('Error updating menu assignments:', error);
-      showSnackbar('Error updating menu assignments', 'error');
+      console.error("Error updating menu assignments:", error);
+      showSnackbar("Error updating menu assignments", "error");
     }
   };
 
   const handleUnassignedMenuToggle = (menuId) => {
-    setSelectedUnassignedMenus(prev => 
-      prev.includes(menuId) 
-        ? prev.filter(id => id !== menuId)
+    setSelectedUnassignedMenus((prev) =>
+      prev.includes(menuId)
+        ? prev.filter((id) => id !== menuId)
         : [...prev, menuId]
     );
   };
 
   const handleAssignedMenuToggle = (menuId) => {
-    setSelectedAssignedMenus(prev => 
-      prev.includes(menuId) 
-        ? prev.filter(id => id !== menuId)
+    setSelectedAssignedMenus((prev) =>
+      prev.includes(menuId)
+        ? prev.filter((id) => id !== menuId)
         : [...prev, menuId]
     );
   };
 
   const handleSelectAllUnassigned = (event) => {
     if (event.target.checked) {
-      setSelectedUnassignedMenus(getUnassignedMenus().map(menu => menu.menuId));
+      setSelectedUnassignedMenus(
+        getUnassignedMenus().map((menu) => menu.menuId)
+      );
     } else {
       setSelectedUnassignedMenus([]);
     }
@@ -265,7 +278,7 @@ const AssignMenus = () => {
 
   const handleSelectAllAssigned = (event) => {
     if (event.target.checked) {
-      setSelectedAssignedMenus(getAssignedMenus().map(menu => menu.menuId));
+      setSelectedAssignedMenus(getAssignedMenus().map((menu) => menu.menuId));
     } else {
       setSelectedAssignedMenus([]);
     }
@@ -274,45 +287,50 @@ const AssignMenus = () => {
   // Get filtered menus based on user role
   const getFilteredMenus = () => {
     if (!user?.role) return menus;
-    
+
     // Admin sees all menus
-    if (user.role.toLowerCase() === 'administrator' || user.role.toLowerCase() === 'admin') {
+    if (
+      user.role.toLowerCase() === "administrator" ||
+      user.role.toLowerCase() === "admin"
+    ) {
       return menus;
     }
-    
+
     // Manager and Employee only see their assigned menus
-    const assignedMenuIds = userMenuRoles.map(mr => mr.menuId);
-    return menus.filter(menu => assignedMenuIds.includes(menu.menuId));
+    const assignedMenuIds = userMenuRoles.map((mr) => mr.menuId);
+    return menus.filter((menu) => assignedMenuIds.includes(menu.menuId));
   };
 
   const getUnassignedMenus = () => {
     if (!selectedRole) return [];
-    
+
     const assignedMenuIds = menuRoles
-      .filter(mr => mr.roleId === parseInt(selectedRole))
-      .map(mr => mr.menuId);
-    
+      .filter((mr) => mr.roleId === parseInt(selectedRole))
+      .map((mr) => mr.menuId);
+
     const filteredMenus = getFilteredMenus();
-    
+
     return filteredMenus
-      .filter(menu => !assignedMenuIds.includes(menu.menuId))
-      .filter(menu => 
-        menu.menuName?.toLowerCase().includes(unassignedSearchTerm.toLowerCase())
+      .filter((menu) => !assignedMenuIds.includes(menu.menuId))
+      .filter((menu) =>
+        menu.menuName
+          ?.toLowerCase()
+          .includes(unassignedSearchTerm.toLowerCase())
       );
   };
 
   const getAssignedMenus = () => {
     if (!selectedRole) return [];
-    
+
     const assignedMenuIds = menuRoles
-      .filter(mr => mr.roleId === parseInt(selectedRole))
-      .map(mr => mr.menuId);
-    
+      .filter((mr) => mr.roleId === parseInt(selectedRole))
+      .map((mr) => mr.menuId);
+
     const filteredMenus = getFilteredMenus();
-    
+
     return filteredMenus
-      .filter(menu => assignedMenuIds.includes(menu.menuId))
-      .filter(menu => 
+      .filter((menu) => assignedMenuIds.includes(menu.menuId))
+      .filter((menu) =>
         menu.menuName?.toLowerCase().includes(assignedSearchTerm.toLowerCase())
       );
   };
@@ -323,32 +341,60 @@ const AssignMenus = () => {
 
   // Sample data functions for demo purposes
   const getSampleRoles = () => [
-    { roleId: 1, roleName: 'Administrator' },
-    { roleId: 2, roleName: 'Manager' },
-    { roleId: 3, roleName: 'User' }
+    { roleId: 1, roleName: "Administrator" },
+    { roleId: 2, roleName: "Manager" },
+    { roleId: 3, roleName: "User" },
   ];
 
   const getSampleMenus = () => [
-    { menuId: 1, menuName: 'Dashboard', iconUrl: '📊', orderNo: 1, isEnabled: 'Y', createdBy: 1 },
-    { menuId: 2, menuName: 'User Management', iconUrl: '👥', orderNo: 2, isEnabled: 'Y', createdBy: 1 },
-    { menuId: 3, menuName: 'Company Management', iconUrl: '🏢', orderNo: 3, isEnabled: 'Y', createdBy: 1 }
+    {
+      menuId: 1,
+      menuName: "Dashboard",
+      iconUrl: "📊",
+      orderNo: 1,
+      isEnabled: "Y",
+      createdBy: 1,
+    },
+    {
+      menuId: 2,
+      menuName: "User Management",
+      iconUrl: "👥",
+      orderNo: 2,
+      isEnabled: "Y",
+      createdBy: 1,
+    },
+    {
+      menuId: 3,
+      menuName: "Company Management",
+      iconUrl: "🏢",
+      orderNo: 3,
+      isEnabled: "Y",
+      createdBy: 1,
+    },
   ];
 
   const getSampleMenuRoles = () => [
     { menuRoleId: 1, roleId: 1, menuId: 1 },
-    { menuRoleId: 2, roleId: 1, menuId: 2 }
+    { menuRoleId: 2, roleId: 1, menuId: 2 },
   ];
 
   const getSampleUserMenuRoles = () => [
     { menuRoleId: 1, roleId: 1, menuId: 1 },
-    { menuRoleId: 2, roleId: 1, menuId: 2 }
+    { menuRoleId: 2, roleId: 1, menuId: 2 },
   ];
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400 }}>
-        <CircularProgress size={40} sx={{ color: '#228B22' }} />
-        <Typography variant="h6" color="text.secondary" sx={{ ml: 2 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: 400,
+        }}
+      >
+        <CircularProgress size={40} sx={{ color: "#228B22" }} />
+        <Typography variant='h6' color='text.secondary' sx={{ ml: 2 }}>
           Loading menu assignment data...
         </Typography>
       </Box>
@@ -360,179 +406,191 @@ const AssignMenus = () => {
   const filteredMenus = getFilteredMenus();
 
   return (
-    <Box sx={{ width: '100%', bgcolor: '#f8fffa', minHeight: '100vh' }}>
-      {/* Header Section */}
-      <Box sx={{ 
-        background: 'linear-gradient(135deg, #228B22 0%, #32CD32 100%)',
-        mb: 3,
-        borderRadius: 3,
-        p: 3,
-        boxShadow: '0 4px 20px rgba(34, 139, 34, 0.3)'
-      }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Box>
-            <Typography variant="h4" sx={{ color: 'white', mb: 1, fontWeight: 700 }}>
-              Assign Menus to Roles
-            </Typography>
-            <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.9)' }}>
-              Manage which menus are accessible to each role
-            </Typography>
-            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)', mt: 1 }}>
-              Current User: {user?.username || 'Unknown'} | Role: {user?.role || 'Unknown'} | Access Level: {
-                user?.role?.toLowerCase() === 'administrator' || user?.role?.toLowerCase() === 'admin' 
-                  ? 'Full Access (All Menus)' 
-                  : 'Limited Access (Assigned Menus Only)'
-              }
-            </Typography>
-          </Box>
-          <Avatar sx={{ width: 64, height: 64, bgcolor: 'rgba(255,255,255,0.2)' }}>
-            <Assignment sx={{ fontSize: 32, color: 'white' }} />
-          </Avatar>
-        </Box>
-      </Box>
+    <Box sx={{ width: "100%", bgcolor: "background.default" }}>
+      <SectionHeader title='Assign Menus to Roles' />
 
       {/* Role Selection */}
-      <Box sx={{ mb: 3, borderRadius: 3, bgcolor: 'background.paper', p: 2, boxShadow: 2, mx: 3 }}>
-        <FormControl fullWidth>
-          <InputLabel sx={{ color: '#228B22', fontWeight: 600 }}>Select Role</InputLabel>
-          <Select
-            value={selectedRole}
-            onChange={handleRoleChange}
-            label="Select Role"
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#228B22',
-                },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#228B22',
-                  borderWidth: '2px',
-                },
-              },
-            }}
-          >
-            {roles.map((role) => (
-              <MenuItem key={role.roleId} value={role.roleId}>
-                {role.roleName}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Box>
+      {/* <Box
+        sx={{
+          mb: 3,
+          borderRadius: 3,
+          bgcolor: "background.paper",
+          p: 2,
+          boxShadow: 2,
+          mx: 3,
+        }}
+      > */}
+      <Grid container spacing={2} sx={{ mb: 3, px: 3 }}>
+        <Grid item xs={12} md={6} lg={4}>
+          <FormControl fullWidth>
+            <InputLabel>Select Role</InputLabel>
+            <Select
+              value={selectedRole}
+              onChange={handleRoleChange}
+              label='Select Role'
+            >
+              {roles.map((role) => (
+                <MenuItem key={role.roleId} value={role.roleId}>
+                  {role.roleName}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+      </Grid>
+
+      {/* </Box> */}
 
       {/* Access Control Notice */}
-      {user?.role?.toLowerCase() !== 'administrator' && user?.role?.toLowerCase() !== 'admin' && (
-        <Box sx={{ mb: 3, mx: 3 }}>
-          <Alert severity="info" sx={{ 
-            bgcolor: '#e3f2fd', 
-            border: '1px solid #2196f3',
-            '& .MuiAlert-icon': { color: '#2196f3' }
-          }}>
-            <Typography variant="body2">
-              <strong>Access Control Active:</strong> You can only view and manage menus that are assigned to your role. 
-              Contact an administrator for full access.
-            </Typography>
-          </Alert>
-        </Box>
-      )}
+      {/* {user?.role?.toLowerCase() !== "administrator" &&
+        user?.role?.toLowerCase() !== "admin" && (
+          <Box sx={{ mb: 3, mx: 3 }}>
+            <Alert
+              severity='info'
+              sx={{
+                bgcolor: "#e3f2fd",
+                border: "1px solid #2196f3",
+                "& .MuiAlert-icon": { color: "#2196f3" },
+              }}
+            >
+              <Typography variant='body2'>
+                <strong>Access Control Active:</strong> You can only view and
+                manage menus that are assigned to your role. Contact an
+                administrator for full access.
+              </Typography>
+            </Alert>
+          </Box>
+        )} */}
 
       {selectedRole && (
         <Grid container spacing={3} sx={{ px: 3 }}>
           {/* Unassigned Menus */}
           <Grid item xs={12} md={6}>
-            <Box sx={{ 
-              borderRadius: 3, 
-              bgcolor: 'background.paper', 
-              p: 2, 
-              boxShadow: 2,
-              border: '2px solid #e8f5e8'
-            }}>
-              <Typography variant="h6" sx={{ 
-                mb: 2, 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: 1, 
-                fontWeight: 600, 
-                color: '#228B22',
-                borderBottom: '2px solid #228B22',
-                pb: 1
-              }}>
-                <Menu sx={{ color: '#228B22' }} />
+            <CardContainer>
+              <Typography
+                variant='h6'
+                sx={{
+                  mb: 2,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  fontWeight: 600,
+                  color: "#228B22",
+                  borderBottom: "2px solid #228B22",
+                  pb: 1,
+                }}
+              >
+                <Menu sx={{ color: "#228B22" }} />
                 Available Menus ({unassignedMenus.length})
               </Typography>
-              
+
               <TextField
-                size="small"
-                placeholder="Search menus..."
+                size='small'
+                placeholder='Search menus...'
                 value={unassignedSearchTerm}
                 onChange={(e) => setUnassignedSearchTerm(e.target.value)}
                 InputProps={{
                   startAdornment: (
-                    <InputAdornment position="start">
-                      <Search sx={{ color: '#228B22' }} />
+                    <InputAdornment position='start'>
+                      <Search sx={{ color: "#228B22" }} />
                     </InputAdornment>
                   ),
                 }}
-                sx={{ 
-                  width: '100%', 
+                sx={{
+                  width: "100%",
                   mb: 2,
-                  '& .MuiOutlinedInput-root': {
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#228B22',
+                  "& .MuiOutlinedInput-root": {
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#228B22",
                     },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#228B22',
-                      borderWidth: '2px',
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#228B22",
+                      borderWidth: "2px",
                     },
                   },
                 }}
               />
 
               <TableContainer>
-                <Table size="small">
+                <Table size='small'>
                   <TableHead>
-                    <TableRow sx={{ backgroundColor: '#f0f8f0' }}>
-                      <TableCell padding="checkbox">
+                    <TableRow sx={{ backgroundColor: "#f0f8f0" }}>
+                      <TableCell padding='checkbox'>
                         <Checkbox
-                          checked={unassignedMenus.length > 0 && selectedUnassignedMenus.length === unassignedMenus.length}
-                          indeterminate={selectedUnassignedMenus.length > 0 && selectedUnassignedMenus.length < unassignedMenus.length}
+                          checked={
+                            unassignedMenus.length > 0 &&
+                            selectedUnassignedMenus.length ===
+                              unassignedMenus.length
+                          }
+                          indeterminate={
+                            selectedUnassignedMenus.length > 0 &&
+                            selectedUnassignedMenus.length <
+                              unassignedMenus.length
+                          }
                           onChange={handleSelectAllUnassigned}
-                          sx={{ color: '#228B22', '&.Mui-checked': { color: '#228B22' } }}
+                          sx={{
+                            color: "#228B22",
+                            "&.Mui-checked": { color: "#228B22" },
+                          }}
                         />
                       </TableCell>
-                      <TableCell sx={{ fontWeight: 600, color: '#228B22' }}>Menu Name</TableCell>
-                      <TableCell sx={{ fontWeight: 600, color: '#228B22' }}>Order</TableCell>
-                      <TableCell sx={{ fontWeight: 600, color: '#228B22' }}>Status</TableCell>
+                      <TableCell sx={{ fontWeight: 600, color: "#228B22" }}>
+                        Menu Name
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 600, color: "#228B22" }}>
+                        Order
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 600, color: "#228B22" }}>
+                        Status
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {unassignedMenus.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={4} align="center">
-                          <Typography variant="body2" color="text.secondary">
+                        <TableCell colSpan={4} align='center'>
+                          <Typography variant='body2' color='text.secondary'>
                             No available menus
                           </Typography>
                         </TableCell>
                       </TableRow>
                     ) : (
                       unassignedMenus
-                        .slice(unassignedPage * rowsPerPage, unassignedPage * rowsPerPage + rowsPerPage)
+                        .slice(
+                          unassignedPage * rowsPerPage,
+                          unassignedPage * rowsPerPage + rowsPerPage
+                        )
                         .map((menu) => (
-                          <TableRow key={menu.menuId} hover sx={{ '&:hover': { backgroundColor: '#f8fffa' } }}>
-                            <TableCell padding="checkbox">
+                          <TableRow
+                            key={menu.menuId}
+                            hover
+                            sx={{ "&:hover": { backgroundColor: "#f8fffa" } }}
+                          >
+                            <TableCell padding='checkbox'>
                               <Checkbox
-                                checked={selectedUnassignedMenus.includes(menu.menuId)}
-                                onChange={() => handleUnassignedMenuToggle(menu.menuId)}
-                                sx={{ color: '#228B22', '&.Mui-checked': { color: '#228B22' } }}
+                                checked={selectedUnassignedMenus.includes(
+                                  menu.menuId
+                                )}
+                                onChange={() =>
+                                  handleUnassignedMenuToggle(menu.menuId)
+                                }
+                                sx={{
+                                  color: "#228B22",
+                                  "&.Mui-checked": { color: "#228B22" },
+                                }}
                               />
                             </TableCell>
                             <TableCell>{menu.menuName}</TableCell>
                             <TableCell>{menu.orderNo}</TableCell>
                             <TableCell>
                               <Chip
-                                label={menu.isEnabled === 'Y' ? 'Active' : 'Inactive'}
-                                size="small"
-                                color={menu.isEnabled === 'Y' ? 'success' : 'error'}
+                                label={
+                                  menu.isEnabled === "Y" ? "Active" : "Inactive"
+                                }
+                                size='small'
+                                color={
+                                  menu.isEnabled === "Y" ? "success" : "error"
+                                }
                                 sx={{ fontWeight: 500 }}
                               />
                             </TableCell>
@@ -544,7 +602,7 @@ const AssignMenus = () => {
               </TableContainer>
 
               <TablePagination
-                component="div"
+                component='div'
                 count={unassignedMenus.length}
                 page={unassignedPage}
                 onPageChange={(event, newPage) => setUnassignedPage(newPage)}
@@ -555,109 +613,140 @@ const AssignMenus = () => {
                 }}
                 rowsPerPageOptions={[25, 50, 100]}
                 sx={{
-                  '& .MuiTablePagination-selectIcon': { color: '#228B22' },
-                  '& .MuiTablePagination-select': { color: '#228B22' },
-                  '& .MuiTablePagination-actions button': { color: '#228B22' }
+                  "& .MuiTablePagination-selectIcon": { color: "#228B22" },
+                  "& .MuiTablePagination-select": { color: "#228B22" },
+                  "& .MuiTablePagination-actions button": { color: "#228B22" },
                 }}
               />
-            </Box>
+            </CardContainer>
           </Grid>
 
           {/* Assigned Menus */}
           <Grid item xs={12} md={6}>
-            <Box sx={{ 
-              borderRadius: 3, 
-              bgcolor: 'background.paper', 
-              p: 2, 
-              boxShadow: 2,
-              border: '2px solid #e8f5e8'
-            }}>
-              <Typography variant="h6" sx={{ 
-                mb: 2, 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: 1, 
-                fontWeight: 600, 
-                color: '#228B22',
-                borderBottom: '2px solid #228B22',
-                pb: 1
-              }}>
-                <Security sx={{ color: '#228B22' }} />
+            <CardContainer>
+              <Typography
+                variant='h6'
+                sx={{
+                  mb: 2,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  fontWeight: 600,
+                  color: "#228B22",
+                  borderBottom: "2px solid #228B22",
+                  pb: 1,
+                }}
+              >
+                <Security sx={{ color: "#228B22" }} />
                 Assigned Menus ({assignedMenus.length})
               </Typography>
-              
+
               <TextField
-                size="small"
-                placeholder="Search menus..."
+                size='small'
+                placeholder='Search menus...'
                 value={assignedSearchTerm}
                 onChange={(e) => setAssignedSearchTerm(e.target.value)}
                 InputProps={{
                   startAdornment: (
-                    <InputAdornment position="start">
-                      <Search sx={{ color: '#228B22' }} />
+                    <InputAdornment position='start'>
+                      <Search sx={{ color: "#228B22" }} />
                     </InputAdornment>
                   ),
                 }}
-                sx={{ 
-                  width: '100%', 
+                sx={{
+                  width: "100%",
                   mb: 2,
-                  '& .MuiOutlinedInput-root': {
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#228B22',
+                  "& .MuiOutlinedInput-root": {
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#228B22",
                     },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#228B22',
-                      borderWidth: '2px',
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#228B22",
+                      borderWidth: "2px",
                     },
                   },
                 }}
               />
 
               <TableContainer>
-                <Table size="small">
+                <Table size='small'>
                   <TableHead>
-                    <TableRow sx={{ backgroundColor: '#f0f8f0' }}>
-                      <TableCell padding="checkbox">
+                    <TableRow sx={{ backgroundColor: "#f0f8f0" }}>
+                      <TableCell padding='checkbox'>
                         <Checkbox
-                          checked={assignedMenus.length > 0 && selectedAssignedMenus.length === assignedMenus.length}
-                          indeterminate={selectedAssignedMenus.length > 0 && selectedAssignedMenus.length < assignedMenus.length}
+                          checked={
+                            assignedMenus.length > 0 &&
+                            selectedAssignedMenus.length ===
+                              assignedMenus.length
+                          }
+                          indeterminate={
+                            selectedAssignedMenus.length > 0 &&
+                            selectedAssignedMenus.length < assignedMenus.length
+                          }
                           onChange={handleSelectAllAssigned}
-                          sx={{ color: '#228B22', '&.Mui-checked': { color: '#228B22' } }}
+                          sx={{
+                            color: "#228B22",
+                            "&.Mui-checked": { color: "#228B22" },
+                          }}
                         />
                       </TableCell>
-                      <TableCell sx={{ fontWeight: 600, color: '#228B22' }}>Menu Name</TableCell>
-                      <TableCell sx={{ fontWeight: 600, color: '#228B22' }}>Order</TableCell>
-                      <TableCell sx={{ fontWeight: 600, color: '#228B22' }}>Status</TableCell>
+                      <TableCell sx={{ fontWeight: 600, color: "#228B22" }}>
+                        Menu Name
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 600, color: "#228B22" }}>
+                        Order
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 600, color: "#228B22" }}>
+                        Status
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {assignedMenus.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={4} align="center">
-                          <Typography variant="body2" color="text.secondary">
+                        <TableCell colSpan={4} align='center'>
+                          <Typography variant='body2' color='text.secondary'>
                             No assigned menus
                           </Typography>
                         </TableCell>
                       </TableRow>
                     ) : (
                       assignedMenus
-                        .slice(assignedPage * rowsPerPage, assignedPage * rowsPerPage + rowsPerPage)
+                        .slice(
+                          assignedPage * rowsPerPage,
+                          assignedPage * rowsPerPage + rowsPerPage
+                        )
                         .map((menu) => (
-                          <TableRow key={menu.menuId} hover sx={{ '&:hover': { backgroundColor: '#f8fffa' } }}>
-                            <TableCell padding="checkbox">
+                          <TableRow
+                            key={menu.menuId}
+                            hover
+                            sx={{ "&:hover": { backgroundColor: "#f8fffa" } }}
+                          >
+                            <TableCell padding='checkbox'>
                               <Checkbox
-                                checked={selectedAssignedMenus.includes(menu.menuId)}
-                                onChange={() => handleAssignedMenuToggle(menu.menuId)}
-                                sx={{ color: '#228B22', '&.Mui-checked': { color: '#228B22' } }}
+                                checked={selectedAssignedMenus.includes(
+                                  menu.menuId
+                                )}
+                                onChange={() =>
+                                  handleAssignedMenuToggle(menu.menuId)
+                                }
+                                sx={{
+                                  color: "#228B22",
+                                  "&.Mui-checked": { color: "#228B22" },
+                                }}
                               />
                             </TableCell>
                             <TableCell>{menu.menuName}</TableCell>
                             <TableCell>{menu.orderNo}</TableCell>
                             <TableCell>
                               <Chip
-                                label={menu.isEnabled === 'Y' ? 'Active' : 'Inactive'}
-                                size="small"
-                                color={menu.isEnabled === 'Y' ? 'success' : 'error'}
+                                label={
+                                  menu.isEnabled === "Y" ? "Active" : "Inactive"
+                                }
+                                size='small'
+                                color={
+                                  menu.isEnabled === "Y" ? "success" : "error"
+                                }
                                 sx={{ fontWeight: 500 }}
                               />
                             </TableCell>
@@ -669,7 +758,7 @@ const AssignMenus = () => {
               </TableContainer>
 
               <TablePagination
-                component="div"
+                component='div'
                 count={assignedMenus.length}
                 page={assignedPage}
                 onPageChange={(event, newPage) => setAssignedPage(newPage)}
@@ -680,41 +769,35 @@ const AssignMenus = () => {
                 }}
                 rowsPerPageOptions={[25, 50, 100]}
                 sx={{
-                  '& .MuiTablePagination-selectIcon': { color: '#228B22' },
-                  '& .MuiTablePagination-select': { color: '#228B22' },
-                  '& .MuiTablePagination-actions button': { color: '#228B22' }
+                  "& .MuiTablePagination-selectIcon": { color: "#228B22" },
+                  "& .MuiTablePagination-select": { color: "#228B22" },
+                  "& .MuiTablePagination-actions button": { color: "#228B22" },
                 }}
               />
-            </Box>
+            </CardContainer>
           </Grid>
         </Grid>
       )}
 
       {/* Action Buttons */}
       {selectedRole && (
-        <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center', gap: 2, px: 3 }}>
+        <Box
+          sx={{
+            mt: 3,
+            display: "flex",
+            justifyContent: "center",
+            gap: 2,
+            px: 3,
+          }}
+        >
           <Button
-            variant="contained"
+            variant='contained'
             startIcon={<Save />}
             onClick={handleSaveAssignments}
-            disabled={selectedUnassignedMenus.length === 0 && selectedAssignedMenus.length === 0}
-            sx={{
-              bgcolor: '#228B22',
-              borderRadius: '12px',
-              px: 4,
-              py: 1.5,
-              fontSize: '1.1rem',
-              fontWeight: 600,
-              boxShadow: '0 4px 15px rgba(34, 139, 34, 0.3)',
-              '&:hover': { 
-                bgcolor: '#1B5E20',
-                boxShadow: '0 6px 20px rgba(34, 139, 34, 0.4)'
-              },
-              '&:disabled': { 
-                bgcolor: '#9CA3AF',
-                boxShadow: 'none'
-              }
-            }}
+            disabled={
+              selectedUnassignedMenus.length === 0 &&
+              selectedAssignedMenus.length === 0
+            }
           >
             Update Menu Assignments
           </Button>
@@ -727,7 +810,10 @@ const AssignMenus = () => {
         autoHideDuration={6000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
       >
-        <Alert severity={snackbar.severity} onClose={() => setSnackbar({ ...snackbar, open: false })}>
+        <Alert
+          severity={snackbar.severity}
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+        >
           {snackbar.message}
         </Alert>
       </Snackbar>

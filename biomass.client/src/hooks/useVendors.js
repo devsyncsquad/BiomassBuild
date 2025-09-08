@@ -32,7 +32,7 @@ export const useVendorStats = () => {
 export const useVendorById = (id) => {
   return useQuery({
     queryKey: vendorKeys.details(id),
-    queryFn: () => apiRequest(`/api/vendors/${id}`, {
+    queryFn: () => apiRequest(`/vendors/${id}`, {
       method: 'GET'
     }),
     enabled: !!id
@@ -43,9 +43,12 @@ export const useVendorById = (id) => {
 export const useCreateVendor = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data) => apiRequest('/api/vendors/create', {
+    mutationFn: (formData) => apiRequest('/vendors/create', {
       method: 'POST',
-      body: JSON.stringify(data)
+      body: formData,
+      headers: {
+        // Don't set Content-Type for FormData, let the browser set it with boundary
+      }
     }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: vendorKeys.lists() });
@@ -58,9 +61,12 @@ export const useCreateVendor = () => {
 export const useUpdateVendor = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, ...data }) => apiRequest(`/api/vendors/update/${id}`, {
+    mutationFn: ({ id, formData }) => apiRequest(`/vendors/update/${id}`, {
       method: 'PUT',
-      body: JSON.stringify(data)
+      body: formData,
+      headers: {
+        // Don't set Content-Type for FormData, let the browser set it with boundary
+      }
     }),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: vendorKeys.lists() });

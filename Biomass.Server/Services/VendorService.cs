@@ -12,10 +12,12 @@ namespace Biomass.Server.Services
     public class VendorService : IVendorService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IFileService _fileService;
 
-        public VendorService(ApplicationDbContext context)
+        public VendorService(ApplicationDbContext context, IFileService fileService)
         {
             _context = context;
+            _fileService = fileService;
         }
 
         public async Task<List<VendorDto>> GetAllVendorsAsync()
@@ -51,6 +53,20 @@ namespace Biomass.Server.Services
         {
             try
             {
+                // Handle file uploads
+                string? frontPicPath = null;
+                string? backPicPath = null;
+
+                if (request.VendorCnicFrontPic != null)
+                {
+                    frontPicPath = await _fileService.SaveCnicImageAsync(request.VendorCnicFrontPic, "uploads/vendors/cnic", "front");
+                }
+
+                if (request.VendorCnicBackPic != null)
+                {
+                    backPicPath = await _fileService.SaveCnicImageAsync(request.VendorCnicBackPic, "uploads/vendors/cnic", "back");
+                }
+
                 var vendor = new Vendor
                 {
                     VendorName = request.VendorName,
@@ -59,7 +75,11 @@ namespace Biomass.Server.Services
                     Phone2 = request.Phone2,
                     Phone3 = request.Phone3,
                     Cnic = request.Cnic,
-                    Status = "Active"
+                    Status = request.Status ?? "Active",
+                    IsVehicleLoader = request.IsVehicleLoader,
+                    IsLabour = request.IsLabour,
+                    VendorCnicFrontPic = frontPicPath,
+                    VendorCnicBackPic = backPicPath
                 };
 
                 _context.Vendors.Add(vendor);
@@ -81,13 +101,45 @@ namespace Biomass.Server.Services
                 if (vendor == null)
                     return null;
 
-                vendor.VendorName = request.VendorName;
-                vendor.Address = request.Address;
-                vendor.Phone1 = request.Phone1;
-                vendor.Phone2 = request.Phone2;
-                vendor.Phone3 = request.Phone3;
-                vendor.Cnic = request.Cnic;
-                vendor.Status = request.Status;
+                // Handle file uploads
+                if (request.VendorCnicFrontPic != null)
+                {
+                    // Delete old file if exists
+                    if (!string.IsNullOrEmpty(vendor.VendorCnicFrontPic))
+                    {
+                        await _fileService.DeleteFileAsync(vendor.VendorCnicFrontPic);
+                    }
+                    vendor.VendorCnicFrontPic = await _fileService.SaveCnicImageAsync(request.VendorCnicFrontPic, "uploads/vendors/cnic", "front");
+                }
+
+                if (request.VendorCnicBackPic != null)
+                {
+                    // Delete old file if exists
+                    if (!string.IsNullOrEmpty(vendor.VendorCnicBackPic))
+                    {
+                        await _fileService.DeleteFileAsync(vendor.VendorCnicBackPic);
+                    }
+                    vendor.VendorCnicBackPic = await _fileService.SaveCnicImageAsync(request.VendorCnicBackPic, "uploads/vendors/cnic", "back");
+                }
+
+                // Update other fields
+                if (!string.IsNullOrEmpty(request.VendorName))
+                    vendor.VendorName = request.VendorName;
+                if (!string.IsNullOrEmpty(request.Address))
+                    vendor.Address = request.Address;
+                if (!string.IsNullOrEmpty(request.Phone1))
+                    vendor.Phone1 = request.Phone1;
+                if (!string.IsNullOrEmpty(request.Phone2))
+                    vendor.Phone2 = request.Phone2;
+                if (!string.IsNullOrEmpty(request.Phone3))
+                    vendor.Phone3 = request.Phone3;
+                if (!string.IsNullOrEmpty(request.Cnic))
+                    vendor.Cnic = request.Cnic;
+                if (!string.IsNullOrEmpty(request.Status))
+                    vendor.Status = request.Status;
+                
+                vendor.IsVehicleLoader = request.IsVehicleLoader;
+                vendor.IsLabour = request.IsLabour;
 
                 await _context.SaveChangesAsync();
 
@@ -109,10 +161,16 @@ namespace Biomass.Server.Services
                 Phone1 = vendor.Phone1,
                 Phone2 = vendor.Phone2,
                 Phone3 = vendor.Phone3,
-                VendorCnicFrontPic = vendor.VendorCnicFrontPic,
-                VendorCnicBackPic = vendor.VendorCnicBackPic,
+                VendorCnicFrontPic = !string.IsNullOrEmpty(vendor.VendorCnicFrontPic) 
+                    ? $"/api/vendors/images/{vendor.VendorCnicFrontPic}" 
+                    : null,
+                VendorCnicBackPic = !string.IsNullOrEmpty(vendor.VendorCnicBackPic) 
+                    ? $"/api/vendors/images/{vendor.VendorCnicBackPic}" 
+                    : null,
                 Cnic = vendor.Cnic,
-                Status = vendor.Status
+                Status = vendor.Status,
+                IsVehicleLoader = vendor.IsVehicleLoader,
+                IsLabour = vendor.IsLabour
             };
         }
     }

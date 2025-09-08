@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -29,37 +29,45 @@ import {
   Switch,
   Card,
   CardContent,
-  Divider
-} from '@mui/material';
+  Divider,
+} from "@mui/material";
 import {
   Save as SaveIcon,
   Cancel as CancelIcon,
   Edit as EditIcon,
   Refresh as RefreshIcon,
-  FilterList as FilterIcon
-} from '@mui/icons-material';
-import axios from 'axios';
-import './RatePopup.css';
+  FilterList as FilterIcon,
+} from "@mui/icons-material";
+import axios from "axios";
+import "./RatePopup.css";
 
-const RatePopup = ({ open, onClose, locationId, locationName, customerId, customerName, onSave }) => {
+const RatePopup = ({
+  open,
+  onClose,
+  locationId,
+  locationName,
+  customerId,
+  customerName,
+  onSave,
+}) => {
   const [activeTab, setActiveTab] = useState(0);
   const [formData, setFormData] = useState({
-    customerId: customerId || '',
-    locationId: locationId || '',
-    effectiveDate: new Date().toISOString().split('T')[0],
+    customerId: customerId || "",
+    locationId: locationId || "",
+    effectiveDate: new Date().toISOString().split("T")[0],
     companyRate: 0,
     transporterRate: 0,
-    route: '',
-    materialType: 'Paper',
-    status: 'Active'
+    route: "",
+    materialType: "Paper",
+    status: "Active",
   });
 
   const [rates, setRates] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [locations, setLocations] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [editingRate, setEditingRate] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [existingRatesWarning, setExistingRatesWarning] = useState(null);
@@ -67,11 +75,11 @@ const RatePopup = ({ open, onClose, locationId, locationName, customerId, custom
 
   // Filter states for Previous Rates tab
   const [filters, setFilters] = useState({
-    customerId: '',
-    locationId: '',
-    startDate: '',
-    endDate: '',
-    status: 'all'
+    customerId: "",
+    locationId: "",
+    startDate: "",
+    endDate: "",
+    status: "all",
   });
 
   useEffect(() => {
@@ -89,75 +97,96 @@ const RatePopup = ({ open, onClose, locationId, locationName, customerId, custom
     if (open && !isEditing) {
       checkExistingActiveRates();
     }
-  }, [formData.customerId, formData.locationId, formData.materialType, formData.effectiveDate]);
+  }, [
+    formData.customerId,
+    formData.locationId,
+    formData.materialType,
+    formData.effectiveDate,
+  ]);
 
   const loadCustomers = async () => {
     try {
-      const response = await axios.get('https://localhost:7084/api/customers/GetAllCustomers');
+      const response = await axios.get(
+        "https://localhost:7084/api/customers/GetAllCustomers"
+      );
       if (response.data.success) {
         setCustomers(response.data.result);
       }
     } catch (error) {
-      console.error('Error loading customers:', error);
+      console.error("Error loading customers:", error);
     }
   };
 
   const loadLocationsByCustomer = async (customerId) => {
     if (!customerId) return;
     try {
-      const response = await axios.get(`https://localhost:7084/api/customerlocations/GetLocationsByCustomerId/${customerId}`);
+      const response = await axios.get(
+        `https://localhost:7084/api/customerlocations/GetLocationsByCustomerId/${customerId}`
+      );
       if (response.data.success) {
         setLocations(response.data.result);
       }
     } catch (error) {
-      console.error('Error loading locations:', error);
+      console.error("Error loading locations:", error);
     }
   };
 
   const loadRatesByLocation = async (locationId) => {
     if (!locationId) return;
     try {
-      const response = await axios.get(`https://localhost:7084/api/materialrates/GetMaterialRatesByLocationId/${locationId}`);
+      const response = await axios.get(
+        `https://localhost:7084/api/materialrates/GetMaterialRatesByLocationId/${locationId}`
+      );
       if (response.data.success) {
         setRates(response.data.result);
       }
     } catch (error) {
-      console.error('Error loading rates:', error);
+      console.error("Error loading rates:", error);
     }
   };
 
   const loadAllRates = async () => {
     try {
-      const response = await axios.get('https://localhost:7084/api/materialrates/GetAllMaterialRates');
+      const response = await axios.get(
+        "https://localhost:7084/api/materialrates/GetAllMaterialRates"
+      );
       if (response.data.success) {
         setRates(response.data.result);
       }
     } catch (error) {
-      console.error('Error loading rates:', error);
+      console.error("Error loading rates:", error);
     }
   };
 
   const checkExistingActiveRates = async () => {
-    if (!formData.customerId || !formData.locationId || !formData.materialType || !formData.effectiveDate) {
+    if (
+      !formData.customerId ||
+      !formData.locationId ||
+      !formData.materialType ||
+      !formData.effectiveDate
+    ) {
       setExistingRatesWarning(null);
       setShowWarningAlert(false);
       return;
     }
 
     try {
-      const response = await axios.get('https://localhost:7084/api/materialrates/CheckExistingActiveRates', {
-        params: {
-          customerId: formData.customerId,
-          locationId: formData.locationId,
-          materialType: formData.materialType,
-          effectiveDate: formData.effectiveDate
+      const response = await axios.get(
+        "https://localhost:7084/api/materialrates/CheckExistingActiveRates",
+        {
+          params: {
+            customerId: formData.customerId,
+            locationId: formData.locationId,
+            materialType: formData.materialType,
+            effectiveDate: formData.effectiveDate,
+          },
         }
-      });
+      );
 
       if (response.data.success && response.data.result.length > 0) {
         setExistingRatesWarning({
           count: response.data.result.length,
-          rates: response.data.result
+          rates: response.data.result,
         });
         setShowWarningAlert(true);
       } else {
@@ -165,28 +194,32 @@ const RatePopup = ({ open, onClose, locationId, locationName, customerId, custom
         setShowWarningAlert(false);
       }
     } catch (error) {
-      console.error('Error checking existing rates:', error);
+      console.error("Error checking existing rates:", error);
       setExistingRatesWarning(null);
       setShowWarningAlert(false);
     }
   };
 
   const handleInputChange = (field, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
 
     // If customer changes, reload locations
-    if (field === 'customerId') {
+    if (field === "customerId") {
       loadLocationsByCustomer(value);
-      setFormData(prev => ({ ...prev, locationId: '' }));
+      setFormData((prev) => ({ ...prev, locationId: "" }));
       setExistingRatesWarning(null);
       setShowWarningAlert(false);
     }
 
     // Check for existing active rates when relevant fields change
-    if (['customerId', 'locationId', 'materialType', 'effectiveDate'].includes(field)) {
+    if (
+      ["customerId", "locationId", "materialType", "effectiveDate"].includes(
+        field
+      )
+    ) {
       // Use setTimeout to avoid too many API calls while typing
       setTimeout(() => {
         checkExistingActiveRates();
@@ -197,37 +230,37 @@ const RatePopup = ({ open, onClose, locationId, locationName, customerId, custom
   const handleSave = async () => {
     // Validate required fields
     if (!formData.customerId) {
-      setError('Customer is required');
+      setError("Customer is required");
       return;
     }
     if (!formData.locationId) {
-      setError('Location is required');
+      setError("Location is required");
       return;
     }
     if (!formData.effectiveDate) {
-      setError('Effective Date is required');
+      setError("Effective Date is required");
       return;
     }
     if (!formData.companyRate || formData.companyRate <= 0) {
-      setError('Company Rate must be greater than 0');
+      setError("Company Rate must be greater than 0");
       return;
     }
     if (!formData.transporterRate || formData.transporterRate <= 0) {
-      setError('Transporter Rate must be greater than 0');
+      setError("Transporter Rate must be greater than 0");
       return;
     }
 
     setLoading(true);
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
 
     try {
-      const url = isEditing 
+      const url = isEditing
         ? `https://localhost:7084/api/materialrates/UpdateMaterialRate/${editingRate.rateId}`
-        : 'https://localhost:7084/api/materialrates/CreateMaterialRate';
-      
-      const method = isEditing ? 'put' : 'post';
-      
+        : "https://localhost:7084/api/materialrates/CreateMaterialRate";
+
+      const method = isEditing ? "put" : "post";
+
       // Convert camelCase to PascalCase for backend compatibility
       const backendData = {
         CustomerId: parseInt(formData.customerId),
@@ -238,45 +271,53 @@ const RatePopup = ({ open, onClose, locationId, locationName, customerId, custom
         DispatchWeight: 0, // Default values as per existing model
         ReceivingWeight: 0,
         Route: formData.route,
-        MaterialType: formData.materialType
+        MaterialType: formData.materialType,
       };
 
-      const data = isEditing ? { ...backendData, Status: formData.status } : backendData;
+      const data = isEditing
+        ? { ...backendData, Status: formData.status }
+        : backendData;
 
-      console.log('Sending rate data to backend:', data);
+      console.log("Sending rate data to backend:", data);
 
       const response = await axios[method](url, data);
-      
+
       if (response.data.success) {
-        setSuccess(isEditing ? 'Rate updated successfully!' : 'Rate created successfully!');
+        setSuccess(
+          isEditing
+            ? "Rate updated successfully!"
+            : "Rate created successfully!"
+        );
         onSave(response.data.result);
-        
+
         // Refresh rates
         if (formData.locationId) {
           loadRatesByLocation(formData.locationId);
         }
-        
+
         // Reset form if not editing
         if (!isEditing) {
           resetForm();
         }
-        
+
         setEditingRate(null);
         setIsEditing(false);
         setExistingRatesWarning(null);
         setShowWarningAlert(false);
       } else {
-        setError('Error saving rate: ' + response.data.message);
+        setError("Error saving rate: " + response.data.message);
       }
     } catch (error) {
-      console.error('Error saving rate:', error);
+      console.error("Error saving rate:", error);
       if (error.response?.data?.errors) {
-        const errorMessages = Object.values(error.response.data.errors).flat().join(', ');
-        setError('Validation errors: ' + errorMessages);
+        const errorMessages = Object.values(error.response.data.errors)
+          .flat()
+          .join(", ");
+        setError("Validation errors: " + errorMessages);
       } else if (error.response?.data?.message) {
-        setError('Error saving rate: ' + error.response.data.message);
+        setError("Error saving rate: " + error.response.data.message);
       } else {
-        setError('Error saving rate. Please try again.');
+        setError("Error saving rate. Please try again.");
       }
     } finally {
       setLoading(false);
@@ -289,12 +330,13 @@ const RatePopup = ({ open, onClose, locationId, locationName, customerId, custom
     setFormData({
       customerId: rate.customerId,
       locationId: rate.locationId,
-      effectiveDate: rate.effectiveDate || new Date().toISOString().split('T')[0],
+      effectiveDate:
+        rate.effectiveDate || new Date().toISOString().split("T")[0],
       companyRate: rate.companyRate,
       transporterRate: rate.transporterRate,
-      route: rate.route || '',
-      materialType: rate.materialType || 'Paper',
-      status: rate.status
+      route: rate.route || "",
+      materialType: rate.materialType || "Paper",
+      status: rate.status,
     });
     setExistingRatesWarning(null);
     setShowWarningAlert(false);
@@ -302,14 +344,14 @@ const RatePopup = ({ open, onClose, locationId, locationName, customerId, custom
 
   const resetForm = () => {
     setFormData({
-      customerId: customerId || '',
-      locationId: locationId || '',
-      effectiveDate: new Date().toISOString().split('T')[0],
+      customerId: customerId || "",
+      locationId: locationId || "",
+      effectiveDate: new Date().toISOString().split("T")[0],
       companyRate: 0,
       transporterRate: 0,
-      route: '',
-      materialType: 'Paper',
-      status: 'Active'
+      route: "",
+      materialType: "Paper",
+      status: "Active",
     });
     setEditingRate(null);
     setIsEditing(false);
@@ -336,11 +378,11 @@ const RatePopup = ({ open, onClose, locationId, locationName, customerId, custom
 
   const clearFilters = () => {
     setFilters({
-      customerId: '',
-      locationId: '',
-      startDate: '',
-      endDate: '',
-      status: 'all'
+      customerId: "",
+      locationId: "",
+      startDate: "",
+      endDate: "",
+      status: "all",
     });
     loadAllRates();
   };
@@ -349,19 +391,27 @@ const RatePopup = ({ open, onClose, locationId, locationName, customerId, custom
     let filtered = [...rates];
 
     if (filters.customerId) {
-      filtered = filtered.filter(rate => rate.customerId === parseInt(filters.customerId));
+      filtered = filtered.filter(
+        (rate) => rate.customerId === parseInt(filters.customerId)
+      );
     }
     if (filters.locationId) {
-      filtered = filtered.filter(rate => rate.locationId === parseInt(filters.locationId));
+      filtered = filtered.filter(
+        (rate) => rate.locationId === parseInt(filters.locationId)
+      );
     }
     if (filters.startDate) {
-      filtered = filtered.filter(rate => new Date(rate.effectiveDate) >= new Date(filters.startDate));
+      filtered = filtered.filter(
+        (rate) => new Date(rate.effectiveDate) >= new Date(filters.startDate)
+      );
     }
     if (filters.endDate) {
-      filtered = filtered.filter(rate => new Date(rate.effectiveDate) <= new Date(filters.endDate));
+      filtered = filtered.filter(
+        (rate) => new Date(rate.effectiveDate) <= new Date(filters.endDate)
+      );
     }
-    if (filters.status !== 'all') {
-      filtered = filtered.filter(rate => rate.status === filters.status);
+    if (filters.status !== "all") {
+      filtered = filtered.filter((rate) => rate.status === filters.status);
     }
 
     return filtered;
@@ -375,33 +425,35 @@ const RatePopup = ({ open, onClose, locationId, locationName, customerId, custom
   };
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={onClose} 
-      maxWidth="xl" 
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth='xl'
       fullWidth
       PaperProps={{
         style: {
           borderRadius: 16,
-          maxHeight: '90vh',
-          minWidth: '1400px'
-        }
+          maxHeight: "90vh",
+          minWidth: "1400px",
+        },
       }}
     >
-      <DialogTitle sx={{ 
-        backgroundColor: '#228B22', 
-        color: 'white',
-        borderBottom: '1px solid #e0e0e0',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-      }}>
-        <Typography variant="h6" fontWeight="bold" sx={{ color: 'white' }}>
+      <DialogTitle
+        sx={{
+          backgroundColor: "#228B22",
+          color: "white",
+          borderBottom: "1px solid #e0e0e0",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <Typography variant='h6' fontWeight='bold' sx={{ color: "white" }}>
           Material Rates Management
         </Typography>
         <Box>
           <Button
-            variant="contained"
+            variant='contained'
             startIcon={<RefreshIcon />}
             onClick={() => {
               if (activeTab === 0 && locationId) {
@@ -410,15 +462,27 @@ const RatePopup = ({ open, onClose, locationId, locationName, customerId, custom
                 loadAllRates();
               }
             }}
-            sx={{ mr: 1, bgcolor: 'white', color: '#228B22', '&:hover': { bgcolor: '#f5f5f5' } }}
+            sx={{
+              mr: 1,
+              bgcolor: "white",
+              color: "#228B22",
+              "&:hover": { bgcolor: "#f5f5f5" },
+            }}
           >
             Refresh
           </Button>
           <Button
-            variant="outlined"
+            variant='outlined'
             startIcon={<CancelIcon />}
             onClick={onClose}
-            sx={{ color: 'white', borderColor: 'white', '&:hover': { borderColor: 'white', bgcolor: 'rgba(255,255,255,0.1)' } }}
+            sx={{
+              color: "white",
+              borderColor: "white",
+              "&:hover": {
+                borderColor: "white",
+                bgcolor: "rgba(255,255,255,0.1)",
+              },
+            }}
           >
             Close
           </Button>
@@ -426,10 +490,10 @@ const RatePopup = ({ open, onClose, locationId, locationName, customerId, custom
       </DialogTitle>
 
       <DialogContent sx={{ p: 0 }}>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
           <Tabs value={activeTab} onChange={handleTabChange} sx={{ px: 3 }}>
-            <Tab label="Add Rate" />
-            <Tab label="Previous Rates" />
+            <Tab label='Add Rate' />
+            <Tab label='Previous Rates' />
           </Tabs>
         </Box>
 
@@ -437,54 +501,75 @@ const RatePopup = ({ open, onClose, locationId, locationName, customerId, custom
           <Box sx={{ p: 3 }}>
             {/* Add Rate Form */}
             <Box sx={{ mb: 3 }}>
-              <Typography variant="h6" gutterBottom>
+              <Typography variant='h6' gutterBottom>
                 Add New Rate
               </Typography>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
-                {locationName && `Location: ${locationName}`} {customerName && `| Customer: ${customerName}`}
+              <Typography variant='body2' color='text.secondary' gutterBottom>
+                {locationName && `Location: ${locationName}`}{" "}
+                {customerName && `| Customer: ${customerName}`}
               </Typography>
-              
+
               {error && (
-                <Alert severity="error" sx={{ mt: 2, mb: 2 }}>
+                <Alert severity='error' sx={{ mt: 2, mb: 2 }}>
                   {error}
                 </Alert>
               )}
-              
+
               {success && (
-                <Alert severity="success" sx={{ mt: 2, mb: 2 }}>
+                <Alert severity='success' sx={{ mt: 2, mb: 2 }}>
                   {success}
                 </Alert>
               )}
 
               {showWarningAlert && existingRatesWarning && (
-                <Alert 
-                  severity="warning" 
-                  sx={{ mt: 2, mb: 2, bgcolor: '#fff3cd', borderColor: '#ffeaa7' }}
+                <Alert
+                  severity='warning'
+                  sx={{
+                    mt: 2,
+                    mb: 2,
+                    bgcolor: "#fff3cd",
+                    borderColor: "#ffeaa7",
+                  }}
                   action={
                     <Button
-                      color="inherit"
-                      size="small"
+                      color='inherit'
+                      size='small'
                       onClick={() => setShowWarningAlert(false)}
                     >
                       Dismiss
                     </Button>
                   }
                 >
-                  <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
+                  <Typography
+                    variant='body2'
+                    sx={{ fontWeight: "bold", mb: 1 }}
+                  >
                     ⚠️ Existing Active Rate(s) Detected
                   </Typography>
-                  <Typography variant="body2">
-                    The system has detected {existingRatesWarning.count} active rate(s) already defined for this client, location, and material combination. 
-                    If you proceed, the existing active rate(s) will be closed automatically, and the new rate will be saved in the system.
+                  <Typography variant='body2'>
+                    The system has detected {existingRatesWarning.count} active
+                    rate(s) already defined for this client, location, and
+                    material combination. If you proceed, the existing active
+                    rate(s) will be closed automatically, and the new rate will
+                    be saved in the system.
                   </Typography>
                   {existingRatesWarning.rates.length > 0 && (
-                    <Box sx={{ mt: 1, p: 1, bgcolor: '#fff8e1', borderRadius: 1 }}>
-                      <Typography variant="caption" sx={{ fontWeight: 'bold' }}>
+                    <Box
+                      sx={{ mt: 1, p: 1, bgcolor: "#fff8e1", borderRadius: 1 }}
+                    >
+                      <Typography variant='caption' sx={{ fontWeight: "bold" }}>
                         Existing rates that will be deactivated:
                       </Typography>
                       {existingRatesWarning.rates.map((rate, index) => (
-                        <Typography key={rate.rateId} variant="caption" sx={{ display: 'block', mt: 0.5 }}>
-                          • Rate ID: {rate.rateId} | Company: Rs {rate.companyRate} | Transporter: Rs {rate.transporterRate} | Effective: {getDateRangeDisplay(rate.effectiveDate)}
+                        <Typography
+                          key={rate.rateId}
+                          variant='caption'
+                          sx={{ display: "block", mt: 0.5 }}
+                        >
+                          • Rate ID: {rate.rateId} | Company: Rs{" "}
+                          {rate.companyRate} | Transporter: Rs{" "}
+                          {rate.transporterRate} | Effective:{" "}
+                          {getDateRangeDisplay(rate.effectiveDate)}
                         </Typography>
                       ))}
                     </Box>
@@ -498,140 +583,182 @@ const RatePopup = ({ open, onClose, locationId, locationName, customerId, custom
                     <InputLabel>Customer</InputLabel>
                     <Select
                       value={formData.customerId}
-                      onChange={(e) => handleInputChange('customerId', e.target.value)}
-                      label="Customer"
+                      onChange={(e) =>
+                        handleInputChange("customerId", e.target.value)
+                      }
+                      label='Customer'
                       required
                     >
                       {customers.map((customer) => (
-                        <MenuItem key={customer.customerId} value={customer.customerId}>
-                          {customer.companyName || `${customer.firstName} ${customer.lastName}`}
+                        <MenuItem
+                          key={customer.customerId}
+                          value={customer.customerId}
+                        >
+                          {customer.companyName ||
+                            `${customer.firstName} ${customer.lastName}`}
                         </MenuItem>
                       ))}
                     </Select>
                   </FormControl>
                 </Grid>
-                
+
                 <Grid item xs={12} sm={6} md={3}>
                   <FormControl fullWidth>
                     <InputLabel>Location</InputLabel>
                     <Select
                       value={formData.locationId}
-                      onChange={(e) => handleInputChange('locationId', e.target.value)}
-                      label="Location"
+                      onChange={(e) =>
+                        handleInputChange("locationId", e.target.value)
+                      }
+                      label='Location'
                       required
                       disabled={!formData.customerId}
                     >
                       {locations.map((location) => (
-                        <MenuItem key={location.locationId} value={location.locationId}>
+                        <MenuItem
+                          key={location.locationId}
+                          value={location.locationId}
+                        >
                           {location.locationName} ({location.locationCode})
                         </MenuItem>
                       ))}
                     </Select>
                   </FormControl>
                 </Grid>
-                
+
                 <Grid item xs={12} sm={6} md={3}>
                   <FormControl fullWidth>
                     <TextField
-                      type="date"
+                      type='date'
                       value={formData.effectiveDate}
-                      onChange={(e) => handleInputChange('effectiveDate', e.target.value)}
-                      label="Effective Date"
+                      onChange={(e) =>
+                        handleInputChange("effectiveDate", e.target.value)
+                      }
+                      label='Effective Date'
                       required
                       InputLabelProps={{ shrink: true }}
                     />
-                    <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                      Selected date falls in range: {formData.effectiveDate ? getDateRangeDisplay(formData.effectiveDate) : 'Select a date'}
+                    <Typography
+                      variant='caption'
+                      color='text.secondary'
+                      sx={{ mt: 0.5, display: "block" }}
+                    >
+                      Selected date falls in range:{" "}
+                      {formData.effectiveDate
+                        ? getDateRangeDisplay(formData.effectiveDate)
+                        : "Select a date"}
                     </Typography>
                   </FormControl>
                 </Grid>
-                
+
                 <Grid item xs={12} sm={6} md={3}>
                   <FormControl fullWidth>
                     <InputLabel>Status</InputLabel>
                     <Select
                       value={formData.status}
-                      onChange={(e) => handleInputChange('status', e.target.value)}
-                      label="Status"
+                      onChange={(e) =>
+                        handleInputChange("status", e.target.value)
+                      }
+                      label='Status'
                     >
-                      <MenuItem value="Active">Active</MenuItem>
-                      <MenuItem value="Inactive">Inactive</MenuItem>
+                      <MenuItem value='Active'>Active</MenuItem>
+                      <MenuItem value='Inactive'>Inactive</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
-                
+
                 <Grid item xs={12} sm={6} md={3}>
                   <TextField
                     fullWidth
-                    label="Company Rate"
-                    type="number"
+                    label='Company Rate'
+                    type='number'
                     value={formData.companyRate}
-                    onChange={(e) => handleInputChange('companyRate', parseFloat(e.target.value))}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "companyRate",
+                        parseFloat(e.target.value)
+                      )
+                    }
                     required
                     InputProps={{
-                      startAdornment: <Typography variant="body2">Rs</Typography>
+                      startAdornment: (
+                        <Typography variant='body2'>Rs</Typography>
+                      ),
                     }}
                   />
                 </Grid>
-                
+
                 <Grid item xs={12} sm={6} md={3}>
                   <TextField
                     fullWidth
-                    label="Transporter Rate"
-                    type="number"
+                    label='Transporter Rate'
+                    type='number'
                     value={formData.transporterRate}
-                    onChange={(e) => handleInputChange('transporterRate', parseFloat(e.target.value))}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "transporterRate",
+                        parseFloat(e.target.value)
+                      )
+                    }
                     required
                     InputProps={{
-                      startAdornment: <Typography variant="body2">Rs</Typography>
+                      startAdornment: (
+                        <Typography variant='body2'>Rs</Typography>
+                      ),
                     }}
                   />
                 </Grid>
-                
+
                 <Grid item xs={12} sm={6} md={3}>
                   <TextField
                     fullWidth
-                    label="Route"
+                    label='Route'
                     value={formData.route}
-                    onChange={(e) => handleInputChange('route', e.target.value)}
+                    onChange={(e) => handleInputChange("route", e.target.value)}
                   />
                 </Grid>
-                
+
                 <Grid item xs={12} sm={6} md={3}>
                   <FormControl fullWidth>
                     <InputLabel>Material Type</InputLabel>
                     <Select
                       value={formData.materialType}
-                      onChange={(e) => handleInputChange('materialType', e.target.value)}
-                      label="Material Type"
+                      onChange={(e) =>
+                        handleInputChange("materialType", e.target.value)
+                      }
+                      label='Material Type'
                     >
-                      <MenuItem value="Paper">Paper</MenuItem>
-                      <MenuItem value="Plastic">Plastic</MenuItem>
-                      <MenuItem value="Glass">Glass</MenuItem>
-                      <MenuItem value="Metal">Metal</MenuItem>
-                      <MenuItem value="Textile">Textile</MenuItem>
+                      <MenuItem value='Paper'>Paper</MenuItem>
+                      <MenuItem value='Plastic'>Plastic</MenuItem>
+                      <MenuItem value='Glass'>Glass</MenuItem>
+                      <MenuItem value='Metal'>Metal</MenuItem>
+                      <MenuItem value='Textile'>Textile</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
               </Grid>
 
-              <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
+              <Box sx={{ mt: 3, display: "flex", gap: 2 }}>
                 <Button
-                  variant="contained"
+                  variant='contained'
                   startIcon={<SaveIcon />}
                   onClick={handleSave}
                   disabled={loading}
                   sx={{
-                    bgcolor: '#228B22',
-                    '&:hover': { bgcolor: '#006400' }
+                    bgcolor: "#228B22",
+                    "&:hover": { bgcolor: "#006400" },
                   }}
                 >
-                  {loading ? 'Saving...' : (isEditing ? 'Update Rate' : 'Save Rate')}
+                  {loading
+                    ? "Saving..."
+                    : isEditing
+                    ? "Update Rate"
+                    : "Save Rate"}
                 </Button>
-                
+
                 {isEditing && (
                   <Button
-                    variant="outlined"
+                    variant='outlined'
                     onClick={resetForm}
                     disabled={loading}
                   >
@@ -645,32 +772,128 @@ const RatePopup = ({ open, onClose, locationId, locationName, customerId, custom
 
             {/* Rates Grid */}
             <Box>
-              <Typography variant="h6" gutterBottom>
+              <Typography variant='h6' gutterBottom>
                 Current Rates for Selected Location
               </Typography>
-              
+
               <TableContainer component={Paper} sx={{ maxHeight: 400 }}>
                 <Table stickyHeader>
                   <TableHead>
-                    <TableRow sx={{ backgroundColor: '#228B22'}}>
-                      <TableCell sx={{ color: 'white', backgroundColor: '#228B22', fontWeight: 'bold' }}>Rate ID</TableCell>
-                      <TableCell sx={{ color: 'white', backgroundColor: '#228B22', fontWeight: 'bold' }}>Customer</TableCell>
-                      <TableCell sx={{ color: 'white', backgroundColor: '#228B22', fontWeight: 'bold' }}>Location</TableCell>
-                      <TableCell sx={{ color: 'white', backgroundColor: '#228B22', fontWeight: 'bold' }}>Effective Date Range</TableCell>
-                      <TableCell sx={{ color: 'white', backgroundColor: '#228B22', fontWeight: 'bold' }}>Company Rate</TableCell>
-                      <TableCell sx={{ color: 'white', backgroundColor: '#228B22', fontWeight: 'bold' }}>Transporter Rate</TableCell>
-                      <TableCell sx={{ color: 'white', backgroundColor: '#228B22', fontWeight: 'bold' }}>Route</TableCell>
-                      <TableCell sx={{ color: 'white', backgroundColor: '#228B22', fontWeight: 'bold' }}>Material Type</TableCell>
-                      <TableCell sx={{ color: 'white', backgroundColor: '#228B22', fontWeight: 'bold' }}>Status</TableCell>
-                      <TableCell sx={{ color: 'white', backgroundColor: '#228B22', fontWeight: 'bold' }}>Created By</TableCell>
-                      <TableCell sx={{ color: 'white', backgroundColor: '#228B22', fontWeight: 'bold' }}>Created On</TableCell>
-                      <TableCell sx={{ color: 'white', backgroundColor: '#228B22', fontWeight: 'bold' }}>Actions</TableCell>
+                    <TableRow sx={{ backgroundColor: "#228B22" }}>
+                      <TableCell
+                        sx={{
+                          color: "white",
+                          backgroundColor: "#228B22",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        Rate ID
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          color: "white",
+                          backgroundColor: "#228B22",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        Customer
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          color: "white",
+                          backgroundColor: "#228B22",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        Location
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          color: "white",
+                          backgroundColor: "#228B22",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        Effective Date Range
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          color: "white",
+                          backgroundColor: "#228B22",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        Company Rate
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          color: "white",
+                          backgroundColor: "#228B22",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        Transporter Rate
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          color: "white",
+                          backgroundColor: "#228B22",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        Route
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          color: "white",
+                          backgroundColor: "#228B22",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        Material Type
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          color: "white",
+                          backgroundColor: "#228B22",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        Status
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          color: "white",
+                          backgroundColor: "#228B22",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        Created By
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          color: "white",
+                          backgroundColor: "#228B22",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        Created On
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          color: "white",
+                          backgroundColor: "#228B22",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        Actions
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {rates.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={12} align="center">
+                        <TableCell colSpan={12} align='center'>
                           No rates found for this location
                         </TableCell>
                       </TableRow>
@@ -683,22 +906,26 @@ const RatePopup = ({ open, onClose, locationId, locationName, customerId, custom
                           <TableCell>{rate.effectiveDate}</TableCell>
                           <TableCell>Rs {rate.companyRate}</TableCell>
                           <TableCell>Rs {rate.transporterRate}</TableCell>
-                          <TableCell>{rate.route || '-'}</TableCell>
-                          <TableCell>{rate.materialType || '-'}</TableCell>
+                          <TableCell>{rate.route || "-"}</TableCell>
+                          <TableCell>{rate.materialType || "-"}</TableCell>
                           <TableCell>
-                            <Chip 
-                              label={rate.status} 
-                              color={rate.status === 'Active' ? 'success' : 'default'}
-                              size="small"
+                            <Chip
+                              label={rate.status}
+                              color={
+                                rate.status === "Active" ? "success" : "default"
+                              }
+                              size='small'
                             />
                           </TableCell>
                           <TableCell>{rate.createdBy}</TableCell>
-                          <TableCell>{new Date(rate.createdOn).toLocaleDateString()}</TableCell>
+                          <TableCell>
+                            {new Date(rate.createdOn).toLocaleDateString()}
+                          </TableCell>
                           <TableCell>
                             <IconButton
-                              size="small"
+                              size='small'
                               onClick={() => handleEdit(rate)}
-                              color="primary"
+                              color='primary'
                             >
                               <EditIcon />
                             </IconButton>
@@ -717,10 +944,10 @@ const RatePopup = ({ open, onClose, locationId, locationName, customerId, custom
           <Box sx={{ p: 3 }}>
             {/* Previous Rates Tab */}
             <Box sx={{ mb: 3 }}>
-              <Typography variant="h6" gutterBottom>
+              <Typography variant='h6' gutterBottom>
                 Previous Rates History
               </Typography>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
+              <Typography variant='body2' color='text.secondary' gutterBottom>
                 View and filter historical material rates
               </Typography>
             </Box>
@@ -728,98 +955,127 @@ const RatePopup = ({ open, onClose, locationId, locationName, customerId, custom
             {/* Filters */}
             <Card sx={{ mb: 3 }}>
               <CardContent>
-                <Typography variant="subtitle1" gutterBottom>
-                  <FilterIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+                <Typography variant='subtitle1' gutterBottom>
+                  <FilterIcon sx={{ mr: 1, verticalAlign: "middle" }} />
                   Filters
                 </Typography>
-                
+
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={6} md={3}>
                     <FormControl fullWidth>
                       <InputLabel>Customer</InputLabel>
                       <Select
                         value={filters.customerId}
-                        onChange={(e) => setFilters(prev => ({ ...prev, customerId: e.target.value }))}
-                        label="Customer"
+                        onChange={(e) =>
+                          setFilters((prev) => ({
+                            ...prev,
+                            customerId: e.target.value,
+                          }))
+                        }
+                        label='Customer'
                       >
-                        <MenuItem value="">All Customers</MenuItem>
+                        <MenuItem value=''>All Customers</MenuItem>
                         {customers.map((customer) => (
-                          <MenuItem key={customer.customerId} value={customer.customerId}>
-                            {customer.companyName || `${customer.firstName} ${customer.lastName}`}
+                          <MenuItem
+                            key={customer.customerId}
+                            value={customer.customerId}
+                          >
+                            {customer.companyName ||
+                              `${customer.firstName} ${customer.lastName}`}
                           </MenuItem>
                         ))}
                       </Select>
                     </FormControl>
                   </Grid>
-                  
+
                   <Grid item xs={12} sm={6} md={3}>
                     <FormControl fullWidth>
                       <InputLabel>Location</InputLabel>
                       <Select
                         value={filters.locationId}
-                        onChange={(e) => setFilters(prev => ({ ...prev, locationId: e.target.value }))}
-                        label="Location"
+                        onChange={(e) =>
+                          setFilters((prev) => ({
+                            ...prev,
+                            locationId: e.target.value,
+                          }))
+                        }
+                        label='Location'
                       >
-                        <MenuItem value="">All Locations</MenuItem>
+                        <MenuItem value=''>All Locations</MenuItem>
                         {locations.map((location) => (
-                          <MenuItem key={location.locationId} value={location.locationId}>
+                          <MenuItem
+                            key={location.locationId}
+                            value={location.locationId}
+                          >
                             {location.locationName}
                           </MenuItem>
                         ))}
                       </Select>
                     </FormControl>
                   </Grid>
-                  
+
                   <Grid item xs={12} sm={6} md={2}>
                     <TextField
                       fullWidth
-                      label="Start Date"
-                      type="date"
+                      label='Start Date'
+                      type='date'
                       value={filters.startDate}
-                      onChange={(e) => setFilters(prev => ({ ...prev, startDate: e.target.value }))}
+                      onChange={(e) =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          startDate: e.target.value,
+                        }))
+                      }
                       InputLabelProps={{ shrink: true }}
                     />
                   </Grid>
-                  
+
                   <Grid item xs={12} sm={6} md={2}>
                     <TextField
                       fullWidth
-                      label="End Date"
-                      type="date"
+                      label='End Date'
+                      type='date'
                       value={filters.endDate}
-                      onChange={(e) => setFilters(prev => ({ ...prev, endDate: e.target.value }))}
+                      onChange={(e) =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          endDate: e.target.value,
+                        }))
+                      }
                       InputLabelProps={{ shrink: true }}
                     />
                   </Grid>
-                  
+
                   <Grid item xs={12} sm={6} md={2}>
                     <FormControl fullWidth>
                       <InputLabel>Status</InputLabel>
                       <Select
                         value={filters.status}
-                        onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
-                        label="Status"
+                        onChange={(e) =>
+                          setFilters((prev) => ({
+                            ...prev,
+                            status: e.target.value,
+                          }))
+                        }
+                        label='Status'
                       >
-                        <MenuItem value="all">All Status</MenuItem>
-                        <MenuItem value="Active">Active</MenuItem>
-                        <MenuItem value="Inactive">Inactive</MenuItem>
+                        <MenuItem value='all'>All Status</MenuItem>
+                        <MenuItem value='Active'>Active</MenuItem>
+                        <MenuItem value='Inactive'>Inactive</MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
                 </Grid>
-                
-                <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
+
+                <Box sx={{ mt: 2, display: "flex", gap: 2 }}>
                   <Button
-                    variant="contained"
+                    variant='contained'
                     onClick={applyFilters}
                     startIcon={<FilterIcon />}
                   >
                     Apply Filters
                   </Button>
-                  <Button
-                    variant="outlined"
-                    onClick={clearFilters}
-                  >
+                  <Button variant='outlined' onClick={clearFilters}>
                     Clear Filters
                   </Button>
                 </Box>
@@ -830,24 +1086,46 @@ const RatePopup = ({ open, onClose, locationId, locationName, customerId, custom
             <TableContainer component={Paper}>
               <Table>
                 <TableHead>
-                  <TableRow sx={{ bgcolor: '#228B22' }}>
-                    <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Rate ID</TableCell>
-                    <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Customer</TableCell>
-                    <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Location</TableCell>
-                    <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Effective Date Range</TableCell>
-                    <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Company Rate</TableCell>
-                    <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Transporter Rate</TableCell>
-                    <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Route</TableCell>
-                    <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Material Type</TableCell>
-                    <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Status</TableCell>
-                    <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Created By</TableCell>
-                    <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Created On</TableCell>
+                  <TableRow sx={{ bgcolor: "#228B22" }}>
+                    <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                      Rate ID
+                    </TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                      Customer
+                    </TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                      Location
+                    </TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                      Effective Date Range
+                    </TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                      Company Rate
+                    </TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                      Transporter Rate
+                    </TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                      Route
+                    </TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                      Material Type
+                    </TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                      Status
+                    </TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                      Created By
+                    </TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                      Created On
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {getFilteredRates().length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={11} align="center">
+                      <TableCell colSpan={11} align='center'>
                         No rates found matching the filters
                       </TableCell>
                     </TableRow>
@@ -857,20 +1135,26 @@ const RatePopup = ({ open, onClose, locationId, locationName, customerId, custom
                         <TableCell>{rate.rateId}</TableCell>
                         <TableCell>{rate.customerName}</TableCell>
                         <TableCell>{rate.locationName}</TableCell>
-                        <TableCell>{getDateRangeDisplay(rate.effectiveDate)}</TableCell>
+                        <TableCell>
+                          {getDateRangeDisplay(rate.effectiveDate)}
+                        </TableCell>
                         <TableCell>Rs {rate.companyRate}</TableCell>
                         <TableCell>Rs {rate.transporterRate}</TableCell>
-                        <TableCell>{rate.route || '-'}</TableCell>
-                        <TableCell>{rate.materialType || '-'}</TableCell>
+                        <TableCell>{rate.route || "-"}</TableCell>
+                        <TableCell>{rate.materialType || "-"}</TableCell>
                         <TableCell>
-                          <Chip 
-                            label={rate.status} 
-                            color={rate.status === 'Active' ? 'success' : 'default'}
-                            size="small"
+                          <Chip
+                            label={rate.status}
+                            color={
+                              rate.status === "Active" ? "success" : "default"
+                            }
+                            size='small'
                           />
                         </TableCell>
                         <TableCell>{rate.createdBy}</TableCell>
-                        <TableCell>{new Date(rate.createdOn).toLocaleDateString()}</TableCell>
+                        <TableCell>
+                          {new Date(rate.createdOn).toLocaleDateString()}
+                        </TableCell>
                       </TableRow>
                     ))
                   )}

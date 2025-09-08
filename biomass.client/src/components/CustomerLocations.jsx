@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Box,
   Typography,
@@ -24,22 +24,22 @@ import {
   InputAdornment,
   Card,
   CardContent,
-  CardActionArea
-} from '@mui/material';
-import ZoomInIcon from '@mui/icons-material/ZoomIn';
-import ZoomOutIcon from '@mui/icons-material/ZoomOut';
-import MyLocationIcon from '@mui/icons-material/MyLocation';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
-import CloseIcon from '@mui/icons-material/Close';
-import SearchIcon from '@mui/icons-material/Search';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
-import MapComponent from './MapComponent';
-import { CustomerLocationForm } from './CustomerLocationForm';
-import RatePopup from './RatePopup';
-import './CustomerLocations.css';
+  CardActionArea,
+} from "@mui/material";
+import ZoomInIcon from "@mui/icons-material/ZoomIn";
+import ZoomOutIcon from "@mui/icons-material/ZoomOut";
+import MyLocationIcon from "@mui/icons-material/MyLocation";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
+import CloseIcon from "@mui/icons-material/Close";
+import SearchIcon from "@mui/icons-material/Search";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import MapComponent from "./MapComponent";
+import { CustomerLocationForm } from "./CustomerLocationForm";
+import RatePopup from "./RatePopup";
+import "./CustomerLocations.css";
 
 const CustomerLocations = ({ customer, onClose }) => {
   const [locations, setLocations] = useState([]);
@@ -49,9 +49,9 @@ const CustomerLocations = ({ customer, onClose }) => {
   const [editingLocation, setEditingLocation] = useState(null);
   const [mapZoom, setMapZoom] = useState(12);
   const [mapCenter, setMapCenter] = useState({ lat: 31.5204, lng: 74.3587 }); // Lahore, Pakistan coordinates
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState('all');
-  const [filterStatus, setFilterStatus] = useState('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterType, setFilterType] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
   const [openMapDialog, setOpenMapDialog] = useState(false);
   const [mapLocation, setMapLocation] = useState(null);
   const [openRatePopup, setOpenRatePopup] = useState(false);
@@ -65,17 +65,21 @@ const CustomerLocations = ({ customer, onClose }) => {
   useEffect(() => {
     if (locations.length > 0) {
       // Try to find a location with valid coordinates
-      const locationWithCoords = locations.find(loc => {
+      const locationWithCoords = locations.find((loc) => {
         const lat = loc.latitude || loc.Latitude;
         const lng = loc.longitude || loc.Longitude;
         return lat && lng && !isNaN(parseFloat(lat)) && !isNaN(parseFloat(lng));
       });
-      
+
       if (locationWithCoords) {
-        const lat = parseFloat(locationWithCoords.latitude || locationWithCoords.Latitude);
-        const lng = parseFloat(locationWithCoords.longitude || locationWithCoords.Longitude);
+        const lat = parseFloat(
+          locationWithCoords.latitude || locationWithCoords.Latitude
+        );
+        const lng = parseFloat(
+          locationWithCoords.longitude || locationWithCoords.Longitude
+        );
         setMapCenter({ lat, lng });
-        console.log('Updated map center to:', { lat, lng });
+        console.log("Updated map center to:", { lat, lng });
       }
     }
   }, [locations]);
@@ -85,20 +89,24 @@ const CustomerLocations = ({ customer, onClose }) => {
     const fetchLocations = async () => {
       try {
         // Fetch locations for the selected customer
-        const response = await axios.get(`https://localhost:7084/api/customerlocations/GetLocationsByCustomerId/${customer.customerId}`);
+        const response = await axios.get(
+          `https://localhost:7084/api/customerlocations/GetLocationsByCustomerId/${customer.customerId}`
+        );
         if (response.data.success) {
           setLocations(response.data.result);
         }
       } catch (error) {
-        console.error('Error fetching locations:', error);
+        console.error("Error fetching locations:", error);
         // Fallback to get all locations if customer-specific fails
         try {
-          const response = await axios.get('https://localhost:7084/api/customerlocations/GetAllLocations');
+          const response = await axios.get(
+            "https://localhost:7084/api/customerlocations/GetAllLocations"
+          );
           if (response.data.success) {
             setLocations(response.data.result);
           }
         } catch (fallbackError) {
-          console.error('Error fetching all locations:', fallbackError);
+          console.error("Error fetching all locations:", fallbackError);
         }
       }
     };
@@ -108,69 +116,71 @@ const CustomerLocations = ({ customer, onClose }) => {
 
   const fetchMaterialRates = async (locationId) => {
     try {
-      const response = await axios.get(`https://localhost:7084/api/materialrates/location/${locationId}`);
+      const response = await axios.get(
+        `https://localhost:7084/api/materialrates/location/${locationId}`
+      );
       if (response.data.success) {
         setMaterialRates(response.data.result);
       } else {
-        console.error('Failed to fetch material rates:', response.data.message);
+        console.error("Failed to fetch material rates:", response.data.message);
       }
     } catch (error) {
-      console.error('Error fetching material rates:', error);
+      console.error("Error fetching material rates:", error);
     }
   };
 
   const getMockLocations = () => [
     {
       locationId: 1,
-      locationName: 'Bulha Shah',
-      locationCode: 'BS001',
-      address: '123 Main Street, Lahore, Pakistan',
+      locationName: "Bulha Shah",
+      locationCode: "BS001",
+      address: "123 Main Street, Lahore, Pakistan",
       latitude: 31.5204,
       longitude: 74.3587,
-      locationType: 'Warehouse',
-      status: 'active',
-      capacity: '5000 sq ft',
-      contactPerson: 'Ahmed Khan',
-      phone: '+92 300 1234567',
-      email: 'ahmed.khan@bulhashah.com',
-      description: 'Main distribution center for Lahore region',
-      lastUpdated: '2024-01-15',
-      customerName: 'John Doe'
+      locationType: "Warehouse",
+      status: "active",
+      capacity: "5000 sq ft",
+      contactPerson: "Ahmed Khan",
+      phone: "+92 300 1234567",
+      email: "ahmed.khan@bulhashah.com",
+      description: "Main distribution center for Lahore region",
+      lastUpdated: "2024-01-15",
+      customerName: "John Doe",
     },
     {
       locationId: 2,
-      locationName: 'Karachi Hub',
-      locationCode: 'KH002',
-      address: '456 Business District, Karachi, Pakistan',
+      locationName: "Karachi Hub",
+      locationCode: "KH002",
+      address: "456 Business District, Karachi, Pakistan",
       latitude: 24.8607,
       longitude: 67.0011,
-      locationType: 'Distribution Center',
-      status: 'active',
-      capacity: '8000 sq ft',
-      contactPerson: 'Fatima Ali',
-      phone: '+92 300 9876543',
-      email: 'fatima.ali@bulhashah.com',
-      description: 'Southern distribution hub',
-      lastUpdated: '2024-01-10',
-      customerName: 'Sarah Johnson'
+      locationType: "Distribution Center",
+      status: "active",
+      capacity: "8000 sq ft",
+      contactPerson: "Fatima Ali",
+      phone: "+92 300 9876543",
+      email: "fatima.ali@bulhashah.com",
+      description: "Southern distribution hub",
+      lastUpdated: "2024-01-10",
+      customerName: "Sarah Johnson",
     },
     {
       locationId: 3,
-      locationName: 'Islamabad Office',
-      locationCode: 'IO003',
-      address: '789 Business Park, Islamabad, Pakistan',
+      locationName: "Islamabad Office",
+      locationCode: "IO003",
+      address: "789 Business Park, Islamabad, Pakistan",
       latitude: 33.6844,
       longitude: 73.0479,
-      locationType: 'Office',
-      status: 'active',
-      capacity: '3000 sq ft',
-      contactPerson: 'Usman Malik',
-      phone: '+92 300 5551234',
-      email: 'usman.malik@bulhashah.com',
-      description: 'Regional office for Islamabad',
-      lastUpdated: '2024-01-20',
-      customerName: 'Michael Brown'
-    }
+      locationType: "Office",
+      status: "active",
+      capacity: "3000 sq ft",
+      contactPerson: "Usman Malik",
+      phone: "+92 300 5551234",
+      email: "usman.malik@bulhashah.com",
+      description: "Regional office for Islamabad",
+      lastUpdated: "2024-01-20",
+      customerName: "Michael Brown",
+    },
   ];
 
   const handleViewDetails = (location) => {
@@ -190,20 +200,24 @@ const CustomerLocations = ({ customer, onClose }) => {
 
   const handleSaveMaterialRate = (materialRate) => {
     // Refresh the material rates list
-    fetchMaterialRates(selectedLocationForRate.locationId || selectedLocationForRate.LocationId);
+    fetchMaterialRates(
+      selectedLocationForRate.locationId || selectedLocationForRate.LocationId
+    );
   };
 
   const handleAddLocation = () => {
     const newLocationData = {
-      customerName: customer ? `${customer.firstName} ${customer.lastName}` : ''
+      customerName: customer
+        ? `${customer.firstName} ${customer.lastName}`
+        : "",
     };
-    
-    console.log('handleAddLocation called:', {
+
+    console.log("handleAddLocation called:", {
       customer,
       newLocationData,
-      customerId: customer?.customerId
+      customerId: customer?.customerId,
     });
-    
+
     setEditingLocation(newLocationData);
     setOpenLocationForm(true);
   };
@@ -218,64 +232,99 @@ const CustomerLocations = ({ customer, onClose }) => {
       address: savedLocation.address || savedLocation.Address,
       latitude: savedLocation.latitude || savedLocation.Latitude,
       longitude: savedLocation.longitude || savedLocation.Longitude,
-      centerDispatchWeightLimit: savedLocation.centerDispatchWeightLimit || savedLocation.CenterDispatchWeightLimit,
-      advancePercentageAllowed: savedLocation.advancePercentageAllowed || savedLocation.AdvancePercentageAllowed,
-      toleranceLimitPercentage: savedLocation.toleranceLimitPercentage || savedLocation.ToleranceLimitPercentage,
-      toleranceLimitKg: savedLocation.toleranceLimitKg || savedLocation.ToleranceLimitKg,
-      materialPenaltyRatePerKg: savedLocation.materialPenaltyRatePerKg || savedLocation.MaterialPenaltyRatePerKg,
-      dispatchLoadingChargesEnabled: savedLocation.dispatchLoadingChargesEnabled || savedLocation.DispatchLoadingChargesEnabled,
-      dispatchChargeType: savedLocation.dispatchChargeType || savedLocation.DispatchChargeType,
-      fixedLoaderCost: savedLocation.fixedLoaderCost || savedLocation.FixedLoaderCost,
-      variableChargeType: savedLocation.variableChargeType || savedLocation.VariableChargeType,
-      variableChargeAmount: savedLocation.variableChargeAmount || savedLocation.VariableChargeAmount,
-      receivingUnloadingCostEnabled: savedLocation.receivingUnloadingCostEnabled || savedLocation.ReceivingUnloadingCostEnabled,
-      receivingChargeType: savedLocation.receivingChargeType || savedLocation.ReceivingChargeType,
-      fixedUnloadingCost: savedLocation.fixedUnloadingCost || savedLocation.FixedUnloadingCost,
-      receivingVariableChargeType: savedLocation.receivingVariableChargeType || savedLocation.ReceivingVariableChargeType,
-      receivingVariableChargeAmount: savedLocation.receivingVariableChargeAmount || savedLocation.ReceivingVariableChargeAmount,
-      laborChargesEnabled: savedLocation.laborChargesEnabled || savedLocation.LaborChargesEnabled,
-      laborChargeType: savedLocation.laborChargeType || savedLocation.LaborChargeType,
-      laborChargesCost: savedLocation.laborChargesCost || savedLocation.LaborChargesCost,
+      centerDispatchWeightLimit:
+        savedLocation.centerDispatchWeightLimit ||
+        savedLocation.CenterDispatchWeightLimit,
+      advancePercentageAllowed:
+        savedLocation.advancePercentageAllowed ||
+        savedLocation.AdvancePercentageAllowed,
+      toleranceLimitPercentage:
+        savedLocation.toleranceLimitPercentage ||
+        savedLocation.ToleranceLimitPercentage,
+      toleranceLimitKg:
+        savedLocation.toleranceLimitKg || savedLocation.ToleranceLimitKg,
+      materialPenaltyRatePerKg:
+        savedLocation.materialPenaltyRatePerKg ||
+        savedLocation.MaterialPenaltyRatePerKg,
+      dispatchLoadingChargesEnabled:
+        savedLocation.dispatchLoadingChargesEnabled ||
+        savedLocation.DispatchLoadingChargesEnabled,
+      dispatchChargeType:
+        savedLocation.dispatchChargeType || savedLocation.DispatchChargeType,
+      fixedLoaderCost:
+        savedLocation.fixedLoaderCost || savedLocation.FixedLoaderCost,
+      variableChargeType:
+        savedLocation.variableChargeType || savedLocation.VariableChargeType,
+      variableChargeAmount:
+        savedLocation.variableChargeAmount ||
+        savedLocation.VariableChargeAmount,
+      receivingUnloadingCostEnabled:
+        savedLocation.receivingUnloadingCostEnabled ||
+        savedLocation.ReceivingUnloadingCostEnabled,
+      receivingChargeType:
+        savedLocation.receivingChargeType || savedLocation.ReceivingChargeType,
+      fixedUnloadingCost:
+        savedLocation.fixedUnloadingCost || savedLocation.FixedUnloadingCost,
+      receivingVariableChargeType:
+        savedLocation.receivingVariableChargeType ||
+        savedLocation.ReceivingVariableChargeType,
+      receivingVariableChargeAmount:
+        savedLocation.receivingVariableChargeAmount ||
+        savedLocation.ReceivingVariableChargeAmount,
+      laborChargesEnabled:
+        savedLocation.laborChargesEnabled || savedLocation.LaborChargesEnabled,
+      laborChargeType:
+        savedLocation.laborChargeType || savedLocation.LaborChargeType,
+      laborChargesCost:
+        savedLocation.laborChargesCost || savedLocation.LaborChargesCost,
       status: savedLocation.status || savedLocation.Status,
       createdOn: savedLocation.createdOn || savedLocation.CreatedOn,
       lastUpdatedOn: savedLocation.lastUpdatedOn || savedLocation.LastUpdatedOn,
-      customerName: savedLocation.customerName || savedLocation.CustomerName
+      customerName: savedLocation.customerName || savedLocation.CustomerName,
     };
 
     // Check if we're editing an existing location (has locationId) or adding a new one
     const isEditingExisting = editingLocation && editingLocation.locationId;
-    
-    console.log('handleSaveLocation:', {
+
+    console.log("handleSaveLocation:", {
       savedLocation,
       convertedLocation,
       editingLocation,
       isEditingExisting,
-      hasLocationId: editingLocation?.locationId
+      hasLocationId: editingLocation?.locationId,
     });
 
     if (isEditingExisting) {
       // Update existing location
-      console.log('Updating existing location:', convertedLocation.locationId);
-      setLocations(prev => prev.map(loc => 
-        loc.locationId === convertedLocation.locationId ? convertedLocation : loc
-      ));
+      console.log("Updating existing location:", convertedLocation.locationId);
+      setLocations((prev) =>
+        prev.map((loc) =>
+          loc.locationId === convertedLocation.locationId
+            ? convertedLocation
+            : loc
+        )
+      );
     } else {
       // Add new location
-      console.log('Adding new location');
-      setLocations(prev => [...prev, convertedLocation]);
+      console.log("Adding new location");
+      setLocations((prev) => [...prev, convertedLocation]);
     }
     setOpenLocationForm(false);
     setEditingLocation(null);
   };
 
   const handleDeleteLocation = async (locationId) => {
-    if (window.confirm('Are you sure you want to delete this location?')) {
+    if (window.confirm("Are you sure you want to delete this location?")) {
       try {
-        await axios.delete(`https://localhost:7084/api/customerlocations/DeleteLocation/${locationId}`);
-        setLocations(prev => prev.filter(loc => loc.locationId !== locationId));
+        await axios.delete(
+          `https://localhost:7084/api/customerlocations/DeleteLocation/${locationId}`
+        );
+        setLocations((prev) =>
+          prev.filter((loc) => loc.locationId !== locationId)
+        );
       } catch (error) {
-        console.error('Error deleting location:', error);
-        alert('Error deleting location. Please try again.');
+        console.error("Error deleting location:", error);
+        alert("Error deleting location. Please try again.");
       }
     }
   };
@@ -286,24 +335,28 @@ const CustomerLocations = ({ customer, onClose }) => {
   };
 
   const handleZoomIn = () => {
-    setMapZoom(prev => Math.min(prev + 2, 20));
+    setMapZoom((prev) => Math.min(prev + 2, 20));
   };
 
   const handleZoomOut = () => {
-    setMapZoom(prev => Math.max(prev - 2, 8));
+    setMapZoom((prev) => Math.max(prev - 2, 8));
   };
 
   const handleCenterMap = () => {
     if (locations.length > 0) {
-      const locationWithCoords = locations.find(loc => {
+      const locationWithCoords = locations.find((loc) => {
         const lat = loc.latitude || loc.Latitude;
         const lng = loc.longitude || loc.Longitude;
         return lat && lng && !isNaN(parseFloat(lat)) && !isNaN(parseFloat(lng));
       });
-      
+
       if (locationWithCoords) {
-        const lat = parseFloat(locationWithCoords.latitude || locationWithCoords.Latitude);
-        const lng = parseFloat(locationWithCoords.longitude || locationWithCoords.Longitude);
+        const lat = parseFloat(
+          locationWithCoords.latitude || locationWithCoords.Latitude
+        );
+        const lng = parseFloat(
+          locationWithCoords.longitude || locationWithCoords.Longitude
+        );
         setMapCenter({ lat, lng });
         setMapZoom(14);
       }
@@ -311,75 +364,89 @@ const CustomerLocations = ({ customer, onClose }) => {
   };
 
   const getStatusColor = (status) => {
-    return status === 'active' ? 'success' : 'error';
+    return status === "active" ? "success" : "error";
   };
 
   const getTypeColor = (type) => {
     const colors = {
-      'Warehouse': '#2196F3',
-      'Distribution Center': '#4CAF50',
-      'Office': '#FF9800',
-      'Service Center': '#9C27B0'
+      Warehouse: "#2196F3",
+      "Distribution Center": "#4CAF50",
+      Office: "#FF9800",
+      "Service Center": "#9C27B0",
     };
-    return colors[type] || '#757575';
+    return colors[type] || "#757575";
   };
 
   // Filter locations based on search and filters
-  const filteredLocations = locations.filter(location => {
-    const matchesSearch = 
+  const filteredLocations = locations.filter((location) => {
+    const matchesSearch =
       location.locationName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       location.locationCode?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       location.address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       location.customerName?.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesType = filterType === 'all' || location.locationType === filterType;
-    const matchesStatus = filterStatus === 'all' || location.status === filterStatus;
-    
+
+    const matchesType =
+      filterType === "all" || location.locationType === filterType;
+    const matchesStatus =
+      filterStatus === "all" || location.status === filterStatus;
+
     return matchesSearch && matchesType && matchesStatus;
   });
 
   if (!isStandalone && !customer) return null;
 
   return (
-    <Box sx={{ height: isStandalone ? 'calc(100vh - 112px)' : '80vh', display: 'flex', flexDirection: 'column' }}>
+    <Box
+      sx={{
+        height: isStandalone ? "calc(100vh - 112px)" : "80vh",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       {/* Header */}
-      <Box sx={{ 
-        p: 3, 
-        background: 'linear-gradient(135deg, #228B22 0%, #006400 100%)',
-        color: 'white',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-      }}>
+      <Box
+        sx={{
+          p: 3,
+          background: "linear-gradient(135deg, #228B22 0%, #006400 100%)",
+          color: "white",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
         <Box>
-          <Typography variant="h4" component="h1" gutterBottom sx={{ color: 'white', fontWeight: 'bold' }}>
+          <Typography
+            variant='h4'
+            component='h1'
+            gutterBottom
+            sx={{ color: "white", fontWeight: "bold" }}
+          >
             Customer Management
           </Typography>
-          <Typography variant="body1">
-            {isStandalone 
-              ? `Showing ${filteredLocations.length} locations` 
-              : `${customer.firstName} ${customer.lastName} - ${customer.company}`
-            }
+          <Typography variant='body1'>
+            {isStandalone
+              ? `Showing ${filteredLocations.length} locations`
+              : `${customer.firstName} ${customer.lastName} - ${customer.company}`}
           </Typography>
         </Box>
-        <Box sx={{ display: 'flex', gap: 1 }}>
+        <Box sx={{ display: "flex", gap: 1 }}>
           <Button
-            variant="contained"
+            variant='contained'
             startIcon={<AddIcon />}
-            size="small"
+            size='small'
             onClick={handleAddLocation}
             sx={{
-              bgcolor: 'rgba(255,255,255,0.2)',
-              color: 'white',
-              '&:hover': {
-                bgcolor: 'rgba(255,255,255,0.3)',
-              }
+              bgcolor: "rgba(255,255,255,0.2)",
+              color: "white",
+              "&:hover": {
+                bgcolor: "rgba(255,255,255,0.3)",
+              },
             }}
           >
             Add Location
           </Button>
           {onClose && (
-            <IconButton onClick={onClose} sx={{ color: 'white' }}>
+            <IconButton onClick={onClose} sx={{ color: "white" }}>
               <CloseIcon />
             </IconButton>
           )}
@@ -388,18 +455,25 @@ const CustomerLocations = ({ customer, onClose }) => {
 
       {/* Filters for standalone mode */}
       {isStandalone && (
-        <Box sx={{ p: 3, bgcolor: 'background.paper', borderBottom: 1, borderColor: 'divider' }}>
-          <Grid container spacing={1.5} alignItems="center">
+        <Box
+          sx={{
+            p: 3,
+            bgcolor: "background.paper",
+            borderBottom: 1,
+            borderColor: "divider",
+          }}
+        >
+          <Grid container spacing={1.5} alignItems='center'>
             <Grid item xs={12} md={4}>
               <TextField
                 fullWidth
-                placeholder="Search locations..."
+                placeholder='Search locations...'
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                size="small"
+                size='small'
                 InputProps={{
                   startAdornment: (
-                    <InputAdornment position="start">
+                    <InputAdornment position='start'>
                       <SearchIcon />
                     </InputAdornment>
                   ),
@@ -407,37 +481,43 @@ const CustomerLocations = ({ customer, onClose }) => {
               />
             </Grid>
             <Grid item xs={12} md={3}>
-              <FormControl fullWidth size="small">
+              <FormControl fullWidth size='small'>
                 <InputLabel>Type</InputLabel>
                 <Select
                   value={filterType}
-                  label="Type"
+                  label='Type'
                   onChange={(e) => setFilterType(e.target.value)}
                 >
-                  <MenuItem value="all">All Types</MenuItem>
-                  <MenuItem value="Warehouse">Warehouse</MenuItem>
-                  <MenuItem value="Distribution Center">Distribution Center</MenuItem>
-                  <MenuItem value="Office">Office</MenuItem>
-                  <MenuItem value="Service Center">Service Center</MenuItem>
+                  <MenuItem value='all'>All Types</MenuItem>
+                  <MenuItem value='Warehouse'>Warehouse</MenuItem>
+                  <MenuItem value='Distribution Center'>
+                    Distribution Center
+                  </MenuItem>
+                  <MenuItem value='Office'>Office</MenuItem>
+                  <MenuItem value='Service Center'>Service Center</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
             <Grid item xs={12} md={3}>
-              <FormControl fullWidth size="small">
+              <FormControl fullWidth size='small'>
                 <InputLabel>Status</InputLabel>
                 <Select
                   value={filterStatus}
-                  label="Status"
+                  label='Status'
                   onChange={(e) => setFilterStatus(e.target.value)}
                 >
-                  <MenuItem value="all">All Status</MenuItem>
-                  <MenuItem value="active">Active</MenuItem>
-                  <MenuItem value="inactive">Inactive</MenuItem>
+                  <MenuItem value='all'>All Status</MenuItem>
+                  <MenuItem value='active'>Active</MenuItem>
+                  <MenuItem value='inactive'>Inactive</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
             <Grid item xs={12} md={2}>
-              <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
+              <Typography
+                variant='body2'
+                color='text.secondary'
+                sx={{ fontSize: "0.8rem" }}
+              >
                 {filteredLocations.length} locations
               </Typography>
             </Grid>
@@ -445,7 +525,7 @@ const CustomerLocations = ({ customer, onClose }) => {
         </Box>
       )}
 
-      <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+      <Box sx={{ display: "flex", flex: 1, overflow: "hidden" }}>
         {/* Map Section - Temporarily Hidden */}
         {/* 
         <Box sx={{ flex: 1, position: 'relative' }}>
@@ -470,106 +550,207 @@ const CustomerLocations = ({ customer, onClose }) => {
         */}
 
         {/* Locations List - Now Full Width */}
-        <Box sx={{ width: '100%', bgcolor: 'white', overflow: 'auto' }}>
-          <Box sx={{ p: 1.5, borderBottom: 1, borderColor: 'divider' }}>
-            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1, fontSize: '1rem' }}>
-              {isStandalone ? 'All Locations' : 'Locations'} ({filteredLocations.length})
+        <Box sx={{ width: "100%", bgcolor: "white", overflow: "auto" }}>
+          <Box sx={{ p: 1.5, borderBottom: 1, borderColor: "divider" }}>
+            <Typography
+              variant='h6'
+              sx={{ fontWeight: "bold", mb: 1, fontSize: "1rem" }}
+            >
+              {isStandalone ? "All Locations" : "Locations"} (
+              {filteredLocations.length})
             </Typography>
           </Box>
 
           <Box sx={{ p: 1.5 }}>
             <Grid container spacing={2}>
               {filteredLocations.map((location) => (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={location.locationId || location.LocationId}>
+                <Grid
+                  item
+                  xs={12}
+                  sm={6}
+                  md={4}
+                  lg={3}
+                  key={location.locationId || location.LocationId}
+                >
                   <Card
-                    sx={{ 
-                      height: '100%',
+                    sx={{
+                      height: "100%",
                       borderRadius: 2,
-                      border: '1px solid',
-                      borderColor: 'divider',
-                      transition: 'all 0.3s ease',
-                      '&:hover': {
+                      border: "1px solid",
+                      borderColor: "divider",
+                      transition: "all 0.3s ease",
+                      "&:hover": {
                         boxShadow: 3,
-                        transform: 'translateY(-2px)'
-                      }
+                        transform: "translateY(-2px)",
+                      },
                     }}
                   >
-                    <CardActionArea onClick={() => handleViewDetails(location)} sx={{ height: '100%' }}>
-                      <CardContent sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
-                          <Avatar sx={{ bgcolor: getTypeColor(location.locationType || 'Warehouse'), width: 40, height: 40, fontSize: '1rem' }}>
-                            {(location.locationName || location.LocationName || 'L').charAt(0)}
+                    <CardActionArea
+                      onClick={() => handleViewDetails(location)}
+                      sx={{ height: "100%" }}
+                    >
+                      <CardContent
+                        sx={{
+                          height: "100%",
+                          display: "flex",
+                          flexDirection: "column",
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1.5,
+                            mb: 1.5,
+                          }}
+                        >
+                          <Avatar
+                            sx={{
+                              bgcolor: "#28C76F",
+                              width: 40,
+                              height: 40,
+                              fontSize: "1rem",
+                            }}
+                          >
+                            {(
+                              location.locationName ||
+                              location.LocationName ||
+                              "L"
+                            ).charAt(0)}
                           </Avatar>
                           <Box sx={{ flex: 1 }}>
-                            <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: '1rem', lineHeight: 1.2 }}>
+                            <Typography
+                              variant='h6'
+                              sx={{
+                                fontWeight: "bold",
+                                fontSize: "1rem",
+                                lineHeight: 1.2,
+                              }}
+                            >
                               {location.locationName || location.LocationName}
                             </Typography>
-                            <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
-                              {location.locationType || 'Warehouse'}
+                            <Typography
+                              variant='body2'
+                              color='text.secondary'
+                              sx={{ fontSize: "0.8rem" }}
+                            >
+                              {location.locationType || "Warehouse"}
                             </Typography>
                             {isStandalone && location.customerName && (
-                              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem', display: 'block' }}>
+                              <Typography
+                                variant='caption'
+                                color='text.secondary'
+                                sx={{ fontSize: "0.7rem", display: "block" }}
+                              >
                                 Customer: {location.customerName}
                               </Typography>
                             )}
                           </Box>
                           <Chip
-                            label={location.status || 'Active'}
+                            label={location.status || "Active"}
                             color={getStatusColor(location.status)}
-                            size="small"
-                            sx={{ textTransform: 'capitalize', fontSize: '0.7rem', height: 24 }}
+                            size='small'
+                            sx={{
+                              textTransform: "capitalize",
+                              fontSize: "0.7rem",
+                              height: 24,
+                            }}
                           />
                         </Box>
 
-                        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, fontSize: '0.8rem', flex: 1 }}>
+                        <Typography
+                          variant='body2'
+                          color='text.secondary'
+                          sx={{ mb: 2, fontSize: "0.8rem", flex: 1 }}
+                        >
                           {location.address || location.Address}
                         </Typography>
 
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 'auto' }}>
-                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
-                              Code: {location.locationCode || location.LocationCode || 'N/A'}
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            mt: "auto",
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              display: "flex",
+                              flexDirection: "column",
+                              gap: 0.5,
+                            }}
+                          >
+                            <Typography
+                              variant='caption'
+                              color='text.secondary'
+                              sx={{ fontSize: "0.7rem" }}
+                            >
+                              Code:{" "}
+                              {location.locationCode ||
+                                location.LocationCode ||
+                                "N/A"}
                             </Typography>
-                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
-                              Weight Limit: {(location.centerDispatchWeightLimit || location.CenterDispatchWeightLimit || 0).toLocaleString()} kg
+                            <Typography
+                              variant='caption'
+                              color='text.secondary'
+                              sx={{ fontSize: "0.7rem" }}
+                            >
+                              Weight Limit:{" "}
+                              {(
+                                location.centerDispatchWeightLimit ||
+                                location.CenterDispatchWeightLimit ||
+                                0
+                              ).toLocaleString()}{" "}
+                              kg
                             </Typography>
-                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
-                              Advance: {(location.advancePercentageAllowed || location.AdvancePercentageAllowed || 0)}%
+                            <Typography
+                              variant='caption'
+                              color='text.secondary'
+                              sx={{ fontSize: "0.7rem" }}
+                            >
+                              Advance:{" "}
+                              {location.advancePercentageAllowed ||
+                                location.AdvancePercentageAllowed ||
+                                0}
+                              %
                             </Typography>
                           </Box>
-                          <Box sx={{ display: 'flex', gap: 0.5 }}>
+                          <Box sx={{ display: "flex", gap: 0.5 }}>
                             <IconButton
-                              size="small"
+                              size='small'
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleAddRate(location);
                               }}
-                              sx={{ color: '#4CAF50', p: 0.5 }}
-                              title="Add Rate"
+                              sx={{ color: "#4CAF50", p: 0.5 }}
+                              title='Add Rate'
                             >
-                              <AttachMoneyIcon sx={{ fontSize: '1.2rem' }} />
+                              <AttachMoneyIcon sx={{ fontSize: "1.2rem" }} />
                             </IconButton>
                             <IconButton
-                              size="small"
+                              size='small'
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleEditLocation(location);
                               }}
-                              sx={{ color: '#2196F3', p: 0.5 }}
-                              title="Edit Location"
+                              sx={{ color: "#2196F3", p: 0.5 }}
+                              title='Edit Location'
                             >
-                              <EditIcon sx={{ fontSize: '1.2rem' }} />
+                              <EditIcon sx={{ fontSize: "1.2rem" }} />
                             </IconButton>
                             <IconButton
-                              size="small"
+                              size='small'
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleDeleteLocation(location.locationId || location.LocationId);
+                                handleDeleteLocation(
+                                  location.locationId || location.LocationId
+                                );
                               }}
-                              sx={{ color: '#f44336', p: 0.5 }}
-                              title="Delete Location"
+                              sx={{ color: "#f44336", p: 0.5 }}
+                              title='Delete Location'
                             >
-                              <DeleteIcon sx={{ fontSize: '1.2rem' }} />
+                              <DeleteIcon sx={{ fontSize: "1.2rem" }} />
                             </IconButton>
                           </Box>
                         </Box>
@@ -587,15 +768,18 @@ const CustomerLocations = ({ customer, onClose }) => {
       <Dialog
         open={openLocationDetails}
         onClose={() => setOpenLocationDetails(false)}
-        maxWidth="md"
+        maxWidth='md'
         fullWidth
       >
-        <DialogTitle sx={{ 
-          background: 'linear-gradient(135deg, #228B22 0%, #006400 100%)',
-          color: 'white',
-          fontWeight: 'bold'
-        }}>
-          Location Details - {selectedLocation?.locationName || selectedLocation?.LocationName}
+        <DialogTitle
+          sx={{
+            background: "linear-gradient(135deg, #228B22 0%, #006400 100%)",
+            color: "white",
+            fontWeight: "bold",
+          }}
+        >
+          Location Details -{" "}
+          {selectedLocation?.locationName || selectedLocation?.LocationName}
         </DialogTitle>
         <DialogContent sx={{ pt: 3 }}>
           {selectedLocation && (
@@ -603,27 +787,33 @@ const CustomerLocations = ({ customer, onClose }) => {
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
-                  label="Location Name"
-                  value={selectedLocation.locationName || selectedLocation.LocationName}
-                  margin="normal"
+                  label='Location Name'
+                  value={
+                    selectedLocation.locationName ||
+                    selectedLocation.LocationName
+                  }
+                  margin='normal'
                   InputProps={{ readOnly: true }}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
-                  label="Location Code"
-                  value={selectedLocation.locationCode || selectedLocation.LocationCode}
-                  margin="normal"
+                  label='Location Code'
+                  value={
+                    selectedLocation.locationCode ||
+                    selectedLocation.LocationCode
+                  }
+                  margin='normal'
                   InputProps={{ readOnly: true }}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
-                  label="Status"
-                  value={selectedLocation.status || 'Active'}
-                  margin="normal"
+                  label='Status'
+                  value={selectedLocation.status || "Active"}
+                  margin='normal'
                   InputProps={{ readOnly: true }}
                 />
               </Grid>
@@ -631,9 +821,9 @@ const CustomerLocations = ({ customer, onClose }) => {
                 <Grid item xs={12} md={6}>
                   <TextField
                     fullWidth
-                    label="Customer"
+                    label='Customer'
                     value={selectedLocation.customerName}
-                    margin="normal"
+                    margin='normal'
                     InputProps={{ readOnly: true }}
                   />
                 </Grid>
@@ -641,9 +831,9 @@ const CustomerLocations = ({ customer, onClose }) => {
               <Grid item xs={12}>
                 <TextField
                   fullWidth
-                  label="Address"
+                  label='Address'
                   value={selectedLocation.address || selectedLocation.Address}
-                  margin="normal"
+                  margin='normal'
                   multiline
                   rows={2}
                   InputProps={{ readOnly: true }}
@@ -652,182 +842,272 @@ const CustomerLocations = ({ customer, onClose }) => {
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
-                  label="Latitude"
+                  label='Latitude'
                   value={selectedLocation.latitude || selectedLocation.Latitude}
-                  margin="normal"
+                  margin='normal'
                   InputProps={{ readOnly: true }}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
-                  label="Longitude"
-                  value={selectedLocation.longitude || selectedLocation.Longitude}
-                  margin="normal"
+                  label='Longitude'
+                  value={
+                    selectedLocation.longitude || selectedLocation.Longitude
+                  }
+                  margin='normal'
                   InputProps={{ readOnly: true }}
                 />
               </Grid>
-              
+
               {/* Business Details Section */}
               <Grid item xs={12}>
-                <Typography variant="h6" sx={{ mt: 2, mb: 1, color: '#228B22', borderBottom: '2px solid #228B22', pb: 0.5 }}>
+                <Typography
+                  variant='h6'
+                  sx={{
+                    mt: 2,
+                    mb: 1,
+                    color: "#228B22",
+                    borderBottom: "2px solid #228B22",
+                    pb: 0.5,
+                  }}
+                >
                   Business Configuration
                 </Typography>
               </Grid>
-              
+
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
-                  label="Center Dispatch Weight Limit"
-                  value={`${(selectedLocation.centerDispatchWeightLimit || selectedLocation.CenterDispatchWeightLimit || 0).toLocaleString()} kg`}
-                  margin="normal"
+                  label='Center Dispatch Weight Limit'
+                  value={`${(
+                    selectedLocation.centerDispatchWeightLimit ||
+                    selectedLocation.CenterDispatchWeightLimit ||
+                    0
+                  ).toLocaleString()} kg`}
+                  margin='normal'
                   InputProps={{ readOnly: true }}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
-                  label="Advance Percentage Allowed"
-                  value={`${selectedLocation.advancePercentageAllowed || selectedLocation.AdvancePercentageAllowed || 0}%`}
-                  margin="normal"
+                  label='Advance Percentage Allowed'
+                  value={`${
+                    selectedLocation.advancePercentageAllowed ||
+                    selectedLocation.AdvancePercentageAllowed ||
+                    0
+                  }%`}
+                  margin='normal'
                   InputProps={{ readOnly: true }}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
-                  label="Tolerance Limit Percentage"
-                  value={`${selectedLocation.toleranceLimitPercentage || selectedLocation.ToleranceLimitPercentage || 0}%`}
-                  margin="normal"
+                  label='Tolerance Limit Percentage'
+                  value={`${
+                    selectedLocation.toleranceLimitPercentage ||
+                    selectedLocation.ToleranceLimitPercentage ||
+                    0
+                  }%`}
+                  margin='normal'
                   InputProps={{ readOnly: true }}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
-                  label="Tolerance Limit (kg)"
-                  value={`${selectedLocation.toleranceLimitKg || selectedLocation.ToleranceLimitKg || 0} kg`}
-                  margin="normal"
+                  label='Tolerance Limit (kg)'
+                  value={`${
+                    selectedLocation.toleranceLimitKg ||
+                    selectedLocation.ToleranceLimitKg ||
+                    0
+                  } kg`}
+                  margin='normal'
                   InputProps={{ readOnly: true }}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
-                  label="Material Penalty Rate"
-                  value={`Rs. ${selectedLocation.materialPenaltyRatePerKg || selectedLocation.MaterialPenaltyRatePerKg || 0} per kg`}
-                  margin="normal"
+                  label='Material Penalty Rate'
+                  value={`Rs. ${
+                    selectedLocation.materialPenaltyRatePerKg ||
+                    selectedLocation.MaterialPenaltyRatePerKg ||
+                    0
+                  } per kg`}
+                  margin='normal'
                   InputProps={{ readOnly: true }}
                 />
               </Grid>
-              
+
               {/* Dispatch Loading Charges Section */}
               <Grid item xs={12}>
-                <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                <Typography variant='subtitle1' fontWeight='bold' gutterBottom>
                   Dispatch Loading Charges
                 </Typography>
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={6}>
-                    <Typography variant="body2" color="text.secondary">
-                      Enabled: {selectedLocation.dispatchLoadingChargesEnabled || selectedLocation.DispatchLoadingChargesEnabled ? 'Yes' : 'No'}
+                    <Typography variant='body2' color='text.secondary'>
+                      Enabled:{" "}
+                      {selectedLocation.dispatchLoadingChargesEnabled ||
+                      selectedLocation.DispatchLoadingChargesEnabled
+                        ? "Yes"
+                        : "No"}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <Typography variant="body2" color="text.secondary">
-                      Type: {selectedLocation.dispatchChargeType || selectedLocation.DispatchChargeType || 'N/A'}
+                    <Typography variant='body2' color='text.secondary'>
+                      Type:{" "}
+                      {selectedLocation.dispatchChargeType ||
+                        selectedLocation.DispatchChargeType ||
+                        "N/A"}
                     </Typography>
                   </Grid>
                 </Grid>
               </Grid>
-              
+
               {/* Labour Charges Section */}
               <Grid item xs={12}>
-                <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                <Typography variant='subtitle1' fontWeight='bold' gutterBottom>
                   Labour Charges
                 </Typography>
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={6}>
-                    <Typography variant="body2" color="text.secondary">
-                      Enabled: {selectedLocation.laborChargesEnabled || selectedLocation.LaborChargesEnabled ? 'Yes' : 'No'}
+                    <Typography variant='body2' color='text.secondary'>
+                      Enabled:{" "}
+                      {selectedLocation.laborChargesEnabled ||
+                      selectedLocation.LaborChargesEnabled
+                        ? "Yes"
+                        : "No"}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <Typography variant="body2" color="text.secondary">
-                      Type: {selectedLocation.laborChargeType || selectedLocation.LaborChargeType || 'N/A'}
+                    <Typography variant='body2' color='text.secondary'>
+                      Type:{" "}
+                      {selectedLocation.laborChargeType ||
+                        selectedLocation.LaborChargeType ||
+                        "N/A"}
                     </Typography>
                   </Grid>
                 </Grid>
               </Grid>
-              
+
               {/* Receiving Unloading Charges Section */}
               <Grid item xs={12}>
-                <Typography variant="h6" sx={{ mt: 2, mb: 1, color: '#228B22', borderBottom: '2px solid #228B22', pb: 0.5 }}>
+                <Typography
+                  variant='h6'
+                  sx={{
+                    mt: 2,
+                    mb: 1,
+                    color: "#228B22",
+                    borderBottom: "2px solid #228B22",
+                    pb: 0.5,
+                  }}
+                >
                   Receiving Unloading Charges
                 </Typography>
               </Grid>
-              
+
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
-                  label="Unloading Charges Enabled"
-                  value={selectedLocation.receivingUnloadingCostEnabled || selectedLocation.ReceivingUnloadingCostEnabled ? 'Yes' : 'No'}
-                  margin="normal"
+                  label='Unloading Charges Enabled'
+                  value={
+                    selectedLocation.receivingUnloadingCostEnabled ||
+                    selectedLocation.ReceivingUnloadingCostEnabled
+                      ? "Yes"
+                      : "No"
+                  }
+                  margin='normal'
                   InputProps={{ readOnly: true }}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
-                  label="Receiving Charge Type"
-                  value={selectedLocation.receivingChargeType || selectedLocation.ReceivingChargeType || 'N/A'}
-                  margin="normal"
+                  label='Receiving Charge Type'
+                  value={
+                    selectedLocation.receivingChargeType ||
+                    selectedLocation.ReceivingChargeType ||
+                    "N/A"
+                  }
+                  margin='normal'
                   InputProps={{ readOnly: true }}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
-                  label="Fixed Unloading Cost"
-                  value={`Rs. ${(selectedLocation.fixedUnloadingCost || selectedLocation.FixedUnloadingCost || 0).toLocaleString()}`}
-                  margin="normal"
+                  label='Fixed Unloading Cost'
+                  value={`Rs. ${(
+                    selectedLocation.fixedUnloadingCost ||
+                    selectedLocation.FixedUnloadingCost ||
+                    0
+                  ).toLocaleString()}`}
+                  margin='normal'
                   InputProps={{ readOnly: true }}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
-                  label="Receiving Variable Charge Type"
-                  value={selectedLocation.receivingVariableChargeType || selectedLocation.ReceivingVariableChargeType || 'N/A'}
-                  margin="normal"
+                  label='Receiving Variable Charge Type'
+                  value={
+                    selectedLocation.receivingVariableChargeType ||
+                    selectedLocation.ReceivingVariableChargeType ||
+                    "N/A"
+                  }
+                  margin='normal'
                   InputProps={{ readOnly: true }}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
-                  label="Receiving Variable Charge Amount"
-                  value={`Rs. ${(selectedLocation.receivingVariableChargeAmount || selectedLocation.ReceivingVariableChargeAmount || 0).toLocaleString()}`}
-                  margin="normal"
+                  label='Receiving Variable Charge Amount'
+                  value={`Rs. ${(
+                    selectedLocation.receivingVariableChargeAmount ||
+                    selectedLocation.ReceivingVariableChargeAmount ||
+                    0
+                  ).toLocaleString()}`}
+                  margin='normal'
                   InputProps={{ readOnly: true }}
                 />
               </Grid>
-              
+
               {/* Timestamps */}
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
-                  label="Created On"
-                  value={selectedLocation.createdOn || selectedLocation.CreatedOn ? new Date(selectedLocation.createdOn || selectedLocation.CreatedOn).toLocaleString() : 'N/A'}
-                  margin="normal"
+                  label='Created On'
+                  value={
+                    selectedLocation.createdOn || selectedLocation.CreatedOn
+                      ? new Date(
+                          selectedLocation.createdOn ||
+                            selectedLocation.CreatedOn
+                        ).toLocaleString()
+                      : "N/A"
+                  }
+                  margin='normal'
                   InputProps={{ readOnly: true }}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
-                  label="Last Updated"
-                  value={selectedLocation.lastUpdatedOn || selectedLocation.LastUpdatedOn ? new Date(selectedLocation.lastUpdatedOn || selectedLocation.LastUpdatedOn).toLocaleString() : 'N/A'}
-                  margin="normal"
+                  label='Last Updated'
+                  value={
+                    selectedLocation.lastUpdatedOn ||
+                    selectedLocation.LastUpdatedOn
+                      ? new Date(
+                          selectedLocation.lastUpdatedOn ||
+                            selectedLocation.LastUpdatedOn
+                        ).toLocaleString()
+                      : "N/A"
+                  }
+                  margin='normal'
                   InputProps={{ readOnly: true }}
                 />
               </Grid>
@@ -835,20 +1115,18 @@ const CustomerLocations = ({ customer, onClose }) => {
           )}
         </DialogContent>
         <DialogActions sx={{ p: 3 }}>
-          <Button onClick={() => setOpenLocationDetails(false)}>
-            Close
-          </Button>
-          <Button 
-            variant="contained"
+          <Button onClick={() => setOpenLocationDetails(false)}>Close</Button>
+          <Button
+            variant='contained'
             onClick={() => {
               setOpenLocationDetails(false);
               handleEditLocation(selectedLocation);
             }}
             sx={{
-              background: 'linear-gradient(135deg, #228B22 0%, #006400 100%)',
-              '&:hover': {
-                background: 'linear-gradient(135deg, #006400 0%, #004d00 100%)',
-              }
+              background: "linear-gradient(135deg, #228B22 0%, #006400 100%)",
+              "&:hover": {
+                background: "linear-gradient(135deg, #006400 0%, #004d00 100%)",
+              },
             }}
           >
             Edit Location
@@ -875,10 +1153,23 @@ const CustomerLocations = ({ customer, onClose }) => {
           setOpenRatePopup(false);
           setSelectedLocationForRate(null);
         }}
-        locationId={selectedLocationForRate?.locationId || selectedLocationForRate?.LocationId}
-        locationName={selectedLocationForRate?.locationName || selectedLocationForRate?.LocationName}
-        customerId={selectedLocationForRate?.customerId || selectedLocationForRate?.CustomerId}
-        customerName={selectedLocationForRate?.customerName || selectedLocationForRate?.CustomerName || (customer ? `${customer.firstName} ${customer.lastName}` : '')}
+        locationId={
+          selectedLocationForRate?.locationId ||
+          selectedLocationForRate?.LocationId
+        }
+        locationName={
+          selectedLocationForRate?.locationName ||
+          selectedLocationForRate?.LocationName
+        }
+        customerId={
+          selectedLocationForRate?.customerId ||
+          selectedLocationForRate?.CustomerId
+        }
+        customerName={
+          selectedLocationForRate?.customerName ||
+          selectedLocationForRate?.CustomerName ||
+          (customer ? `${customer.firstName} ${customer.lastName}` : "")
+        }
         onSave={handleSaveMaterialRate}
       />
 
@@ -886,61 +1177,87 @@ const CustomerLocations = ({ customer, onClose }) => {
       <Dialog
         open={openMapDialog}
         onClose={() => setOpenMapDialog(false)}
-        maxWidth="lg"
+        maxWidth='lg'
         fullWidth
         PaperProps={{
           sx: {
-            height: '80vh',
-            maxHeight: '80vh'
-          }
+            height: "80vh",
+            maxHeight: "80vh",
+          },
         }}
       >
-        <DialogTitle sx={{ 
-          background: 'linear-gradient(135deg, #228B22 0%, #006400 100%)',
-          color: 'white',
-          fontWeight: 'bold',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
+        <DialogTitle
+          sx={{
+            background: "linear-gradient(135deg, #228B22 0%, #006400 100%)",
+            color: "white",
+            fontWeight: "bold",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <Box>
-            <Typography variant="h6">
-              {mapLocation?.locationName || mapLocation?.LocationName} - Location on Map
+            <Typography variant='h6'>
+              {mapLocation?.locationName || mapLocation?.LocationName} -
+              Location on Map
             </Typography>
-            <Typography variant="body2" sx={{ opacity: 0.9 }}>
+            <Typography variant='body2' sx={{ opacity: 0.9 }}>
               {mapLocation?.address || mapLocation?.Address}
             </Typography>
           </Box>
-          <IconButton onClick={() => setOpenMapDialog(false)} sx={{ color: 'white' }}>
+          <IconButton
+            onClick={() => setOpenMapDialog(false)}
+            sx={{ color: "white" }}
+          >
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-        <DialogContent sx={{ p: 0, position: 'relative', height: 'calc(80vh - 120px)' }}>
+        <DialogContent
+          sx={{ p: 0, position: "relative", height: "calc(80vh - 120px)" }}
+        >
           {mapLocation && (
-            <Box sx={{ height: '100%', position: 'relative' }}>
-              <MapComponent 
+            <Box sx={{ height: "100%", position: "relative" }}>
+              <MapComponent
                 locations={[mapLocation]}
                 center={{
-                  lat: parseFloat(mapLocation.latitude || mapLocation.Latitude) || 31.5204,
-                  lng: parseFloat(mapLocation.longitude || mapLocation.Longitude) || 74.3587
+                  lat:
+                    parseFloat(mapLocation.latitude || mapLocation.Latitude) ||
+                    31.5204,
+                  lng:
+                    parseFloat(
+                      mapLocation.longitude || mapLocation.Longitude
+                    ) || 74.3587,
                 }}
                 zoom={15}
               />
-              <Box sx={{ position: 'absolute', top: 16, right: 16, display: 'flex', flexDirection: 'column', gap: 1 }}>
-                <Fab 
-                  size="small" 
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: 16,
+                  right: 16,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 1,
+                }}
+              >
+                <Fab
+                  size='small'
                   onClick={() => {
                     if (mapLocation) {
-                      const lat = parseFloat(mapLocation.latitude || mapLocation.Latitude);
-                      const lng = parseFloat(mapLocation.longitude || mapLocation.Longitude);
+                      const lat = parseFloat(
+                        mapLocation.latitude || mapLocation.Latitude
+                      );
+                      const lng = parseFloat(
+                        mapLocation.longitude || mapLocation.Longitude
+                      );
                       if (lat && lng) {
                         setMapCenter({ lat, lng });
                         setMapZoom(15);
                       }
                     }
-                  }} 
-                  sx={{ bgcolor: 'white' }}
-                  title="Center on location"
+                  }}
+                  sx={{ bgcolor: "white" }}
+                  title='Center on location'
                 >
                   <MyLocationIcon />
                 </Fab>
@@ -953,4 +1270,4 @@ const CustomerLocations = ({ customer, onClose }) => {
   );
 };
 
-export default CustomerLocations; 
+export default CustomerLocations;

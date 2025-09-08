@@ -42,6 +42,14 @@ namespace Biomass.Server.Controllers.Api
 			return Ok(result);
 		}
 
+		[HttpDelete("DeleteEntry/{cashId}")]
+		public async Task<IActionResult> DeleteEntry(long cashId)
+		{
+			var result = await _service.DeleteCashbookEntryAsync(cashId);
+			if (!result.Success) return NotFound(result);
+			return Ok(result);
+		}
+
 		[HttpGet("GetWalletBalanceByEmployeeId")]
 		public async Task<IActionResult> GetWalletBalance(int employeeId)
 		{

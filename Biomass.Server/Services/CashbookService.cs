@@ -236,6 +236,53 @@ namespace Biomass.Server.Services
 			return response;
 		}
 
+		public async Task<ServiceResponse<bool>> DeleteCashbookEntryAsync(long cashId)
+		{
+			var response = new ServiceResponse<bool>();
+			try
+			{
+				var entity = await _db.Cashbooks.FirstOrDefaultAsync(c => c.CashId == cashId);
+				if (entity == null)
+				{
+					response.Success = false;
+					response.Message = "Cashbook entry not found";
+					return response;
+				}
+
+				// Delete the associated receipt file if it exists
+				if (!string.IsNullOrEmpty(entity.ReceiptPath))
+				{
+					try
+					{
+						var fullPath = Path.Combine(_environment.WebRootPath, entity.ReceiptPath.TrimStart('/'));
+						if (File.Exists(fullPath))
+						{
+							File.Delete(fullPath);
+						}
+					}
+					catch (Exception fileEx)
+					{
+						// Log the file deletion error but continue with database deletion
+						Console.WriteLine($"Error deleting receipt file: {fileEx.Message}");
+					}
+				}
+
+				// Remove the cashbook entry from database
+				_db.Cashbooks.Remove(entity);
+				await _db.SaveChangesAsync();
+
+				response.Result = true;
+				response.Success = true;
+				response.Message = "Cashbook entry deleted successfully";
+			}
+			catch (Exception ex)
+			{
+				response.Success = false;
+				response.Message = ex.Message;
+			}
+			return response;
+		}
+
 		public async Task<ServiceResponse<WalletBalanceResponse>> GetWalletBalanceAsync(int employeeId)
 		{
 			var response = new ServiceResponse<WalletBalanceResponse>();

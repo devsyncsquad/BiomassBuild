@@ -236,9 +236,10 @@ namespace Biomass.Server.Data
                 entity.HasKey(e => e.RateId);
                 entity.Property(e => e.RateId).HasColumnName("rateid");
                 entity.Property(e => e.CustomerId).HasColumnName("customerid");
-                entity.Property(e => e.EffectiveDate).HasColumnName("effectivedate").IsRequired();
+                entity.Property(e => e.EffectiveDate).HasColumnName("effectivedate");
                 entity.Property(e => e.CompanyRate).HasColumnName("company_rate").IsRequired().HasColumnType("decimal(10,2)");
                 entity.Property(e => e.TransporterRate).HasColumnName("transporter_rate").IsRequired().HasColumnType("decimal(10,2)");
+                entity.Property(e => e.DieselRate).HasColumnName("diesel_rate").HasColumnType("decimal(18,2)");
                // entity.Property(e => e.DispatchWeight).HasColumnName("dispatchweight").HasColumnType("decimal(10,2)");
                // entity.Property(e => e.ReceivingWeight).HasColumnName("receivingweight").HasColumnType("decimal(10,2)");
                 entity.Property(e => e.Route).HasColumnName("route").HasMaxLength(100);

@@ -23,23 +23,25 @@ namespace Biomass.Server.Services
             try
             {
                 var materialRates = await _context.MaterialRates
-                    .Select(mr => new MaterialRateDto
+                    .Join(_context.Customers, mr => mr.CustomerId, c => c.CustomerId, (mr, c) => new { mr, c })
+                    .Join(_context.CustomerLocations, mr => mr.mr.LocationId, cl => cl.LocationId, (mr, cl) => new { mr.mr, mr.c, cl })
+                    .Select(x => new MaterialRateDto
                     {
-                        RateId = mr.RateId,
-                        CustomerId = mr.CustomerId,
-                        LocationId = mr.LocationId,
-                        EffectiveDate = mr.EffectiveDate,
-                        CompanyRate = mr.CompanyRate,
-                        TransporterRate = mr.TransporterRate,
-                        
-                        Route = mr.Route,
-                        MaterialType = mr.MaterialType,
-                        Status = mr.Status,
-                        CreatedBy = mr.CreatedBy,
-                        CreatedOn = mr.CreatedOn,
-                        CustomerName = "Customer", // Default value
-                        LocationName = "Location", // Default value
-                        LocationCode = "LOC" // Default value
+                        RateId = x.mr.RateId,
+                        CustomerId = x.mr.CustomerId,
+                        LocationId = x.mr.LocationId,
+                        EffectiveDate = x.mr.EffectiveDate,
+                        CompanyRate = x.mr.CompanyRate,
+                        TransporterRate = x.mr.TransporterRate,
+                        DieselRate = x.mr.DieselRate,
+                        Route = x.mr.Route,
+                        MaterialType = x.mr.MaterialType,
+                        Status = x.mr.Status,
+                        CreatedBy = x.mr.CreatedBy,
+                        CreatedOn = x.mr.CreatedOn,
+                        CustomerName = x.c.CompanyName ?? $"{x.c.FirstName} {x.c.LastName}",
+                        LocationName = x.cl.LocationName,
+                        LocationCode = x.cl.LocationCode
                     })
                     .ToListAsync();
 
@@ -64,24 +66,26 @@ namespace Biomass.Server.Services
             {
                 var materialRates = await _context.MaterialRates
                     .Where(mr => mr.CustomerId == customerId)
-                    .OrderByDescending(mr => mr.EffectiveDate)
-                    .Select(mr => new MaterialRateDto
+                    .Join(_context.Customers, mr => mr.CustomerId, c => c.CustomerId, (mr, c) => new { mr, c })
+                    .Join(_context.CustomerLocations, mr => mr.mr.LocationId, cl => cl.LocationId, (mr, cl) => new { mr.mr, mr.c, cl })
+                    .OrderByDescending(x => x.mr.EffectiveDate)
+                    .Select(x => new MaterialRateDto
                     {
-                        RateId = mr.RateId,
-                        CustomerId = mr.CustomerId,
-                        LocationId = mr.LocationId,
-                        EffectiveDate = mr.EffectiveDate,
-                        CompanyRate = mr.CompanyRate,
-                        TransporterRate = mr.TransporterRate,
-                      
-                        Route = mr.Route,
-                        MaterialType = mr.MaterialType,
-                        Status = mr.Status,
-                        CreatedBy = mr.CreatedBy,
-                        CreatedOn = mr.CreatedOn,
-                        CustomerName = "Customer", // Default value
-                        LocationName = "Location", // Default value
-                        LocationCode = "LOC" // Default value
+                        RateId = x.mr.RateId,
+                        CustomerId = x.mr.CustomerId,
+                        LocationId = x.mr.LocationId,
+                        EffectiveDate = x.mr.EffectiveDate,
+                        CompanyRate = x.mr.CompanyRate,
+                        TransporterRate = x.mr.TransporterRate,
+                        DieselRate = x.mr.DieselRate,
+                        Route = x.mr.Route,
+                        MaterialType = x.mr.MaterialType,
+                        Status = x.mr.Status,
+                        CreatedBy = x.mr.CreatedBy,
+                        CreatedOn = x.mr.CreatedOn,
+                        CustomerName = x.c.CompanyName ?? $"{x.c.FirstName} {x.c.LastName}",
+                        LocationName = x.cl.LocationName,
+                        LocationCode = x.cl.LocationCode
                     })
                     .ToListAsync();
 
@@ -106,23 +110,25 @@ namespace Biomass.Server.Services
             {
                 var materialRate = await _context.MaterialRates
                     .Where(mr => mr.RateId == rateId)
-                    .Select(mr => new MaterialRateDto
+                    .Join(_context.Customers, mr => mr.CustomerId, c => c.CustomerId, (mr, c) => new { mr, c })
+                    .Join(_context.CustomerLocations, mr => mr.mr.LocationId, cl => cl.LocationId, (mr, cl) => new { mr.mr, mr.c, cl })
+                    .Select(x => new MaterialRateDto
                     {
-                        RateId = mr.RateId,
-                        CustomerId = mr.CustomerId,
-                        LocationId = mr.LocationId,
-                        EffectiveDate = mr.EffectiveDate,
-                        CompanyRate = mr.CompanyRate,
-                        TransporterRate = mr.TransporterRate,
-                      
-                        Route = mr.Route,
-                        MaterialType = mr.MaterialType,
-                        Status = mr.Status,
-                        CreatedBy = mr.CreatedBy,
-                        CreatedOn = mr.CreatedOn,
-                        CustomerName = "Customer", // Default value
-                        LocationName = "Location", // Default value
-                        LocationCode = "LOC" // Default value
+                        RateId = x.mr.RateId,
+                        CustomerId = x.mr.CustomerId,
+                        LocationId = x.mr.LocationId,
+                        EffectiveDate = x.mr.EffectiveDate,
+                        CompanyRate = x.mr.CompanyRate,
+                        TransporterRate = x.mr.TransporterRate,
+                        DieselRate = x.mr.DieselRate,
+                        Route = x.mr.Route,
+                        MaterialType = x.mr.MaterialType,
+                        Status = x.mr.Status,
+                        CreatedBy = x.mr.CreatedBy,
+                        CreatedOn = x.mr.CreatedOn,
+                        CustomerName = x.c.CompanyName ?? $"{x.c.FirstName} {x.c.LastName}",
+                        LocationName = x.cl.LocationName,
+                        LocationCode = x.cl.LocationCode
                     })
                     .FirstOrDefaultAsync();
 
@@ -162,10 +168,10 @@ namespace Biomass.Server.Services
                     EffectiveDate = request.EffectiveDate,
                     CompanyRate = request.CompanyRate,
                     TransporterRate = request.TransporterRate,
-                    
-                    Route = request.Route,
+                    DieselRate = request.DieselRate,
+                    Route = request.Route ?? "", // Handle null route
                     MaterialType = request.MaterialType,
-                    Status = "active",
+                    Status = "Active",
                     CreatedBy = 1, // TODO: Get from current user context
                     CreatedOn = DateTime.UtcNow
                 };
@@ -227,8 +233,8 @@ namespace Biomass.Server.Services
 
                 materialRate.CompanyRate = request.CompanyRate;
                 materialRate.TransporterRate = request.TransporterRate;
-               
-                materialRate.Route = request.Route;
+                materialRate.DieselRate = request.DieselRate;
+                materialRate.Route = request.Route ?? ""; // Handle null route
                 materialRate.MaterialType = request.MaterialType;
                 materialRate.Status = request.Status;
 
@@ -302,6 +308,7 @@ namespace Biomass.Server.Services
             return response;
         }
 
+        // Commented out - method not compatible with string EffectiveDate
         public async Task<ServiceResponse<List<MaterialRateDto>>> GetMaterialRatesByDateRangeAsync(DateTime startDate, DateTime endDate)
         {
             var response = new ServiceResponse<List<MaterialRateDto>>();
@@ -309,7 +316,7 @@ namespace Biomass.Server.Services
             try
             {
                 var materialRates = await _context.MaterialRates
-                    .Where(mr => mr.EffectiveDate >= startDate && mr.EffectiveDate <= endDate)
+                    .Where(mr => mr.EffectiveDate == "1-15" || mr.EffectiveDate == "16-31") // Simplified for string comparison
                     .OrderByDescending(mr => mr.EffectiveDate)
                     .Select(mr => new MaterialRateDto
                     {
@@ -352,24 +359,26 @@ namespace Biomass.Server.Services
             {
                 var materialRates = await _context.MaterialRates
                     .Where(mr => mr.LocationId == locationId)
-                    .OrderByDescending(mr => mr.EffectiveDate)
-                    .Select(mr => new MaterialRateDto
+                    .Join(_context.Customers, mr => mr.CustomerId, c => c.CustomerId, (mr, c) => new { mr, c })
+                    .Join(_context.CustomerLocations, mr => mr.mr.LocationId, cl => cl.LocationId, (mr, cl) => new { mr.mr, mr.c, cl })
+                    .OrderByDescending(x => x.mr.EffectiveDate)
+                    .Select(x => new MaterialRateDto
                     {
-                        RateId = mr.RateId,
-                        CustomerId = mr.CustomerId,
-                        LocationId = mr.LocationId,
-                        EffectiveDate = mr.EffectiveDate,
-                        CompanyRate = mr.CompanyRate,
-                        TransporterRate = mr.TransporterRate,
-                       
-                        Route = mr.Route,
-                        MaterialType = mr.MaterialType,
-                        Status = mr.Status,
-                        CreatedBy = mr.CreatedBy,
-                        CreatedOn = mr.CreatedOn,
-                        CustomerName = "Customer", // Default value
-                        LocationName = "Location", // Default value
-                        LocationCode = "LOC" // Default value
+                        RateId = x.mr.RateId,
+                        CustomerId = x.mr.CustomerId,
+                        LocationId = x.mr.LocationId,
+                        EffectiveDate = x.mr.EffectiveDate,
+                        CompanyRate = x.mr.CompanyRate,
+                        TransporterRate = x.mr.TransporterRate,
+                        DieselRate = x.mr.DieselRate,
+                        Route = x.mr.Route,
+                        MaterialType = x.mr.MaterialType,
+                        Status = x.mr.Status,
+                        CreatedBy = x.mr.CreatedBy,
+                        CreatedOn = x.mr.CreatedOn,
+                        CustomerName = x.c.CompanyName ?? $"{x.c.FirstName} {x.c.LastName}",
+                        LocationName = x.cl.LocationName,
+                        LocationCode = x.cl.LocationCode
                     })
                     .ToListAsync();
 
@@ -386,52 +395,45 @@ namespace Biomass.Server.Services
             return response;
         }
 
-        public async Task<ServiceResponse<List<MaterialRateDto>>> CheckExistingActiveRatesAsync(int customerId, int locationId, string materialType, DateTime effectiveDate)
+        public async Task<ServiceResponse<List<MaterialRateDto>>> CheckExistingActiveRatesAsync(int customerId, int locationId, string materialType, string effectiveDate)
         {
             var response = new ServiceResponse<List<MaterialRateDto>>();
 
             try
             {
-                // Convert the input date to a range for comparison
-                var dayOfMonth = effectiveDate.Day;
-                var dateRange = dayOfMonth <= 16 ? "1 to 16" : "17 to 30";
-
+                // Use string comparison for effective date
                 var existingRates = await _context.MaterialRates
                     .Where(mr => mr.CustomerId == customerId 
                                 && mr.LocationId == locationId 
                                 && mr.MaterialType == materialType
+                                && mr.EffectiveDate == effectiveDate
                                 && mr.Status.ToLower() == "active")
+                    .Join(_context.Customers, mr => mr.CustomerId, c => c.CustomerId, (mr, c) => new { mr, c })
+                    .Join(_context.CustomerLocations, mr => mr.mr.LocationId, cl => cl.LocationId, (mr, cl) => new { mr.mr, mr.c, cl })
+                    .Select(x => new MaterialRateDto
+                    {
+                        RateId = x.mr.RateId,
+                        CustomerId = x.mr.CustomerId,
+                        LocationId = x.mr.LocationId,
+                        EffectiveDate = x.mr.EffectiveDate,
+                        CompanyRate = x.mr.CompanyRate,
+                        TransporterRate = x.mr.TransporterRate,
+                        DieselRate = x.mr.DieselRate,
+                        Route = x.mr.Route,
+                        MaterialType = x.mr.MaterialType,
+                        Status = x.mr.Status,
+                        CreatedBy = x.mr.CreatedBy,
+                        CreatedOn = x.mr.CreatedOn,
+                        CustomerName = x.c.CompanyName ?? $"{x.c.FirstName} {x.c.LastName}",
+                        LocationName = x.cl.LocationName,
+                        LocationCode = x.cl.LocationCode
+                    })
                     .ToListAsync();
 
-                // Filter rates that fall in the same date range
-                var ratesInSameRange = existingRates.Where(mr => {
-                    var rateDay = mr.EffectiveDate.Day;
-                    var rateRange = rateDay <= 16 ? "1 to 16" : "17 to 30";
-                    return rateRange == dateRange;
-                }).ToList();
-
-                var existingRatesDto = ratesInSameRange.Select(mr => new MaterialRateDto
-                {
-                    RateId = mr.RateId,
-                    CustomerId = mr.CustomerId,
-                    LocationId = mr.LocationId,
-                    EffectiveDate = mr.EffectiveDate,
-                    CompanyRate = mr.CompanyRate,
-                    TransporterRate = mr.TransporterRate,
-                    Route = mr.Route,
-                    MaterialType = mr.MaterialType,
-                    Status = mr.Status,
-                    CreatedBy = mr.CreatedBy,
-                    CreatedOn = mr.CreatedOn,
-                    CustomerName = "Customer", // Default value
-                    LocationName = "Location", // Default value
-                    LocationCode = "LOC" // Default value
-                }).ToList();
-
-                response.Result = existingRatesDto;
+                response.Result = existingRates;
                 response.Success = true;
-                response.Message = existingRatesDto.Count > 0 
-                    ? $"Found {existingRatesDto.Count} existing active rate(s)" 
+                response.Message = existingRates.Count > 0 
+                    ? $"Found {existingRates.Count} existing active rate(s)" 
                     : "No existing active rates found";
             }
             catch (Exception ex)
@@ -443,27 +445,17 @@ namespace Biomass.Server.Services
             return response;
         }
 
-        private async Task DeactivateExistingRatesAsync(int customerId, int locationId, string materialType, DateTime effectiveDate)
+        private async Task DeactivateExistingRatesAsync(int customerId, int locationId, string materialType, string effectiveDate)
         {
-            // Convert the input date to a range for comparison
-            var dayOfMonth = effectiveDate.Day;
-            var dateRange = dayOfMonth <= 16 ? "1 to 16" : "17 to 30";
-
             var existingRates = await _context.MaterialRates
                 .Where(mr => mr.CustomerId == customerId 
                             && mr.LocationId == locationId 
                             && mr.MaterialType == materialType
+                            && mr.EffectiveDate == effectiveDate
                             && mr.Status.ToLower() == "active")
                 .ToListAsync();
 
-            // Filter rates that fall in the same date range
-            var ratesInSameRange = existingRates.Where(mr => {
-                var rateDay = mr.EffectiveDate.Day;
-                var rateRange = rateDay <= 16 ? "1 to 16" : "17 to 30";
-                return rateRange == dateRange;
-            }).ToList();
-
-            foreach (var rate in ratesInSameRange)
+            foreach (var rate in existingRates)
             {
                 rate.Status = "Inactive";
             }

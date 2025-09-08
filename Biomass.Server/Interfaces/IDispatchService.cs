@@ -9,5 +9,7 @@ namespace Biomass.Server.Interfaces
         Task<int> CreateDispatchAsync(CreateDispatchRequest request);
         Task<DispatchDto?> UpdateDispatchAsync(int id, UpdateDispatchRequest request);
         Task<bool> DeleteDispatchAsync(int id);
+
+        Task<List<DispatchDto>> GetDispatchesByUserAndStatusAsync(int userId, string status);
     }
 }

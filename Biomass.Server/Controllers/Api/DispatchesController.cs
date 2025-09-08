@@ -103,5 +103,28 @@ namespace Biomass.Server.Controllers.Api
                 Success = true
             });
         }
+
+        [HttpGet("user/{userId}/status/{status}")]
+        public async Task<ActionResult<ServiceResponse<List<DispatchDto>>>> GetDispatchesByUserAndStatus(int userId, string status)
+        {
+            var dispatches = await _dispatchService.GetDispatchesByUserAndStatusAsync(userId, status);
+
+            if (!dispatches.Any())
+            {
+                return Ok(new ServiceResponse<List<DispatchDto>>
+                {
+                    Result = dispatches,
+                    Message = "No dispatches found for the specified user and status",
+                    Success = true
+                });
+            }
+
+            return Ok(new ServiceResponse<List<DispatchDto>>
+            {
+                Result = dispatches,
+                Message = $"Found {dispatches.Count} dispatches for user {userId} with status '{status}'",
+                Success = true
+            });
+        }
     }
 }

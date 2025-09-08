@@ -192,6 +192,41 @@ namespace Biomass.Server.Services
             return true;
         }
 
+        public async Task<List<DispatchDto>> GetDispatchesByUserAndStatusAsync(int userId, string status)
+        {
+            // Step 1: Get customer IDs assigned to the user
+            var customerIds = await _context.UserCustomers
+                .Where(uc => uc.UserId == userId && uc.Enabled)
+                .Select(uc => uc.CustomerId)
+                .ToListAsync();
+
+            if (!customerIds.Any())
+            {
+                return new List<DispatchDto>(); // Return empty list if user has no assigned customers
+            }
+
+            // Step 2: Get location IDs for those customers
+            var locationIds = await _context.CustomerLocations
+                .Where(l => customerIds.Contains(l.CustomerId) && l.Status == "Active")
+                .Select(l => l.LocationId)
+                .ToListAsync();
+
+            if (!locationIds.Any())
+            {
+                return new List<DispatchDto>(); // Return empty list if no locations found
+            }
+
+            // Step 3: Get dispatches for those locations with status filter
+            var dispatches = await _context.Dispatches
+                .Include(d => d.Vehicle)
+                .Include(d => d.Location)
+                .Where(d => locationIds.Contains(d.LocationId) && d.Status == status)
+                .OrderByDescending(d => d.CreatedOn)
+                .ToListAsync();
+
+            return dispatches.Select(MapToDto).ToList();
+        }
+
         private static DispatchDto MapToDto(Dispatch dispatch)
         {
             return new DispatchDto
@@ -231,10 +266,14 @@ namespace Biomass.Server.Services
                     Status = dispatch.Vehicle.Status,
                     CreatedOn = dispatch.Vehicle.CreatedOn,
                     VehicleRegNumber = dispatch.Vehicle.VehicleRegNumber,
-                    VendorId = dispatch.Vehicle.VendorId
+                    VendorId = dispatch.Vehicle.VendorId,
+                    CostCenterId= dispatch.Vehicle.CostCenterId
+
                 } : null,
                 Location = dispatch.Location
             };
         }
+
+
     }
 }

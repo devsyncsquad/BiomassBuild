@@ -38,7 +38,7 @@ import {
   Refresh as RefreshIcon,
   FilterList as FilterIcon,
 } from "@mui/icons-material";
-import axios from "axios";
+import { materialRatesApi, customerLocationsApi, customerApi } from "../utils/api";
 import "./RatePopup.css";
 
 const RatePopup = ({
@@ -54,10 +54,10 @@ const RatePopup = ({
   const [formData, setFormData] = useState({
     customerId: customerId || "",
     locationId: locationId || "",
-    effectiveDate: new Date().toISOString().split("T")[0],
+    effectiveDate: "1-15",
     companyRate: 0,
     transporterRate: 0,
-    route: "",
+    dieselRate: 0,
     materialType: "Paper",
     status: "Active",
   });
@@ -106,11 +106,9 @@ const RatePopup = ({
 
   const loadCustomers = async () => {
     try {
-      const response = await axios.get(
-        "https://localhost:7084/api/customers/GetAllCustomers"
-      );
-      if (response.data.success) {
-        setCustomers(response.data.result);
+      const response = await customerApi.getCustomers();
+      if (response.success) {
+        setCustomers(response.result);
       }
     } catch (error) {
       console.error("Error loading customers:", error);
@@ -120,11 +118,9 @@ const RatePopup = ({
   const loadLocationsByCustomer = async (customerId) => {
     if (!customerId) return;
     try {
-      const response = await axios.get(
-        `https://localhost:7084/api/customerlocations/GetLocationsByCustomerId/${customerId}`
-      );
-      if (response.data.success) {
-        setLocations(response.data.result);
+      const response = await customerLocationsApi.getLocationsByCustomerId(customerId);
+      if (response.success) {
+        setLocations(response.result);
       }
     } catch (error) {
       console.error("Error loading locations:", error);
@@ -134,11 +130,9 @@ const RatePopup = ({
   const loadRatesByLocation = async (locationId) => {
     if (!locationId) return;
     try {
-      const response = await axios.get(
-        `https://localhost:7084/api/materialrates/GetMaterialRatesByLocationId/${locationId}`
-      );
-      if (response.data.success) {
-        setRates(response.data.result);
+      const response = await materialRatesApi.getMaterialRatesByLocationId(locationId);
+      if (response.success) {
+        setRates(response.result);
       }
     } catch (error) {
       console.error("Error loading rates:", error);
@@ -147,14 +141,12 @@ const RatePopup = ({
 
   const loadAllRates = async () => {
     try {
-      const response = await axios.get(
-        "https://localhost:7084/api/materialrates/GetAllMaterialRates"
-      );
-      if (response.data.success) {
-        setRates(response.data.result);
+      const response = await materialRatesApi.getAllMaterialRates();
+      if (response.success) {
+        setRates(response.result);
       }
     } catch (error) {
-      console.error("Error loading rates:", error);
+      console.error("Error loading all rates:", error);
     }
   };
 
@@ -171,22 +163,17 @@ const RatePopup = ({
     }
 
     try {
-      const response = await axios.get(
-        "https://localhost:7084/api/materialrates/CheckExistingActiveRates",
-        {
-          params: {
-            customerId: formData.customerId,
-            locationId: formData.locationId,
-            materialType: formData.materialType,
-            effectiveDate: formData.effectiveDate,
-          },
-        }
+      const response = await materialRatesApi.checkExistingActiveRates(
+        formData.customerId,
+        formData.locationId,
+        formData.materialType,
+        formData.effectiveDate // Send the actual dropdown value (1-15 or 16-31)
       );
 
-      if (response.data.success && response.data.result.length > 0) {
+      if (response.success && response.result.length > 0) {
         setExistingRatesWarning({
-          count: response.data.result.length,
-          rates: response.data.result,
+          count: response.result.length,
+          rates: response.result,
         });
         setShowWarningAlert(true);
       } else {
@@ -212,18 +199,6 @@ const RatePopup = ({
       setFormData((prev) => ({ ...prev, locationId: "" }));
       setExistingRatesWarning(null);
       setShowWarningAlert(false);
-    }
-
-    // Check for existing active rates when relevant fields change
-    if (
-      ["customerId", "locationId", "materialType", "effectiveDate"].includes(
-        field
-      )
-    ) {
-      // Use setTimeout to avoid too many API calls while typing
-      setTimeout(() => {
-        checkExistingActiveRates();
-      }, 500);
     }
   };
 
@@ -255,22 +230,14 @@ const RatePopup = ({
     setSuccess("");
 
     try {
-      const url = isEditing
-        ? `https://localhost:7084/api/materialrates/UpdateMaterialRate/${editingRate.rateId}`
-        : "https://localhost:7084/api/materialrates/CreateMaterialRate";
-
-      const method = isEditing ? "put" : "post";
-
       // Convert camelCase to PascalCase for backend compatibility
       const backendData = {
         CustomerId: parseInt(formData.customerId),
         LocationId: parseInt(formData.locationId),
-        EffectiveDate: new Date(formData.effectiveDate).toISOString(), // Convert back to DateTime for backend
+        EffectiveDate: formData.effectiveDate, // Send the actual dropdown value (1-15 or 16-31)
         CompanyRate: parseFloat(formData.companyRate),
         TransporterRate: parseFloat(formData.transporterRate),
-        DispatchWeight: 0, // Default values as per existing model
-        ReceivingWeight: 0,
-        Route: formData.route,
+        DieselRate: formData.dieselRate ? parseFloat(formData.dieselRate) : null,
         MaterialType: formData.materialType,
       };
 
@@ -280,15 +247,17 @@ const RatePopup = ({
 
       console.log("Sending rate data to backend:", data);
 
-      const response = await axios[method](url, data);
+      const response = isEditing
+        ? await materialRatesApi.updateMaterialRate(editingRate.rateId, data)
+        : await materialRatesApi.createMaterialRate(data);
 
-      if (response.data.success) {
+      if (response.success) {
         setSuccess(
           isEditing
             ? "Rate updated successfully!"
             : "Rate created successfully!"
         );
-        onSave(response.data.result);
+        onSave(response.result);
 
         // Refresh rates
         if (formData.locationId) {
@@ -305,7 +274,7 @@ const RatePopup = ({
         setExistingRatesWarning(null);
         setShowWarningAlert(false);
       } else {
-        setError("Error saving rate: " + response.data.message);
+        setError("Error saving rate: " + response.message);
       }
     } catch (error) {
       console.error("Error saving rate:", error);
@@ -330,11 +299,10 @@ const RatePopup = ({
     setFormData({
       customerId: rate.customerId,
       locationId: rate.locationId,
-      effectiveDate:
-        rate.effectiveDate || new Date().toISOString().split("T")[0],
+      effectiveDate: getDateRangeFromDate(rate.effectiveDate) || "1-15",
       companyRate: rate.companyRate,
       transporterRate: rate.transporterRate,
-      route: rate.route || "",
+      dieselRate: rate.dieselRate || 0,
       materialType: rate.materialType || "Paper",
       status: rate.status,
     });
@@ -346,10 +314,10 @@ const RatePopup = ({
     setFormData({
       customerId: customerId || "",
       locationId: locationId || "",
-      effectiveDate: new Date().toISOString().split("T")[0],
+      effectiveDate: "1-15",
       companyRate: 0,
       transporterRate: 0,
-      route: "",
+      dieselRate: 0,
       materialType: "Paper",
       status: "Active",
     });
@@ -421,7 +389,15 @@ const RatePopup = ({
   const getDateRangeDisplay = (dateString) => {
     const date = new Date(dateString);
     const day = date.getDate();
-    return day <= 16 ? "1 to 16" : "17 to 30";
+    return day <= 15 ? "1-15" : "16-31";
+  };
+
+  // Helper function to convert date to range for form
+  const getDateRangeFromDate = (dateString) => {
+    if (!dateString) return "1-15";
+    const date = new Date(dateString);
+    const day = date.getDate();
+    return day <= 15 ? "1-15" : "16-31";
   };
 
   return (
@@ -434,7 +410,8 @@ const RatePopup = ({
         style: {
           borderRadius: 16,
           maxHeight: "90vh",
-          minWidth: "1400px",
+          width: "95vw",
+          maxWidth: "1400px",
         },
       }}
     >
@@ -566,8 +543,7 @@ const RatePopup = ({
                           variant='caption'
                           sx={{ display: "block", mt: 0.5 }}
                         >
-                          • Rate ID: {rate.rateId} | Company: Rs{" "}
-                          {rate.companyRate} | Transporter: Rs{" "}
+                          • Rate ID: {rate.rateId} | Transporter: Rs{" "}
                           {rate.transporterRate} | Effective:{" "}
                           {getDateRangeDisplay(rate.effectiveDate)}
                         </Typography>
@@ -594,7 +570,7 @@ const RatePopup = ({
                           key={customer.customerId}
                           value={customer.customerId}
                         >
-                          {customer.companyName ||
+                          {customer.customerName ||
                             `${customer.firstName} ${customer.lastName}`}
                         </MenuItem>
                       ))}
@@ -628,26 +604,18 @@ const RatePopup = ({
 
                 <Grid item xs={12} sm={6} md={3}>
                   <FormControl fullWidth>
-                    <TextField
-                      type='date'
+                    <InputLabel>Effective Date Range</InputLabel>
+                    <Select
                       value={formData.effectiveDate}
                       onChange={(e) =>
                         handleInputChange("effectiveDate", e.target.value)
                       }
-                      label='Effective Date'
+                      label='Effective Date Range'
                       required
-                      InputLabelProps={{ shrink: true }}
-                    />
-                    <Typography
-                      variant='caption'
-                      color='text.secondary'
-                      sx={{ mt: 0.5, display: "block" }}
                     >
-                      Selected date falls in range:{" "}
-                      {formData.effectiveDate
-                        ? getDateRangeDisplay(formData.effectiveDate)
-                        : "Select a date"}
-                    </Typography>
+                      <MenuItem value='1-15'>1-15</MenuItem>
+                      <MenuItem value='16-31'>16-31</MenuItem>
+                    </Select>
                   </FormControl>
                 </Grid>
 
@@ -712,9 +680,20 @@ const RatePopup = ({
                 <Grid item xs={12} sm={6} md={3}>
                   <TextField
                     fullWidth
-                    label='Route'
-                    value={formData.route}
-                    onChange={(e) => handleInputChange("route", e.target.value)}
+                    label='Diesel Rate'
+                    type='number'
+                    value={formData.dieselRate}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "dieselRate",
+                        parseFloat(e.target.value) || 0
+                      )
+                    }
+                    InputProps={{
+                      startAdornment: (
+                        <Typography variant='body2'>Rs</Typography>
+                      ),
+                    }}
                   />
                 </Grid>
 
@@ -776,7 +755,7 @@ const RatePopup = ({
                 Current Rates for Selected Location
               </Typography>
 
-              <TableContainer component={Paper} sx={{ maxHeight: 400 }}>
+              <TableContainer component={Paper} sx={{ maxHeight: 400, overflowX: 'auto' }}>
                 <Table stickyHeader>
                   <TableHead>
                     <TableRow sx={{ backgroundColor: "#228B22" }}>
@@ -841,7 +820,7 @@ const RatePopup = ({
                           fontWeight: "bold",
                         }}
                       >
-                        Route
+                        Diesel Rate
                       </TableCell>
                       <TableCell
                         sx={{
@@ -906,7 +885,7 @@ const RatePopup = ({
                           <TableCell>{rate.effectiveDate}</TableCell>
                           <TableCell>Rs {rate.companyRate}</TableCell>
                           <TableCell>Rs {rate.transporterRate}</TableCell>
-                          <TableCell>{rate.route || "-"}</TableCell>
+                          <TableCell>Rs {rate.dieselRate || "-"}</TableCell>
                           <TableCell>{rate.materialType || "-"}</TableCell>
                           <TableCell>
                             <Chip
@@ -980,7 +959,7 @@ const RatePopup = ({
                             key={customer.customerId}
                             value={customer.customerId}
                           >
-                            {customer.companyName ||
+                            {customer.customerName ||
                               `${customer.firstName} ${customer.lastName}`}
                           </MenuItem>
                         ))}
@@ -1083,7 +1062,7 @@ const RatePopup = ({
             </Card>
 
             {/* Previous Rates Table */}
-            <TableContainer component={Paper}>
+            <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
               <Table>
                 <TableHead>
                   <TableRow sx={{ bgcolor: "#228B22" }}>
@@ -1106,7 +1085,7 @@ const RatePopup = ({
                       Transporter Rate
                     </TableCell>
                     <TableCell sx={{ color: "white", fontWeight: "bold" }}>
-                      Route
+                      Diesel Rate
                     </TableCell>
                     <TableCell sx={{ color: "white", fontWeight: "bold" }}>
                       Material Type
@@ -1140,7 +1119,7 @@ const RatePopup = ({
                         </TableCell>
                         <TableCell>Rs {rate.companyRate}</TableCell>
                         <TableCell>Rs {rate.transporterRate}</TableCell>
-                        <TableCell>{rate.route || "-"}</TableCell>
+                        <TableCell>Rs {rate.dieselRate || "-"}</TableCell>
                         <TableCell>{rate.materialType || "-"}</TableCell>
                         <TableCell>
                           <Chip

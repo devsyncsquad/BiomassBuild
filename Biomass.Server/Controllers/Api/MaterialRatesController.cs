@@ -42,7 +42,7 @@ namespace Biomass.Server.Controllers.Api
             [FromQuery] int customerId, 
             [FromQuery] int locationId, 
             [FromQuery] string materialType, 
-            [FromQuery] DateTime effectiveDate)
+            [FromQuery] string effectiveDate)
         {
             var response = await _materialRateService.CheckExistingActiveRatesAsync(customerId, locationId, materialType, effectiveDate);
             return Ok(response);

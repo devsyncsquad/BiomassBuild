@@ -154,6 +154,7 @@ namespace Biomass.Server.Interfaces
 
         Task<ServiceResponse<CashbookDto>> GetCashbookByIdAsync(long cashId);
 		Task<ServiceResponse<bool>> CancelCashbookEntryAsync(long cashId, string cancellationReason);
+		Task<ServiceResponse<bool>> DeleteCashbookEntryAsync(long cashId);
 		
 		// Wallet Operations
 		Task<ServiceResponse<WalletBalanceResponse>> GetWalletBalanceAsync(int employeeId);

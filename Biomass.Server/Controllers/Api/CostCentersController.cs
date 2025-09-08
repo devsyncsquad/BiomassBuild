@@ -115,5 +115,17 @@ namespace Biomass.Server.Controllers.Api
                 Success = true
             });
         }
+
+        [HttpGet("GetActiveParentCostCentersWithChildren")]
+        public async Task<ActionResult<ServiceResponse<List<CostCenterDto>>>> GetActiveParentCostCentersWithChildren([FromQuery] int? companyId = null)
+        {
+            var costCenters = await _costCenterService.GetActiveParentCostCentersAsync(companyId);
+            return Ok(new ServiceResponse<List<CostCenterDto>>
+            {
+                Result = costCenters,
+                Message = "Active parent cost centers with children retrieved successfully",
+                Success = true
+            });
+        }
     }
 }

@@ -34,6 +34,9 @@ namespace Biomass.Server.Models.Lookup
         
         [Column("created_by")]
         public int? CreatedBy { get; set; }
+
+        [Column("show_in_dispatch")]
+        public string? ShowInDispatch { get; set; } = string.Empty;
     }
 
     public class LookupDto

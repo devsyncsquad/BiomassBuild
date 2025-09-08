@@ -14,6 +14,9 @@ namespace Biomass.Server.Models.Vehicle
         public DateTime? CreatedOn { get; set; }
         public string? VehicleRegNumber { get; set; }
         public int? VendorId { get; set; }
+        public int? CostCenterId { get; set; }
+        public string? IsWeightAllocated { get; set; }
+        public int? WeightAllowed { get; set; }
         public Driver.DriverDto? Driver { get; set; }
     }
 
@@ -38,6 +41,9 @@ namespace Biomass.Server.Models.Vehicle
 
         public string? VehicleRegNumber { get; set; }
         public int? VendorId { get; set; }
+        public int? CostCenterId { get; set; }
+        public string? IsWeightAllocated { get; set; }
+        public int? WeightAllowed { get; set; }
 
         // Optional driver information
         public CreateDriverRequest? Driver { get; set; }
@@ -64,6 +70,9 @@ namespace Biomass.Server.Models.Vehicle
 
         public string? VehicleRegNumber { get; set; }
         public int? VendorId { get; set; }
+        public int? CostCenterId { get; set; }
+        public string? IsWeightAllocated { get; set; }
+        public int? WeightAllowed { get; set; }
 
         // Optional driver information for update
         public UpdateDriverRequest? Driver { get; set; }

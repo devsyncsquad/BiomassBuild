@@ -389,6 +389,7 @@ namespace Biomass.Server.Data
                 entity.Property(e => e.SortOrder).HasColumnName("sort_order").IsRequired();
                 entity.Property(e => e.CreatedOn).HasColumnName("created_on").IsRequired();
                 entity.Property(e => e.CreatedBy).HasColumnName("created_by");
+                entity.Property(e => e.ShowInDispatch).HasColumnName("show_in_dispatch");
             });
 
             // MoneyAccounts
@@ -406,6 +407,7 @@ namespace Biomass.Server.Data
                 entity.Property(e => e.CreatedOn).HasColumnName("createdon");
                 entity.Property(e => e.VehicleRegNumber).HasColumnName("vehicle_reg_number");
                 entity.Property(e => e.VendorId).HasColumnName("vendorid");
+                entity.Property(e => e.CostCenterId).HasColumnName("cost_center_id");
 
                 // Configure one-to-one relationship with Driver
                 entity.HasOne(v => v.Driver)

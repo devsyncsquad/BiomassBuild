@@ -25,6 +25,15 @@ namespace Biomass.Server.Controllers.Api
             return Ok(new { CashId = id });
         }
 
+        [HttpPost("CashInsert")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> CashInsert([FromForm] CashbookEntryDto dto)
+        {
+            var result = await _service.CashInsertAsync(dto);
+            if (!result.Success) return BadRequest(result);
+            return Ok(result);
+        }
+
 
         [HttpGet("GetCashbookById/{cashId}")]
 		public async Task<IActionResult> GetCashbookById(long cashId)

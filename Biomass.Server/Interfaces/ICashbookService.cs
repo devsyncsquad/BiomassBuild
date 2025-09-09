@@ -25,7 +25,9 @@ namespace Biomass.Server.Interfaces
 		public string? ReceiptPath { get; set; }
 		public decimal? BankDelta { get; set; }
 		public decimal? WalletDelta { get; set; }
-	}
+		public long? DispatchId { get; set; }
+		public int? CostCenterSubId { get; set; }
+    }
 
 	public class CashTransactionDetailed
 	{
@@ -151,6 +153,8 @@ namespace Biomass.Server.Interfaces
 		Task<ServiceResponse<CashbookDto>> CreateCashbookEntryAsync(CreateCashbookRequest request, IFormFile? receipt);
 
 		Task<long> SaveCashbookEntryAsync(CashbookEntryDto dto);
+
+		Task<ServiceResponse<CashbookDto>> CashInsertAsync(CashbookEntryDto dto);
 
         Task<ServiceResponse<CashbookDto>> GetCashbookByIdAsync(long cashId);
 		Task<ServiceResponse<bool>> CancelCashbookEntryAsync(long cashId, string cancellationReason);

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Hosting;
 using System.Text.Json;
 using Npgsql;
+using Biomass.Server.Models;
 
 namespace Biomass.Server.Services
 {
@@ -53,7 +54,8 @@ namespace Biomass.Server.Services
 					Status = dto.Status,
 					//Meta = string.IsNullOrWhiteSpace(dto.MetaJson) ? null : JsonDocument.Parse(dto.MetaJson).RootElement,
 					ReceiptPath = filePath,
-					CostCenterSubId=dto.CostCenterSubId
+					CostCenterSubId=dto.CostCenterSubId,
+					DispatchId = dto.DispatchId
 				};
             try
             {
@@ -66,6 +68,81 @@ namespace Biomass.Server.Services
             return entry.CashId;
         }
 
+        public async Task<ServiceResponse<CashbookDto>> CashInsertAsync(CashbookEntryDto dto)
+        {
+            var response = new ServiceResponse<CashbookDto>();
+
+            try
+            {
+                using var transaction = await _db.Database.BeginTransactionAsync();
+
+                // Save the cashbook entry first
+                var cashbookId = await SaveCashbookEntryAsync(dto);
+
+                // Create AP Ledger entry
+                var apLedgerEntry = new ApLedger
+                {
+                    VendorId = dto.CostCenterSubId ?? 0, // Use CostCenterSubId as vendor_id
+                    HappenedAt = dto.HappenedAt ?? DateTime.UtcNow,
+                    EntryKind = "Payment", // Set to "Payment" as requested
+                    Amount = dto.Amount ?? 0,
+                    Currency = "PKR", // Set to PKR as requested
+                    DispatchId = dto.DispatchId, // Map from cashbook DispatchId
+                    CashId = cashbookId,
+                    ReferenceNo = dto.ReferenceNo,
+                    Remarks = dto.Remarks,
+                    CreatedBy = dto.WalletEmployeeId,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                _db.ApLedgers.Add(apLedgerEntry);
+                await _db.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+
+                // Get the created cashbook entry
+                var cashbook = await _db.Cashbooks.FindAsync(cashbookId);
+                if (cashbook != null)
+                {
+                    var cashbookDto = new CashbookDto
+                    {
+                        CashId = cashbook.CashId,
+                        HappenedAt = cashbook.HappenedAt,
+                        CashKind = cashbook.CashKindId,
+                        Amount = cashbook.Amount,
+                        Currency = cashbook.Currency,
+                        MoneyAccountId = cashbook.MoneyAccountId,
+                        WalletEmployeeId = cashbook.WalletEmployeeId,
+                        CategoryId = cashbook.CategoryId,
+                        CostCenterId = cashbook.CostCenterId,
+                        CostCenterSubId = cashbook.CostCenterSubId,
+                        PaymentModeId = cashbook.PaymentModeId,
+                        ReferenceNo = cashbook.ReferenceNo,
+                        CounterpartyName = cashbook.CounterpartyName,
+                        Remarks = cashbook.Remarks,
+                        Status = cashbook.Status,
+                        ReceiptPath = cashbook.ReceiptPath,
+                        DispatchId = cashbook.DispatchId
+                    };
+
+                    response.Success = true;
+                    response.Result = cashbookDto;
+                    response.Message = "Cashbook entry and AP Ledger entry created successfully";
+                }
+                else
+                {
+                    response.Success = false;
+                    response.Message = "Failed to retrieve created cashbook entry";
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = $"Error creating cashbook entry: {ex.Message}";
+            }
+
+            return response;
+        }
 
         public async Task<ServiceResponse<CashbookDto>> CreateCashbookEntryAsync(CreateCashbookRequest request, IFormFile? receipt)
 		{

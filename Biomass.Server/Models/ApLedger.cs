@@ -43,7 +43,7 @@ namespace Biomass.Server.Models
 
         [Column("reference_no")]
         [StringLength(100)]
-        public int? ReferenceNo { get; set; }
+        public string? ReferenceNo { get; set; }
 
         [Column("remarks")]
         public string? Remarks { get; set; }

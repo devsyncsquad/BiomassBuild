@@ -70,5 +70,8 @@ namespace Biomass.Server.Models.Cashbook
 		[Column("receipt_path")]
 		[StringLength(500)]
 		public string? ReceiptPath { get; set; }
+
+		[Column("dispatch_id")]
+		public long? DispatchId { get; set; }
 	}
 }

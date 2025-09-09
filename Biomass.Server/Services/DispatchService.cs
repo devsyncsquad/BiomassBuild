@@ -130,7 +130,7 @@ namespace Biomass.Server.Services
                         Remarks = request.Remarks,
                         CreatedBy = request.CreatedBy,
                         CreatedAt = DateTime.UtcNow,
-                        ReferenceNo = request.VehicleId,
+                        //ReferenceNo = request.VehicleId,
                     });
                 }
 
@@ -148,7 +148,7 @@ namespace Biomass.Server.Services
                         Remarks = request.Remarks,
                         CreatedBy = request.CreatedBy,
                         CreatedAt = DateTime.UtcNow,
-                        ReferenceNo = request.VehicleId,
+                        //ReferenceNo = request.VehicleId,
                     });
                 }
 
@@ -166,7 +166,7 @@ namespace Biomass.Server.Services
                         Remarks = request.Remarks,
                         CreatedBy = request.CreatedBy,
                         CreatedAt = DateTime.UtcNow,
-                        ReferenceNo = request.VehicleId,
+                        //ReferenceNo = request.VehicleId,
                     });
                 }
 
@@ -325,9 +325,6 @@ namespace Biomass.Server.Services
             };
         }
 
-<<<<<<< HEAD
-
-=======
         /// <summary>
         /// Calculates charges based on either fixed amount or variable rate per mund
         /// </summary>
@@ -346,6 +343,6 @@ namespace Biomass.Server.Services
             // Otherwise, use fixed amount (default to 0 if null)
             return fixedAmount ?? 0;
         }
->>>>>>> dispatch_02
+//>>>>>>> dispatch_02
     }
 }

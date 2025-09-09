@@ -21,9 +21,10 @@ import {
   CardContent,
   Select,
   MenuItem,
+  InputLabel,
 } from "@mui/material";
 import { Save as SaveIcon, Cancel as CancelIcon } from "@mui/icons-material";
-import axios from "axios";
+import { customerApi, customerLocationsApi } from "../utils/api";
 
 export const CustomerLocationForm = ({
   open,
@@ -62,6 +63,34 @@ export const CustomerLocationForm = ({
   });
 
   const [isEditing, setIsEditing] = useState(false);
+  const [customers, setCustomers] = useState([]);
+  const [loadingCustomers, setLoadingCustomers] = useState(false);
+
+  // Fetch customers when form opens and no customerId is provided
+  useEffect(() => {
+    if (open && !customerId) {
+      fetchCustomers();
+    }
+  }, [open, customerId]);
+
+  const fetchCustomers = async () => {
+    setLoadingCustomers(true);
+    try {
+      const response = await customerApi.getCustomers();
+      
+      if (response.success) {
+        setCustomers(response.result || []);
+      } else {
+        console.error("Failed to fetch customers:", response.message);
+        setCustomers([]);
+      }
+    } catch (error) {
+      console.error("Error fetching customers:", error);
+      setCustomers([]);
+    } finally {
+      setLoadingCustomers(false);
+    }
+  };
 
   useEffect(() => {
     // Check if we have a complete location object with locationId (editing existing)
@@ -128,6 +157,10 @@ export const CustomerLocationForm = ({
 
   const handleSave = async () => {
     // Validate required fields
+    if (!formData.customerId) {
+      alert("Please select a customer");
+      return;
+    }
     if (!formData.locationName?.trim()) {
       alert("Location Name is required");
       return;
@@ -138,10 +171,6 @@ export const CustomerLocationForm = ({
     }
     if (!formData.address?.trim()) {
       alert("Address is required");
-      return;
-    }
-    if (!formData.customerId) {
-      alert("Customer ID is required");
       return;
     }
 
@@ -169,12 +198,6 @@ export const CustomerLocationForm = ({
     try {
       // Determine if this is a new location or an edit
       const isNewLocation = !locationData || !locationData.locationId;
-
-      const url = isNewLocation
-        ? "https://localhost:7084/api/customerlocations/CreateLocation"
-        : `https://localhost:7084/api/customerlocations/UpdateLocation/${locationData.locationId}`;
-
-      const method = isNewLocation ? "post" : "put";
 
       // Convert camelCase to PascalCase for backend compatibility
       const backendData = {
@@ -234,17 +257,17 @@ export const CustomerLocationForm = ({
         : { ...backendData, Status: "active" };
 
       console.log("Sending data to backend:", data);
-      console.log("Request method:", method.toUpperCase());
-      console.log("Request URL:", url);
       console.log("Is new location:", isNewLocation);
 
-      const response = await axios[method](url, data);
+      const response = isNewLocation
+        ? await customerLocationsApi.createLocation(data)
+        : await customerLocationsApi.updateLocation(locationData.locationId, data);
 
-      if (response.data.success) {
-        onSave(response.data.result);
+      if (response.success) {
+        onSave(response.result);
         onClose();
       } else {
-        alert("Error saving location: " + response.data.message);
+        alert("Error saving location: " + response.message);
       }
     } catch (error) {
       console.error("Error saving location:", error);
@@ -327,29 +350,64 @@ export const CustomerLocationForm = ({
           <Typography variant='h6' gutterBottom>
             Customer Location Information
           </Typography>
-          <Typography variant='body2' color='text.secondary' gutterBottom>
-            Manage customer details and delivery/collection locations
-          </Typography>
+         
 
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label='Customer Name'
-                value={formData.customerName}
-                InputProps={{
-                  readOnly: true,
-                }}
-                sx={{
-                  "& .MuiInputBase-root": {
-                    backgroundColor: "#f5f5f5",
-                    "&.Mui-focused": {
+              {customerId ? (
+                // Show read-only customer name when customerId is provided
+                <TextField
+                  fullWidth
+                  label='Customer Name'
+                  value={formData.customerName}
+                  InputProps={{
+                    readOnly: true,
+                  }}
+                  sx={{
+                    "& .MuiInputBase-root": {
                       backgroundColor: "#f5f5f5",
+                      "&.Mui-focused": {
+                        backgroundColor: "#f5f5f5",
+                      },
                     },
-                  },
-                }}
-                helperText='Customer name is read-only and will be saved with the location'
-              />
+                  }}
+                  helperText='Customer name is read-only and will be saved with the location'
+                />
+              ) : (
+                // Show customer dropdown when no customerId is provided
+                <FormControl fullWidth required>
+                  <InputLabel>Select Customer</InputLabel>
+                  <Select
+                    value={formData.customerId || ""}
+                    onChange={(e) => {
+                      const selectedCustomerId = e.target.value;
+                      const selectedCustomer = customers.find(c => c.customerId === selectedCustomerId);
+                      handleInputChange("customerId", selectedCustomerId);
+                      handleInputChange("customerName", selectedCustomer ? 
+                        `${selectedCustomer.firstName} ${selectedCustomer.lastName}` : ""
+                      );
+                    }}
+                    label='Select Customer'
+                    disabled={loadingCustomers}
+                  >
+                    {customers.map((customer) => (
+                      <MenuItem key={customer.customerId} value={customer.customerId}>
+                        {`${customer.firstName} ${customer.lastName}`}
+                        {customer.companyName && (
+                          <span style={{ color: '#666', fontSize: '0.9em' }}>
+                            {' '}({customer.companyName})
+                          </span>
+                        )}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  {loadingCustomers && (
+                    <Typography variant="caption" color="text.secondary">
+                      Loading customers...
+                    </Typography>
+                  )}
+                </FormControl>
+              )}
             </Grid>
           </Grid>
         </Box>
@@ -366,15 +424,7 @@ export const CustomerLocationForm = ({
               mb: 2,
             }}
           >
-            <Box>
-              <Typography variant='h6' gutterBottom>
-                Delivery & Collection Locations
-              </Typography>
-              <Typography variant='body2' color='text.secondary'>
-                Configure location specific settings, freight rates, and penalty
-                rates
-              </Typography>
-            </Box>
+            
           </Box>
 
           <Grid container spacing={3}>

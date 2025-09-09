@@ -655,7 +655,7 @@ export const CustomerLocationForm = ({
                   <Typography
                     variant='subtitle2'
                     fontWeight='bold'
-                    color='primary'
+                    
                   >
                     Dispatch: Loading Charges
                   </Typography>
@@ -681,7 +681,7 @@ export const CustomerLocationForm = ({
                         mb: 1,
                       }}
                     >
-                      <Typography variant='body2' fontWeight='medium'>
+                      <Typography variant='body2' fontWeight='medium' color='black'>
                         Loader cost:
                       </Typography>
                       <FormControl size='small' sx={{ minWidth: 100 }}>
@@ -777,7 +777,7 @@ export const CustomerLocationForm = ({
                   <Typography
                     variant='subtitle2'
                     fontWeight='bold'
-                    color='primary'
+                    
                   >
                     Labor Cost
                   </Typography>
@@ -890,7 +890,7 @@ export const CustomerLocationForm = ({
                   <Typography
                     variant='subtitle2'
                     fontWeight='bold'
-                    color='primary'
+                   
                   >
                     Receiving: Unloading Cost
                   </Typography>

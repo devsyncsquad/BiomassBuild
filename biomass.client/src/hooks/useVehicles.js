@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-const useVehicles = () => {
+const useVehicles = (page = 1, pageSize = 10) => {
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [totalCount, setTotalCount] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const [stats, setStats] = useState({
     total: 0,
     active: 0,
@@ -15,12 +17,33 @@ const useVehicles = () => {
   const fetchVehicles = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("https://localhost:7084/api/vehicles");
+      const response = await axios.get("https://localhost:7084/api/vehicles", {
+        params: {
+          page,
+          pageSize,
+        },
+      });
+      
       if (response.data.success) {
-        setVehicles(response.data.result);
+        const result = response.data.result;
+        
+        // Handle both paginated and non-paginated responses
+        if (result.items) {
+          // Paginated response
+          setVehicles(result.items);
+          setTotalCount(result.totalCount || 0);
+          setTotalPages(result.totalPages || 1);
+        } else {
+          // Non-paginated response (fallback)
+          setVehicles(result);
+          setTotalCount(result.length);
+          setTotalPages(Math.ceil(result.length / pageSize));
+        }
 
-        // Calculate stats
-        const vehicleStats = response.data.result.reduce(
+        // Calculate stats from all vehicles (not just current page)
+        // For now, we'll calculate from current page data
+        // In a real implementation, you might want to get stats separately
+        const vehicleStats = (result.items || result).reduce(
           (acc, vehicle) => {
             acc.total++;
             switch (vehicle.status.toLowerCase()) {
@@ -50,9 +73,17 @@ const useVehicles = () => {
 
   useEffect(() => {
     fetchVehicles();
-  }, []);
+  }, [page, pageSize]);
 
-  return { vehicles, loading, error, stats, refetchVehicles: fetchVehicles };
+  return { 
+    vehicles, 
+    loading, 
+    error, 
+    stats, 
+    totalCount, 
+    totalPages, 
+    refetchVehicles: fetchVehicles 
+  };
 };
 
 export default useVehicles;

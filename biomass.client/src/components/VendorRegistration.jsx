@@ -267,17 +267,12 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave, onEdit 
       </DialogTitle>
 
       <DialogContent sx={{ p: 4 }}>
-        <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: '#333' }}>
-          {isEditMode ? 'Edit Vendor Information' : vendor ? 'Vendor Information' : 'Register and manage supplier information for raw materials and services.'}
+        <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold',  }}>
+          {isEditMode ? 'Edit Vendor Information' : vendor ? 'Vendor Information' : 'Vendor Registration'}
         </Typography>
 
         <Grid container spacing={3}>
-          {/* Basic Information Section */}
-          <Grid item xs={12}>
-            <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', color: '#6366F1' }}>
-              Basic Information
-            </Typography>
-          </Grid>
+          
 
           <Grid item xs={12} md={6}>
             <TextField
@@ -286,7 +281,7 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave, onEdit 
               value={formData.vendorName}
               onChange={(e) => handleInputChange('vendorName', e.target.value)}
               error={!!errors.vendorName}
-              helperText={errors.vendorName || 'Required field'}
+              //helperText={errors.vendorName || 'Required field'}
               disabled={isReadOnly}
               InputProps={{
                 readOnly: isReadOnly
@@ -337,7 +332,7 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave, onEdit 
               value={formData.address}
               onChange={(e) => handleInputChange('address', e.target.value)}
               error={!!errors.address}
-              helperText={errors.address || 'Required field'}
+              //helperText={errors.address || 'Required field'}
               multiline
               rows={3}
               disabled={isReadOnly}
@@ -349,7 +344,7 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave, onEdit 
 
           {/* Service Type Section */}
           <Grid item xs={12}>
-            <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', color: '#6366F1' }}>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
               Service Type
             </Typography>
           </Grid>
@@ -382,7 +377,7 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave, onEdit 
 
           {/* Contact Information Section */}
           <Grid item xs={12}>
-            <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', color: '#6366F1' }}>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
               Contact Information
             </Typography>
           </Grid>
@@ -394,7 +389,7 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave, onEdit 
               value={formData.phone1}
               onChange={(e) => handleInputChange('phone1', e.target.value)}
               error={!!errors.phone1}
-              helperText={errors.phone1 || 'Required field'}
+              //helperText={errors.phone1 || 'Required field'}
               disabled={isReadOnly}
               InputProps={{
                 readOnly: isReadOnly
@@ -409,7 +404,7 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave, onEdit 
               value={formData.phone2}
               onChange={(e) => handleInputChange('phone2', e.target.value)}
               error={!!errors.phone2}
-              helperText={errors.phone2 || 'Optional field'}
+              //helperText={errors.phone2 || 'Optional field'}
               disabled={isReadOnly}
               InputProps={{
                 readOnly: isReadOnly
@@ -424,7 +419,7 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave, onEdit 
               value={formData.phone3}
               onChange={(e) => handleInputChange('phone3', e.target.value)}
               error={!!errors.phone3}
-              helperText={errors.phone3 || 'Optional field'}
+              //helperText={errors.phone3 || 'Optional field'}
               disabled={isReadOnly}
               InputProps={{
                 readOnly: isReadOnly
@@ -434,7 +429,7 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave, onEdit 
 
           {/* CNIC Documentation Section */}
           <Grid item xs={12}>
-            <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', color: '#2563eb' }}>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
               CNIC Documentation
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
@@ -450,7 +445,7 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave, onEdit 
                 borderRadius: 2,
                 textAlign: 'center',
                 cursor: isReadOnly ? 'default' : 'pointer',
-                '&:hover': isReadOnly ? {} : { borderColor: '#2563eb' }
+                '&:hover': isReadOnly ? {} : { borderColor: 'black' }
               }}
               onClick={() => !isReadOnly && document.getElementById('cnicFront').click()}
             >
@@ -467,7 +462,7 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave, onEdit 
                 </Box>
               ) : (
                 <Box>
-                  <CloudUploadIcon sx={{ fontSize: 48, color: '#999', mb: 1 }} />
+                  <CloudUploadIcon sx={{ fontSize: 48, mb: 1 }} />
                   <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 1 }}>
                     CNIC Front Image (Optional)
                   </Typography>
@@ -495,7 +490,7 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave, onEdit 
                 borderRadius: 2,
                 textAlign: 'center',
                 cursor: isReadOnly ? 'default' : 'pointer',
-                '&:hover': isReadOnly ? {} : { borderColor: '#2563eb' }
+                '&:hover': isReadOnly ? {} : { borderColor: 'black' }
               }}
               onClick={() => !isReadOnly && document.getElementById('cnicBack').click()}
             >
@@ -535,9 +530,7 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave, onEdit 
       </DialogContent>
 
       <DialogActions sx={{ p: 3, justifyContent: 'space-between' }}>
-        <Typography variant="body2" color="text.secondary">
-          *Required fields
-        </Typography>
+       
         
         <Box sx={{ display: 'flex', gap: 2 }}>
           <Button onClick={handleClose} variant="outlined">

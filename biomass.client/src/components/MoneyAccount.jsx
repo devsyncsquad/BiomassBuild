@@ -71,7 +71,6 @@ const MoneyAccount = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [kindLookupId, setKindLookupId] = useState(6); // Default to Bank
-  const [isActive, setIsActive] = useState(true);
 
   const [formData, setFormData] = useState({
     accountCode: "",
@@ -100,7 +99,7 @@ const MoneyAccount = () => {
   // Load money accounts from API
   useEffect(() => {
     loadMoneyAccounts();
-  }, [page, pageSize, kindLookupId, isActive]);
+  }, [page, pageSize, kindLookupId]);
 
   // Get current user info for createdBy and updatedBy
   const getCurrentUser = () => {
@@ -122,7 +121,6 @@ const MoneyAccount = () => {
             page,
             pageSize,
             kindLookupId,
-            isActive,
           },
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -596,12 +594,7 @@ const MoneyAccount = () => {
             >
               Money Account Management
             </Typography>
-            <Typography
-              variant='h6'
-              sx={{ color: "white", opacity: 0.9, fontWeight: 300 }}
-            >
-              Manage your bank accounts, wallets, and cash accounts
-            </Typography>
+           
           </Box>
           <Button
             variant='contained'
@@ -652,9 +645,6 @@ const MoneyAccount = () => {
         >
           <CardContent sx={{ p: 3 }}>
             <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-              <FilterIcon
-                sx={{ mr: 2, fontSize: "1.5rem", color: "#228B22" }}
-              />
               <Typography
                 variant='h5'
                 sx={{ fontWeight: 600, color: "#228B22" }}
@@ -710,27 +700,6 @@ const MoneyAccount = () => {
                     <MenuItem value={8}>Cash</MenuItem>
                   </Select>
                 </FormControl>
-              </Grid>
-              <Grid item xs={12} sm={6} md={3}>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={isActive}
-                      onChange={(e) => setIsActive(e.target.checked)}
-                      sx={{
-                        "& .MuiSwitch-switchBase.Mui-checked": {
-                          color: "#228B22",
-                        },
-                        "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track":
-                          {
-                            backgroundColor: "#228B22",
-                          },
-                      }}
-                    />
-                  }
-                  label='Active Only'
-                  sx={{ color: "#228B22" }}
-                />
               </Grid>
               <Grid item xs={12} sm={6} md={3}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>

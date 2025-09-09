@@ -20,6 +20,11 @@ import {
   DialogContent,
   CircularProgress,
   Alert,
+  Pagination,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import {
   Add as AddIcon,
@@ -38,7 +43,12 @@ const VehicleManagement = () => {
   const [openVehicleForm, setOpenVehicleForm] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [openDriverDetails, setOpenDriverDetails] = useState(false);
-  const { vehicles, loading, error, stats, refetchVehicles } = useVehicles();
+  
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  
+  const { vehicles, loading, error, stats, totalCount, totalPages, refetchVehicles } = useVehicles(page, pageSize);
 
   const handleAddVehicle = () => {
     setSelectedVehicle(null);
@@ -63,6 +73,15 @@ const VehicleManagement = () => {
   const handleEditVehicle = (vehicle) => {
     setSelectedVehicle(vehicle);
     setOpenVehicleForm(true);
+  };
+
+  const handlePageChange = (event, value) => {
+    setPage(value);
+  };
+
+  const handlePageSizeChange = (event) => {
+    setPageSize(event.target.value);
+    setPage(1); // Reset to first page when changing page size
   };
 
   return (
@@ -140,17 +159,7 @@ const VehicleManagement = () => {
             >
               Vehicle Management & Driver
             </Typography>
-            <Typography
-              variant='h6'
-              sx={{
-                color: "white",
-                opacity: 0.9,
-                fontWeight: 300,
-                textShadow: "0 1px 2px rgba(0,0,0,0.1)",
-              }}
-            >
-              Manage your vehicles and drivers efficiently
-            </Typography>
+            
           </Box>
           <Button
             variant='contained'
@@ -284,79 +293,136 @@ const VehicleManagement = () => {
 
       {/* Vehicle List */}
       {!loading && !error && (
-        <TableContainer component={Paper} sx={{ mt: 4 }}>
-          <Table>
-            <TableHead>
-              <TableRow sx={{ bgcolor: "green" }}>
-                <TableCell>Vehicle Number</TableCell>
-                <TableCell>Type</TableCell>
-                <TableCell>Capacity</TableCell>
-                <TableCell>Fuel Type</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Driver</TableCell>
-                <TableCell align='center'>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {vehicles.map((vehicle) => (
-                <TableRow key={vehicle.vehicleId}>
-                  <TableCell>{vehicle.vehicleNumber}</TableCell>
-                  <TableCell>{vehicle.vehicleType}</TableCell>
-                  <TableCell>{vehicle.capacity}</TableCell>
-                  <TableCell>{vehicle.fuelType}</TableCell>
-                  <TableCell>
-                    <Box
-                      sx={{
-                        display: "inline-block",
-                        px: 2,
-                        py: 0.5,
-                        borderRadius: 1,
-                        bgcolor:
-                          vehicle.status === "Active"
-                            ? "#e8f5e9"
-                            : vehicle.status === "Maintenance"
-                            ? "#fff3e0"
-                            : "#ffebee",
-                        color:
-                          vehicle.status === "Active"
-                            ? "#2e7d32"
-                            : vehicle.status === "Maintenance"
-                            ? "#e65100"
-                            : "#c62828",
-                      }}
-                    >
-                      {vehicle.status}
-                    </Box>
-                  </TableCell>
-                  <TableCell>
-                    {vehicle.driver ? (
-                      <Button
-                        startIcon={<DriverIcon />}
-                        onClick={() => handleViewDriver(vehicle)}
-                        size='small'
-                      >
-                        View Driver
-                      </Button>
-                    ) : (
-                      <Typography variant='body2' color='text.secondary'>
-                        No Driver Assigned
-                      </Typography>
-                    )}
-                  </TableCell>
-                  <TableCell align='center'>
-                    <IconButton
-                      size='small'
-                      onClick={() => handleEditVehicle(vehicle)}
-                      color='primary'
-                    >
-                      <EditIcon />
-                    </IconButton>
-                  </TableCell>
+        <>
+          {/* Pagination Controls */}
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            mb: 2,
+            px: 2
+          }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Typography variant="body2" color="text.secondary">
+                Showing {vehicles.length} of {totalCount} vehicles
+              </Typography>
+              <FormControl size="small" sx={{ minWidth: 120 }}>
+                <InputLabel>Per Page</InputLabel>
+                <Select
+                  value={pageSize}
+                  label="Per Page"
+                  onChange={handlePageSizeChange}
+                >
+                  <MenuItem value={5}>5</MenuItem>
+                  <MenuItem value={10}>10</MenuItem>
+                  <MenuItem value={20}>20</MenuItem>
+                  <MenuItem value={50}>50</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+            <Pagination
+              count={totalPages}
+              page={page}
+              onChange={handlePageChange}
+              color="primary"
+              size="medium"
+              showFirstButton
+              showLastButton
+            />
+          </Box>
+
+          <TableContainer component={Paper} sx={{ mt: 2 }}>
+            <Table>
+              <TableHead>
+                <TableRow sx={{ bgcolor: "green" }}>
+                  <TableCell>Vehicle Number</TableCell>
+                  <TableCell>Type</TableCell>
+                  <TableCell>Capacity</TableCell>
+                  <TableCell>Fuel Type</TableCell>
+                  <TableCell>Status</TableCell>
+                  <TableCell>Driver</TableCell>
+                  <TableCell align='center'>Actions</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {vehicles.map((vehicle) => (
+                  <TableRow key={vehicle.vehicleId}>
+                    <TableCell>{vehicle.vehicleNumber}</TableCell>
+                    <TableCell>{vehicle.vehicleType}</TableCell>
+                    <TableCell>{vehicle.capacity}</TableCell>
+                    <TableCell>{vehicle.fuelType}</TableCell>
+                    <TableCell>
+                      <Box
+                        sx={{
+                          display: "inline-block",
+                          px: 2,
+                          py: 0.5,
+                          borderRadius: 1,
+                          bgcolor:
+                            vehicle.status === "Active"
+                              ? "#e8f5e9"
+                              : vehicle.status === "Maintenance"
+                              ? "#fff3e0"
+                              : "#ffebee",
+                          color:
+                            vehicle.status === "Active"
+                              ? "#2e7d32"
+                              : vehicle.status === "Maintenance"
+                              ? "#e65100"
+                              : "#c62828",
+                        }}
+                      >
+                        {vehicle.status}
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      {vehicle.driver ? (
+                        <Button
+                          startIcon={<DriverIcon />}
+                          onClick={() => handleViewDriver(vehicle)}
+                          size='small'
+                        >
+                          View Driver
+                        </Button>
+                      ) : (
+                        <Typography variant='body2' color='text.secondary'>
+                          No Driver Assigned
+                        </Typography>
+                      )}
+                    </TableCell>
+                    <TableCell align='center'>
+                      <IconButton
+                        size='small'
+                        onClick={() => handleEditVehicle(vehicle)}
+                        color='primary'
+                      >
+                        <EditIcon />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          {/* Bottom Pagination */}
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            mt: 2,
+            px: 2
+          }}>
+            <Pagination
+              count={totalPages}
+              page={page}
+              onChange={handlePageChange}
+              color="primary"
+              size="large"
+              showFirstButton
+              showLastButton
+            />
+          </Box>
+        </>
       )}
 
       {/* Vehicle Form Dialog */}

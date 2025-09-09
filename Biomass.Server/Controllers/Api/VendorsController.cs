@@ -348,6 +348,32 @@ namespace Biomass.Server.Controllers.Api
             };
         }
 
+        /// <summary>
+        /// Get vendors that are both labor and vehicle loader (for dropdowns)
+        /// </summary>
+        [HttpGet("labor-and-loader")]
+        public async Task<ActionResult<ServiceResponse<List<VendorDto>>>> GetLaborAndLoaderVendors()
+        {
+            try
+            {
+                var result = await _vendorService.GetLaborAndLoaderVendorsAsync();
+                return Ok(new ServiceResponse<List<VendorDto>>
+                {
+                    Success = true,
+                    Result = result,
+                    Message = "Labor and loader vendors retrieved successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ServiceResponse<List<VendorDto>>
+                {
+                    Success = false,
+                    Message = "An error occurred while retrieving labor and loader vendors"
+                });
+            }
+        }
+
         private int GetCurrentUserId()
         {
             // TODO: Implement user ID extraction from JWT token

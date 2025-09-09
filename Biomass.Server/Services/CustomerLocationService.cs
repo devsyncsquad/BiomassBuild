@@ -46,6 +46,8 @@ namespace Biomass.Server.Services
                         LaborChargesEnabled = l.LaborChargesEnabled,
                         LaborChargeType = l.LaborChargeType,
                         LaborChargesCost = l.LaborChargesCost,
+                        DefaultBucket = l.DefaultBucket,
+                        LaborVendor = l.LaborVendor,
                         ReceivingUnloadingCostEnabled = l.ReceivingUnloadingCostEnabled,
                         ReceivingChargeType = l.ReceivingChargeType,
                         FixedUnloadingCost = l.FixedUnloadingCost,
@@ -102,6 +104,8 @@ namespace Biomass.Server.Services
                         LaborChargesEnabled = l.LaborChargesEnabled,
                         LaborChargeType = l.LaborChargeType,
                         LaborChargesCost = l.LaborChargesCost,
+                        DefaultBucket = l.DefaultBucket,
+                        LaborVendor = l.LaborVendor,
                         ReceivingUnloadingCostEnabled = l.ReceivingUnloadingCostEnabled,
                         ReceivingChargeType = l.ReceivingChargeType,
                         FixedUnloadingCost = l.FixedUnloadingCost,
@@ -158,6 +162,8 @@ namespace Biomass.Server.Services
                         LaborChargesEnabled = l.LaborChargesEnabled,
                         LaborChargeType = l.LaborChargeType,
                         LaborChargesCost = l.LaborChargesCost,
+                        DefaultBucket = l.DefaultBucket,
+                        LaborVendor = l.LaborVendor,
                         ReceivingUnloadingCostEnabled = l.ReceivingUnloadingCostEnabled,
                         ReceivingChargeType = l.ReceivingChargeType,
                         FixedUnloadingCost = l.FixedUnloadingCost,
@@ -239,6 +245,8 @@ namespace Biomass.Server.Services
                     LaborChargesEnabled = request.LaborChargesEnabled,
                     LaborChargeType = request.LaborChargeType,
                     LaborChargesCost = request.LaborChargesCost,
+                    DefaultBucket = request.DefaultBucket,
+                    LaborVendor = request.LaborVendor,
                     ReceivingUnloadingCostEnabled = request.ReceivingUnloadingCostEnabled,
                     ReceivingChargeType = request.ReceivingChargeType,
                     FixedUnloadingCost = request.FixedUnloadingCost,
@@ -274,6 +282,8 @@ namespace Biomass.Server.Services
                     LaborChargesEnabled = location.LaborChargesEnabled,
                     LaborChargeType = location.LaborChargeType,
                     LaborChargesCost = location.LaborChargesCost,
+                    DefaultBucket = location.DefaultBucket,
+                    LaborVendor = location.LaborVendor,
                     ReceivingUnloadingCostEnabled = location.ReceivingUnloadingCostEnabled,
                     ReceivingChargeType = location.ReceivingChargeType,
                     FixedUnloadingCost = location.FixedUnloadingCost,
@@ -345,6 +355,8 @@ namespace Biomass.Server.Services
                 location.LaborChargesEnabled = request.LaborChargesEnabled;
                 location.LaborChargeType = request.LaborChargeType;
                 location.LaborChargesCost = request.LaborChargesCost;
+                location.DefaultBucket = request.DefaultBucket;
+                location.LaborVendor = request.LaborVendor;
                 location.ReceivingUnloadingCostEnabled = request.ReceivingUnloadingCostEnabled;
                 location.ReceivingChargeType = request.ReceivingChargeType;
                 location.FixedUnloadingCost = request.FixedUnloadingCost;
@@ -378,6 +390,8 @@ namespace Biomass.Server.Services
                     LaborChargesEnabled = location.LaborChargesEnabled,
                     LaborChargeType = location.LaborChargeType,
                     LaborChargesCost = location.LaborChargesCost,
+                    DefaultBucket = location.DefaultBucket,
+                    LaborVendor = location.LaborVendor,
                     ReceivingUnloadingCostEnabled = location.ReceivingUnloadingCostEnabled,
                     ReceivingChargeType = location.ReceivingChargeType,
                     FixedUnloadingCost = location.FixedUnloadingCost,
@@ -482,6 +496,8 @@ namespace Biomass.Server.Services
                         LaborChargesEnabled = l.LaborChargesEnabled,
                         LaborChargeType = l.LaborChargeType,
                         LaborChargesCost = l.LaborChargesCost,
+                        DefaultBucket = l.DefaultBucket,
+                        LaborVendor = l.LaborVendor,
                         ReceivingUnloadingCostEnabled = l.ReceivingUnloadingCostEnabled,
                         ReceivingChargeType = l.ReceivingChargeType,
                         FixedUnloadingCost = l.FixedUnloadingCost,

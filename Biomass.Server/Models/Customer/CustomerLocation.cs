@@ -110,6 +110,12 @@ namespace Biomass.Server.Models.Customer
         [Column("labor_charges_cost")]
         public decimal? LaborChargesCost { get; set; }
 
+        [Column("default_bucket")]
+        public int? DefaultBucket { get; set; }
+
+        [Column("labor_vendor")]
+        public int? LaborVendor { get; set; }
+
         // Navigation properties
         public virtual Customer Customer { get; set; } = null!;
     }
@@ -145,6 +151,8 @@ namespace Biomass.Server.Models.Customer
         public decimal? Latitude { get; set; }
         public decimal? Longitude { get; set; }
         public string CustomerName { get; set; } = string.Empty;
+        public int? DefaultBucket { get; set; }
+        public int? LaborVendor { get; set; }
     }
 
     public class CreateCustomerLocationRequest
@@ -177,6 +185,8 @@ namespace Biomass.Server.Models.Customer
         public bool LaborChargesEnabled { get; set; }
         public string? LaborChargeType { get; set; }
         public decimal? LaborChargesCost { get; set; }
+        public int? DefaultBucket { get; set; }
+        public int? LaborVendor { get; set; }
         public decimal? Latitude { get; set; }
         public decimal? Longitude { get; set; }
     }
@@ -208,6 +218,8 @@ namespace Biomass.Server.Models.Customer
         public bool LaborChargesEnabled { get; set; }
         public string? LaborChargeType { get; set; }
         public decimal? LaborChargesCost { get; set; }
+        public int? DefaultBucket { get; set; }
+        public int? LaborVendor { get; set; }
         public string Status { get; set; } = string.Empty;
         public decimal? Latitude { get; set; }
         public decimal? Longitude { get; set; }

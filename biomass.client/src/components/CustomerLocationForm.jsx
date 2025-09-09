@@ -55,6 +55,9 @@ export const CustomerLocationForm = ({
     laborChargesEnabled: false,
     laborChargeType: "Fixed",
     laborChargesCost: 3500,
+    // Vendor Configuration
+    defaultBucket: null,
+    laborVendor: null,
     receivingUnloadingCostEnabled: false,
     receivingChargeType: "Fixed",
     fixedUnloadingCost: 4000,
@@ -65,11 +68,16 @@ export const CustomerLocationForm = ({
   const [isEditing, setIsEditing] = useState(false);
   const [customers, setCustomers] = useState([]);
   const [loadingCustomers, setLoadingCustomers] = useState(false);
+  const [vendors, setVendors] = useState([]);
+  const [loadingVendors, setLoadingVendors] = useState(false);
 
-  // Fetch customers when form opens and no customerId is provided
+  // Fetch customers and vendors when form opens
   useEffect(() => {
-    if (open && !customerId) {
-      fetchCustomers();
+    if (open) {
+      if (!customerId) {
+        fetchCustomers();
+      }
+      fetchVendors();
     }
   }, [open, customerId]);
 
@@ -89,6 +97,26 @@ export const CustomerLocationForm = ({
       setCustomers([]);
     } finally {
       setLoadingCustomers(false);
+    }
+  };
+
+  const fetchVendors = async () => {
+    setLoadingVendors(true);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_LIVE_APP_BASEURL || 'https://localhost:7084/api'}/vendors/labor-and-loader`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setVendors(data.result || []);
+      } else {
+        console.error("Failed to fetch vendors:", data.message);
+        setVendors([]);
+      }
+    } catch (error) {
+      console.error("Error fetching vendors:", error);
+      setVendors([]);
+    } finally {
+      setLoadingVendors(false);
     }
   };
 
@@ -137,6 +165,9 @@ export const CustomerLocationForm = ({
         laborChargesEnabled: false,
         laborChargeType: "Fixed",
         laborChargesCost: 3500,
+        // Vendor Configuration
+        defaultBucket: null,
+        laborVendor: null,
         receivingUnloadingCostEnabled: false,
         receivingChargeType: "Fixed",
         fixedUnloadingCost: 4000,
@@ -238,6 +269,8 @@ export const CustomerLocationForm = ({
         LaborChargesCost: formData.laborChargesCost
           ? parseFloat(formData.laborChargesCost)
           : null,
+        DefaultBucket: formData.defaultBucket || null,
+        LaborVendor: formData.laborVendor || null,
         ReceivingUnloadingCostEnabled: Boolean(
           formData.receivingUnloadingCostEnabled
         ),
@@ -872,6 +905,8 @@ export const CustomerLocationForm = ({
               </Box>
             </Grid>
 
+            
+
             {/* Receiving Unloading Cost */}
             <Grid item xs={12} sm={6} md={4}>
               <Box
@@ -991,6 +1026,70 @@ export const CustomerLocationForm = ({
                     )}
                   </Box>
                 )}
+              </Box>
+            </Grid>
+
+            {/* Vendor Configuration */}
+            <Grid item xs={12} sm={6} md={4}>
+              <Box
+                sx={{
+                  border: "1px solid #e0e0e0",
+                  borderRadius: 2,
+                  p: 2,
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <Typography
+                  variant='subtitle2'
+                  fontWeight='bold'
+                  sx={{ mb: 2 }}
+                >
+                  Vendor Configuration
+                </Typography>
+
+                <FormControl fullWidth size='small' sx={{ mb: 2 }}>
+                  <InputLabel>Select Loader Vendor</InputLabel>
+                  <Select
+                    value={formData.defaultBucket || ''}
+                    onChange={(e) =>
+                      handleInputChange("defaultBucket", e.target.value ? parseInt(e.target.value) : null)
+                    }
+                    label='Select Loader Vendor'
+                    disabled={loadingVendors}
+                  >
+                    <MenuItem value=''>
+                      <em>Select a vendor</em>
+                    </MenuItem>
+                    {vendors.map((vendor) => (
+                      <MenuItem key={vendor.vendorId} value={vendor.vendorId}>
+                        {vendor.vendorName}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                <FormControl fullWidth size='small'>
+                  <InputLabel>Select Labor Vendor</InputLabel>
+                  <Select
+                    value={formData.laborVendor || ''}
+                    onChange={(e) =>
+                      handleInputChange("laborVendor", e.target.value ? parseInt(e.target.value) : null)
+                    }
+                    label='Select Labor Vendor'
+                    disabled={loadingVendors}
+                  >
+                    <MenuItem value=''>
+                      <em>Select a vendor</em>
+                    </MenuItem>
+                    {vendors.map((vendor) => (
+                      <MenuItem key={vendor.vendorId} value={vendor.vendorId}>
+                        {vendor.vendorName}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               </Box>
             </Grid>
           </Grid>

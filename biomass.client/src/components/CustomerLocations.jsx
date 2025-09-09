@@ -476,25 +476,8 @@ const CustomerLocations = ({ customer, onClose }) => {
                 }}
               />
             </Grid>
-            <Grid item xs={12} md={3}>
-              <FormControl fullWidth size='small'>
-                <InputLabel>Type</InputLabel>
-                <Select
-                  value={filterType}
-                  label='Type'
-                  onChange={(e) => setFilterType(e.target.value)}
-                >
-                  <MenuItem value='all'>All Types</MenuItem>
-                  <MenuItem value='Warehouse'>Warehouse</MenuItem>
-                  <MenuItem value='Distribution Center'>
-                    Distribution Center
-                  </MenuItem>
-                  <MenuItem value='Office'>Office</MenuItem>
-                  <MenuItem value='Service Center'>Service Center</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} md={3}>
+            
+            <Grid item xs={12} md={6}>
               <FormControl fullWidth size='small'>
                 <InputLabel>Status</InputLabel>
                 <Select

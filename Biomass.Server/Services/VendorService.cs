@@ -151,6 +151,22 @@ namespace Biomass.Server.Services
             }
         }
 
+        public async Task<List<VendorDto>> GetLaborAndLoaderVendorsAsync()
+        {
+            try
+            {
+                var vendors = await _context.Vendors
+                    .Where(v => v.IsLabour == true && v.IsVehicleLoader == true && v.Status == "Active")
+                    .ToListAsync();
+
+                return vendors.Select(MapToVendorDto).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error retrieving labor and loader vendors: {ex.Message}");
+            }
+        }
+
         private VendorDto MapToVendorDto(Vendor vendor)
         {
             return new VendorDto

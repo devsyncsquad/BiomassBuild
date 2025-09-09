@@ -10,3 +10,4 @@ Biomass.Server/wwwroot/
 /.vs
 biomass.client/.env
 /biomass.client/obj
+Biomass.Server/Properties/PublishProfiles/FolderProfile.pubxml.user

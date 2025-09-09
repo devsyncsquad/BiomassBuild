@@ -525,6 +525,11 @@ namespace Biomass.Server.Data
                 entity.Property(e => e.PayableWeight).HasColumnName("payable_weight");
                 entity.Property(e => e.BucketVendorId).HasColumnName("bucket_vendor_id");
                 entity.Property(e => e.LabourVendorId).HasColumnName("labour_vendor_id");
+                entity.Property(e => e.MaterialId).HasColumnName("material_id");
+                entity.Property(e => e.TransporterVendorId).HasColumnName("transporter_vendor_id");
+                entity.Property(e => e.BucketRatePerMund).HasColumnName("bucket_rate_per_mund").HasColumnType("numeric(18,2)");
+                entity.Property(e => e.LaborRatePerMund).HasColumnName("labor_rate_per_mund").HasColumnType("numeric(18,2)");
+                entity.Property(e => e.TransporterRatePerMund).HasColumnName("transporter_rate_per_mund").HasColumnType("numeric(18,2)");
 
                 // Configure foreign key relationships
                 entity.HasOne(d => d.Vehicle)
@@ -545,6 +550,11 @@ namespace Biomass.Server.Data
                 entity.HasOne(d => d.LabourVendor)
                       .WithMany()
                       .HasForeignKey(d => d.LabourVendorId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(d => d.TransporterVendor)
+                      .WithMany()
+                      .HasForeignKey(d => d.TransporterVendorId)
                       .OnDelete(DeleteBehavior.Restrict);
             });
 

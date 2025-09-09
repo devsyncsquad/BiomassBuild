@@ -3,6 +3,7 @@ using Biomass.Server.Interfaces;
 using Biomass.Server.Models;
 using Biomass.Server.Models.Dispatch;
 using Biomass.Server.Models.Vehicle;
+using Biomass.Server.Models.Vendor;
 using Microsoft.EntityFrameworkCore;
 
 namespace Biomass.Server.Services
@@ -42,14 +43,30 @@ namespace Biomass.Server.Services
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                // Find transporter vendor where both is_vehicle_loader and is_labour are null
-                var transporterVendor = await _context.Vendors
-                    .Where(v => v.IsVehicleLoader == null && v.IsLabour == null && v.Status == "Active")
-                    .FirstOrDefaultAsync();
-
-                if (transporterVendor == null)
+                // Find transporter vendor - use provided one or auto-detect
+                Vendor? transporterVendor = null;
+                
+                if (request.TransporterVendorId.HasValue)
                 {
-                    throw new InvalidOperationException("No transporter vendor found. A vendor with both is_vehicle_loader and is_labour set to null is required.");
+                    transporterVendor = await _context.Vendors
+                        .FirstOrDefaultAsync(v => v.VendorId == request.TransporterVendorId.Value && v.Status == "Active");
+                    
+                    if (transporterVendor == null)
+                    {
+                        throw new InvalidOperationException($"Transporter vendor with ID {request.TransporterVendorId.Value} not found or inactive.");
+                    }
+                }
+                else
+                {
+                    // Auto-detect transporter vendor where both is_vehicle_loader and is_labour are null
+                    transporterVendor = await _context.Vendors
+                        .Where(v => v.IsVehicleLoader == null && v.IsLabour == null && v.Status == "Active")
+                        .FirstOrDefaultAsync();
+
+                    if (transporterVendor == null)
+                    {
+                        throw new InvalidOperationException("No transporter vendor found. A vendor with both is_vehicle_loader and is_labour set to null is required.");
+                    }
                 }
 
                 // Create the dispatch record
@@ -80,60 +97,84 @@ namespace Biomass.Server.Services
                     PayableWeight = request.PayableWeight,
                     BucketVendorId = request.BucketVendorId,
                     LabourVendorId = request.LabourVendorId,
+                    MaterialId = request.MaterialId,
+                    TransporterVendorId = request.TransporterVendorId,
+                    BucketRatePerMund = request.BucketRatePerMund,
+                    LaborRatePerMund = request.LaborRatePerMund,
+                    TransporterRatePerMund = request.TransporterRatePerMund,
                     CreatedOn = DateTime.UtcNow
                 };
 
                 _context.Dispatches.Add(dispatch);
                 await _context.SaveChangesAsync();
 
-                // Create AP Ledger entries for each vendor with specific charge amounts
-                var apLedgerEntries = new List<ApLedger>
+                // Calculate charges based on variable rates or fixed amounts
+                var bucketCharges = CalculateCharges(request.LoaderCharges, request.BucketRatePerMund, request.NetWeight);
+                var laborCharges = CalculateCharges(request.LaborCharges, request.LaborRatePerMund, request.NetWeight);
+                var transporterCharges = CalculateCharges(request.TransporterRate, request.TransporterRatePerMund, request.NetWeight);
+
+                // Create AP Ledger entries only for vendors with non-zero amounts
+                var apLedgerEntries = new List<ApLedger>();
+
+                // Bucket vendor - only create entry if amount > 0
+                if (bucketCharges > 0 && request.BucketVendorId > 0)
                 {
-                    // Bucket vendor - use loader charges
-                    new ApLedger
+                    apLedgerEntries.Add(new ApLedger
                     {
                         VendorId = request.BucketVendorId,
                         HappenedAt = DateTime.UtcNow,
                         EntryKind = "Bill",
-                        Amount = request.LoaderCharges ?? 0,
+                        Amount = bucketCharges,
                         Currency = "PKR",
                         DispatchId = dispatch.DispatchId,
                         Remarks = request.Remarks,
                         CreatedBy = request.CreatedBy,
                         CreatedAt = DateTime.UtcNow,
                         ReferenceNo = request.VehicleId,
-                    },
-                    // Labour vendor - use labor charges
-                    new ApLedger
+                    });
+                }
+
+                // Labour vendor - only create entry if amount > 0
+                if (laborCharges > 0 && request.LabourVendorId > 0)
+                {
+                    apLedgerEntries.Add(new ApLedger
                     {
                         VendorId = request.LabourVendorId,
                         HappenedAt = DateTime.UtcNow,
                         EntryKind = "Bill",
-                        Amount = request.LaborCharges ?? 0,
+                        Amount = laborCharges,
                         Currency = "PKR",
                         DispatchId = dispatch.DispatchId,
                         Remarks = request.Remarks,
                         CreatedBy = request.CreatedBy,
                         CreatedAt = DateTime.UtcNow,
                         ReferenceNo = request.VehicleId,
-                    },
-                    // Transporter vendor - use transporter rate
-                    new ApLedger
+                    });
+                }
+
+                // Transporter vendor - only create entry if amount > 0
+                if (transporterCharges > 0)
+                {
+                    apLedgerEntries.Add(new ApLedger
                     {
                         VendorId = transporterVendor.VendorId,
                         HappenedAt = DateTime.UtcNow,
                         EntryKind = "Bill",
-                        Amount = request.TransporterRate ?? 0,
+                        Amount = transporterCharges,
                         Currency = "PKR",
                         DispatchId = dispatch.DispatchId,
                         Remarks = request.Remarks,
                         CreatedBy = request.CreatedBy,
                         CreatedAt = DateTime.UtcNow,
                         ReferenceNo = request.VehicleId,
-                    }
-                };
+                    });
+                }
 
-                _context.ApLedgers.AddRange(apLedgerEntries);
+                // Only add entries if there are any to add
+                if (apLedgerEntries.Any())
+                {
+                    _context.ApLedgers.AddRange(apLedgerEntries);
+                }
                 await _context.SaveChangesAsync();
 
                 await transaction.CommitAsync();
@@ -177,6 +218,11 @@ namespace Biomass.Server.Services
             dispatch.TotalDeduction = request.TotalDeduction;
             dispatch.Status = request.Status;
             dispatch.PayableWeight = request.PayableWeight;
+            dispatch.MaterialId = request.MaterialId;
+            dispatch.TransporterVendorId = request.TransporterVendorId;
+            dispatch.BucketRatePerMund = request.BucketRatePerMund;
+            dispatch.LaborRatePerMund = request.LaborRatePerMund;
+            dispatch.TransporterRatePerMund = request.TransporterRatePerMund;
 
             await _context.SaveChangesAsync();
             return MapToDto(dispatch);
@@ -221,6 +267,11 @@ namespace Biomass.Server.Services
                 CreatedOn = dispatch.CreatedOn,
                 Status = dispatch.Status,
                 PayableWeight = dispatch.PayableWeight,
+                MaterialId = dispatch.MaterialId,
+                TransporterVendorId = dispatch.TransporterVendorId,
+                BucketRatePerMund = dispatch.BucketRatePerMund,
+                LaborRatePerMund = dispatch.LaborRatePerMund,
+                TransporterRatePerMund = dispatch.TransporterRatePerMund,
                 Vehicle = dispatch.Vehicle != null ? new VehicleDto
                 {
                     VehicleId = dispatch.Vehicle.VehicleId,
@@ -235,6 +286,25 @@ namespace Biomass.Server.Services
                 } : null,
                 Location = dispatch.Location
             };
+        }
+
+        /// <summary>
+        /// Calculates charges based on either fixed amount or variable rate per mund
+        /// </summary>
+        /// <param name="fixedAmount">Fixed charge amount (nullable)</param>
+        /// <param name="ratePerMund">Rate per mund for variable calculation (nullable)</param>
+        /// <param name="netWeight">Net weight in munds</param>
+        /// <returns>Calculated charge amount</returns>
+        private static decimal CalculateCharges(decimal? fixedAmount, decimal? ratePerMund, decimal netWeight)
+        {
+            // If variable rate is provided, use it for calculation
+            if (ratePerMund.HasValue)
+            {
+                return ratePerMund.Value * netWeight;
+            }
+            
+            // Otherwise, use fixed amount (default to 0 if null)
+            return fixedAmount ?? 0;
         }
     }
 }

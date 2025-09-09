@@ -31,6 +31,11 @@ namespace Biomass.Server.Models.Dispatch
         public DateTime CreatedOn { get; set; }
         public string? Status { get; set; }
         public int? PayableWeight { get; set; }
+        public int? MaterialId { get; set; }
+        public int? TransporterVendorId { get; set; }
+        public decimal? BucketRatePerMund { get; set; }
+        public decimal? LaborRatePerMund { get; set; }
+        public decimal? TransporterRatePerMund { get; set; }
         
         // Navigation properties
         public VehicleDto? Vehicle { get; set; }
@@ -96,6 +101,10 @@ namespace Biomass.Server.Models.Dispatch
         [Required]
         public int LabourVendorId { get; set; }
 
+        public int? MaterialId { get; set; }
+
+        public int? TransporterVendorId { get; set; }
+
         public string? Remarks { get; set; }
 
         [Required]
@@ -105,6 +114,12 @@ namespace Biomass.Server.Models.Dispatch
         public string? Status { get; set; } = "Active";
 
         public int? PayableWeight { get; set; }
+
+        public decimal? BucketRatePerMund { get; set; }
+
+        public decimal? LaborRatePerMund { get; set; }
+
+        public decimal? TransporterRatePerMund { get; set; }
     }
 
     public class UpdateDispatchRequest
@@ -161,5 +176,15 @@ namespace Biomass.Server.Models.Dispatch
         public string? Status { get; set; }
 
         public int? PayableWeight { get; set; }
+
+        public int? MaterialId { get; set; }
+
+        public int? TransporterVendorId { get; set; }
+
+        public decimal? BucketRatePerMund { get; set; }
+
+        public decimal? LaborRatePerMund { get; set; }
+
+        public decimal? TransporterRatePerMund { get; set; }
     }
 }

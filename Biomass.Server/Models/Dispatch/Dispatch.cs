@@ -98,10 +98,26 @@ namespace Biomass.Server.Models.Dispatch
         [Column("labour_vendor_id")]
         public int? LabourVendorId { get; set; }
 
+        [Column("material_id")]
+        public int? MaterialId { get; set; }
+
+        [Column("transporter_vendor_id")]
+        public int? TransporterVendorId { get; set; }
+
+        [Column("bucket_rate_per_mund")]
+        public decimal? BucketRatePerMund { get; set; }
+
+        [Column("labor_rate_per_mund")]
+        public decimal? LaborRatePerMund { get; set; }
+
+        [Column("transporter_rate_per_mund")]
+        public decimal? TransporterRatePerMund { get; set; }
+
         // Navigation properties
         public virtual Vehicle.Vehicle? Vehicle { get; set; }
         public virtual CustomerLocation? Location { get; set; }
         public virtual Vendor.Vendor? BucketVendor { get; set; }
         public virtual Vendor.Vendor? LabourVendor { get; set; }
+        public virtual Vendor.Vendor? TransporterVendor { get; set; }
     }
 }

@@ -493,10 +493,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
                           handleInputChange("companyAddress", e.target.value)
                         }
                         error={!!errors.companyAddress}
-                        helperText={
-                          errors.companyAddress ||
-                          "Complete registered address including city, state, and postal code"
-                        }
+                        
                         multiline
                         rows={3}
                         required
@@ -545,7 +542,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
                           handleInputChange("ntn", e.target.value)
                         }
                         placeholder='Enter NTN number'
-                        helperText='National Tax Number'
+                      
                         disabled={isViewMode && !isEditing}
                         variant='outlined'
                         sx={{
@@ -567,7 +564,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
                           handleInputChange("strn", e.target.value)
                         }
                         placeholder='Enter STRN number'
-                        helperText='Sales Tax Registration Number'
+                       
                         disabled={isViewMode && !isEditing}
                         variant='outlined'
                         sx={{
@@ -589,7 +586,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
                           handleInputChange("pra", e.target.value)
                         }
                         placeholder='Enter PRA number'
-                        helperText='Pakistan Revenue Authority registration number'
+                      
                         disabled={isViewMode && !isEditing}
                         variant='outlined'
                         sx={{
@@ -635,7 +632,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
                           handleInputChange("contactPersonName", e.target.value)
                         }
                         placeholder='Enter person name'
-                        helperText='Primary contact person for business communications'
+                       
                         disabled={isViewMode && !isEditing}
                         variant='outlined'
                         sx={{
@@ -660,7 +657,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
                           )
                         }
                         placeholder='Enter number with country code'
-                        helperText='Phone number with country code'
+                       
                         disabled={isViewMode && !isEditing}
                         variant='outlined'
                         sx={{

@@ -336,17 +336,12 @@ const CompanyManagement = () => {
           <Box>
             <Typography
               variant='h4'
-              gutterBottom
-              sx={{ color: "white", fontWeight: 700, mb: 1 }}
+              lowerBottom
+              sx={{ color: "white", fontWeight: 300, m: 0 }}
             >
               Companies Directory
             </Typography>
-            <Typography
-              variant='h6'
-              sx={{ color: "white", opacity: 0.9, fontWeight: 300 }}
-            >
-              Discover and explore companies in your industry
-            </Typography>
+           
           </Box>
           <Button
             variant='contained'
@@ -384,80 +379,9 @@ const CompanyManagement = () => {
           }}
         >
           <CardContent sx={{ p: 3 }}>
-            <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-              <FilterIcon
-                sx={{ mr: 2, fontSize: "1.5rem", color: "#228B22" }}
-              />
-              <Typography
-                variant='h5'
-                sx={{ fontWeight: 600, color: "#228B22" }}
-              >
-                Search & Filters
-              </Typography>
-            </Box>
-
             <Grid container spacing={3}>
-              <Grid item xs={12} sm={6} md={3}>
-                <TextField
-                  fullWidth
-                  label='Industry'
-                  value={filters.industry}
-                  onChange={(e) =>
-                    handleFilterChange("industry", e.target.value)
-                  }
-                  size='medium'
-                  variant='outlined'
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: 2,
-                      "&:hover fieldset": {
-                        borderColor: "#228B22",
-                      },
-                    },
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6} md={3}>
-                <TextField
-                  fullWidth
-                  label='Company Size'
-                  value={filters.companySize}
-                  onChange={(e) =>
-                    handleFilterChange("companySize", e.target.value)
-                  }
-                  size='medium'
-                  variant='outlined'
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: 2,
-                      "&:hover fieldset": {
-                        borderColor: "#228B22",
-                      },
-                    },
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6} md={3}>
-                <TextField
-                  fullWidth
-                  label='Location'
-                  value={filters.location}
-                  onChange={(e) =>
-                    handleFilterChange("location", e.target.value)
-                  }
-                  size='medium'
-                  variant='outlined'
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: 2,
-                      "&:hover fieldset": {
-                        borderColor: "#228B22",
-                      },
-                    },
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6} md={3}>
+              
+              <Grid item xs={12} sm={12} md={6}>
                 <TextField
                   fullWidth
                   label='Search Companies'
@@ -484,46 +408,6 @@ const CompanyManagement = () => {
                 />
               </Grid>
             </Grid>
-
-            <Box sx={{ display: "flex", gap: 2, mt: 3, flexWrap: "wrap" }}>
-              <Button
-                variant='contained'
-                onClick={applyFilters}
-                size='large'
-                sx={{
-                  borderRadius: 2,
-                  px: 4,
-                  py: 1.5,
-                  fontWeight: 600,
-                  bgcolor: "#228B22",
-                  "&:hover": {
-                    bgcolor: "#006400",
-                  },
-                }}
-              >
-                Apply Filters
-              </Button>
-              <Button
-                variant='outlined'
-                onClick={clearFilters}
-                size='large'
-                sx={{
-                  borderRadius: 2,
-                  px: 4,
-                  py: 1.5,
-                  fontWeight: 600,
-                  borderColor: "#228B22",
-                  color: "#228B22",
-                  "&:hover": {
-                    borderColor: "#006400",
-                    color: "#006400",
-                    bgcolor: "rgba(34, 139, 34, 0.04)",
-                  },
-                }}
-              >
-                Clear All
-              </Button>
-            </Box>
           </CardContent>
         </Card>
       </Box>

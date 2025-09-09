@@ -532,9 +532,7 @@ const AddMenu = ({ menuData, onMenuSaved, onRefresh }) => {
                 type='submit'
                 variant='contained'
                 disabled={isMenuSaveLoading}
-                startIcon={
-                  isMenuSaveLoading ? <CircularProgress size={20} /> : <Save />
-                }
+                
                 sx={{
                   bgcolor: "#228B22",
                   borderRadius: "12px",

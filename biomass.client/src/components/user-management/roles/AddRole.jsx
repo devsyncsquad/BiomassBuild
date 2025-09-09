@@ -482,9 +482,7 @@ const AddRole = ({ initialData, onRoleSaved, onCancel }) => {
                 type='submit'
                 variant='contained'
                 disabled={isRoleSaveLoading}
-                startIcon={
-                  isRoleSaveLoading ? <CircularProgress size={20} /> : <Save />
-                }
+                
                 sx={{
                   bgcolor: "#228B22",
                   borderRadius: "12px",

@@ -347,10 +347,8 @@ const ViewUsers = ({ setUserData }) => {
                       "&:nth-of-type(even)": { bgcolor: "#f8fafc" },
                       "&:hover": {
                         bgcolor: "rgba(34, 139, 34, 0.02)",
-                        transform: "scale(1.01)",
-                        transition: "all 0.2s ease",
+                        transition: "background-color 0.2s ease",
                       },
-                      transition: "all 0.2s ease",
                     }}
                   >
                     <TableCell>
@@ -469,9 +467,8 @@ const ViewUsers = ({ setUserData }) => {
                               bgcolor: "rgba(34, 139, 34, 0.1)",
                               "&:hover": {
                                 bgcolor: "rgba(34, 139, 34, 0.2)",
-                                transform: "scale(1.1)",
                               },
-                              transition: "all 0.2s ease",
+                              transition: "background-color 0.2s ease",
                             }}
                           >
                             <Edit sx={{ fontSize: "1.1rem" }} />
@@ -487,9 +484,8 @@ const ViewUsers = ({ setUserData }) => {
                               bgcolor: "rgba(239, 68, 68, 0.1)",
                               "&:hover": {
                                 bgcolor: "rgba(239, 68, 68, 0.2)",
-                                transform: "scale(1.1)",
                               },
-                              transition: "all 0.2s ease",
+                              transition: "background-color 0.2s ease",
                             }}
                           >
                             <Delete sx={{ fontSize: "1.1rem" }} />

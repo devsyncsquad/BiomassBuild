@@ -529,24 +529,14 @@ const CustomerManagement = () => {
               gutterBottom
               sx={{
                 color: "white",
-                fontWeight: 700,
-                mb: 1,
+                fontWeight: 500,
+                mb: 0,
                 textShadow: "0 2px 4px rgba(0,0,0,0.1)",
               }}
             >
               Customer Management
             </Typography>
-            <Typography
-              variant='h6'
-              sx={{
-                color: "white",
-                opacity: 0.9,
-                fontWeight: 300,
-                textShadow: "0 1px 2px rgba(0,0,0,0.1)",
-              }}
-            >
-              Manage your customer database and relationships
-            </Typography>
+            
           </Box>
           <Button
             variant='contained'
@@ -589,7 +579,7 @@ const CustomerManagement = () => {
           }}
         >
           <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-            <SearchIcon sx={{ mr: 2, fontSize: "1.5rem", color: "#228B22" }} />
+           
             <Typography variant='h6' sx={{ fontWeight: 600, color: "#228B22" }}>
               Search & Filters
             </Typography>

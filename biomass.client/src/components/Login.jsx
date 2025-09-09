@@ -189,8 +189,8 @@ const Login = ({ onLoginSuccess }) => {
           width: '100%',
           maxWidth: 450,
           borderRadius: '24px',
-          background: 'rgba(255, 255, 255, 0.95)',
-          backdropFilter: 'blur(25px)',
+          background: 'rgba(255, 255, 255, 0.98)',
+          backdropFilter: 'blur(10px)',
           border: '1px solid rgba(34, 139, 34, 0.1)',
           position: 'relative',
           zIndex: 2,
@@ -202,7 +202,15 @@ const Login = ({ onLoginSuccess }) => {
           }
         }}
       >
-        <CardContent sx={{ p: 6 }}>
+        <CardContent sx={{ 
+          p: 6,
+          backdropFilter: 'none',
+          filter: 'none',
+          '& *': {
+            backdropFilter: 'none',
+            filter: 'none'
+          }
+        }}>
           {/* Header */}
           <Box sx={{ textAlign: 'center', mb: 4 }}>
             <Box
@@ -274,17 +282,18 @@ const Login = ({ onLoginSuccess }) => {
                 mb: 3,
                 '& .MuiOutlinedInput-root': {
                   borderRadius: '16px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                  backgroundColor: '#ffffff',
+                  backdropFilter: 'none',
                   transition: 'all 0.3s ease',
                   '&:hover': {
-                    backgroundColor: 'rgba(255, 255, 255, 1)',
+                    backgroundColor: '#ffffff',
                     '& fieldset': {
                       borderColor: '#228B22',
                       borderWidth: '2px'
                     }
                   },
                   '&.Mui-focused': {
-                    backgroundColor: 'rgba(255, 255, 255, 1)',
+                    backgroundColor: '#ffffff',
                     '& fieldset': {
                       borderColor: '#228B22',
                       borderWidth: '2px'
@@ -293,13 +302,17 @@ const Login = ({ onLoginSuccess }) => {
                   '& input': {
                     color: '#333',
                     fontSize: '1rem',
-                    fontWeight: 500
+                    fontWeight: 500,
+                    textShadow: 'none',
+                    filter: 'none'
                   }
                 },
                 '& .MuiInputLabel-root': {
                   color: '#666',
                   fontSize: '0.95rem',
                   fontWeight: 500,
+                  textShadow: 'none',
+                  filter: 'none',
                   '&.Mui-focused': {
                     color: '#228B22',
                     fontWeight: 600
@@ -343,17 +356,18 @@ const Login = ({ onLoginSuccess }) => {
                 mb: 4,
                 '& .MuiOutlinedInput-root': {
                   borderRadius: '16px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                  backgroundColor: '#ffffff',
+                  backdropFilter: 'none',
                   transition: 'all 0.3s ease',
                   '&:hover': {
-                    backgroundColor: 'rgba(255, 255, 255, 1)',
+                    backgroundColor: '#ffffff',
                     '& fieldset': {
                       borderColor: '#228B22',
                       borderWidth: '2px'
                     }
                   },
                   '&.Mui-focused': {
-                    backgroundColor: 'rgba(255, 255, 255, 1)',
+                    backgroundColor: '#ffffff',
                     '& fieldset': {
                       borderColor: '#228B22',
                       borderWidth: '2px'
@@ -362,13 +376,17 @@ const Login = ({ onLoginSuccess }) => {
                   '& input': {
                     color: '#333',
                     fontSize: '1rem',
-                    fontWeight: 500
+                    fontWeight: 500,
+                    textShadow: 'none',
+                    filter: 'none'
                   }
                 },
                 '& .MuiInputLabel-root': {
                   color: '#666',
                   fontSize: '0.95rem',
                   fontWeight: 500,
+                  textShadow: 'none',
+                  filter: 'none',
                   '&.Mui-focused': {
                     color: '#228B22',
                     fontWeight: 600
@@ -462,6 +480,27 @@ const Login = ({ onLoginSuccess }) => {
         @keyframes float {
           0%, 100% { transform: translateY(0px) rotate(0deg); }
           50% { transform: translateY(-25px) rotate(2deg); }
+        }
+        
+        /* Fix for input field blur issues */
+        .MuiTextField-root .MuiOutlinedInput-root {
+          backdrop-filter: none !important;
+          filter: none !important;
+          -webkit-backdrop-filter: none !important;
+        }
+        
+        .MuiTextField-root .MuiOutlinedInput-root input {
+          text-shadow: none !important;
+          filter: none !important;
+          backdrop-filter: none !important;
+          -webkit-backdrop-filter: none !important;
+        }
+        
+        .MuiTextField-root .MuiInputLabel-root {
+          text-shadow: none !important;
+          filter: none !important;
+          backdrop-filter: none !important;
+          -webkit-backdrop-filter: none !important;
         }
       `}</style>
     </Box>

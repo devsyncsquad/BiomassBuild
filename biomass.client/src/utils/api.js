@@ -336,4 +336,16 @@ export const materialRatesApi = {
 // Customer Locations API functions
 export const customerLocationsApi = {
   getLocationsByCustomerId: (customerId) => apiRequest(`/customerlocations/GetLocationsByCustomerId/${customerId}`),
+  getAllLocations: () => apiRequest("/customerlocations/GetAllLocations"),
+  createLocation: (locationData) => apiRequest("/customerlocations/CreateLocation", {
+    method: "POST",
+    body: JSON.stringify(locationData),
+  }),
+  updateLocation: (locationId, locationData) => apiRequest(`/customerlocations/UpdateLocation/${locationId}`, {
+    method: "PUT",
+    body: JSON.stringify(locationData),
+  }),
+  deleteLocation: (locationId) => apiRequest(`/customerlocations/DeleteLocation/${locationId}`, {
+    method: "DELETE",
+  }),
 };

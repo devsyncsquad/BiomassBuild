@@ -395,18 +395,25 @@ const CostCenters = () => {
             >
               Cost Centers
             </Typography>
-            <Typography
-              variant='h6'
-              sx={{
-                color: "white",
-                opacity: 0.9,
-                fontWeight: 300,
-                textShadow: "0 1px 2px rgba(0,0,0,0.1)",
-              }}
-            >
-              Manage your cost center hierarchy and organizational structure
-            </Typography>
+            
           </Box>
+          <Grid item xs={12} md={4} sx={{ textAlign: "right" }}>
+              <Button
+                variant='contained'
+                startIcon={<AddIcon />}
+                onClick={handleAddCostCenter}
+                sx={{
+                  background:
+                    "linear-gradient(135deg, #228B22 0%, #006400 100%)",
+                  "&:hover": {
+                    background:
+                      "linear-gradient(135deg, #006400 0%, #004d00 100%)",
+                  },
+                }}
+              >
+                Add Cost Centers
+              </Button>
+            </Grid>
           {/* <Button
             variant='contained'
             startIcon={<AddIcon />}
@@ -459,7 +466,7 @@ const CostCenters = () => {
       <Card sx={{ mb: 3, boxShadow: 2 }}>
         <CardContent>
           <Grid container spacing={3} alignItems='center'>
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12} md={8}>
               <FormControl fullWidth>
                 <InputLabel>Filter Type</InputLabel>
                 <Select
@@ -479,23 +486,7 @@ const CostCenters = () => {
                 cost centers
               </Typography>
             </Grid>
-            <Grid item xs={12} md={4} sx={{ textAlign: "right" }}>
-              <Button
-                variant='contained'
-                startIcon={<AddIcon />}
-                onClick={handleAddCostCenter}
-                sx={{
-                  background:
-                    "linear-gradient(135deg, #228B22 0%, #006400 100%)",
-                  "&:hover": {
-                    background:
-                      "linear-gradient(135deg, #006400 0%, #004d00 100%)",
-                  },
-                }}
-              >
-                Add Cost Centers
-              </Button>
-            </Grid>
+           
           </Grid>
         </CardContent>
       </Card>
@@ -548,12 +539,10 @@ const CostCenters = () => {
                   {getPaginatedData().map((costCenter) => (
                     <TableRow key={costCenter.costCenterId} hover>
                       <TableCell>
-                        <Chip
-                          label={costCenter.code}
-                          variant='outlined'
-                          color='primary'
-                          size='small'
-                        />
+                        <Typography variant='body2' fontWeight='medium'>
+                          {costCenter.code}
+                        </Typography>
+                        
                       </TableCell>
                       <TableCell>
                         <Typography variant='body2' fontWeight='medium'>

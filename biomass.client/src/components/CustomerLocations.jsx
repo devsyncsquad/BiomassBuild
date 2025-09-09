@@ -421,13 +421,9 @@ const CustomerLocations = ({ customer, onClose }) => {
             gutterBottom
             sx={{ color: "white", fontWeight: "bold" }}
           >
-            Customer Management
+            Customer Location Management
           </Typography>
-          <Typography variant='body1'>
-            {isStandalone
-              ? `Showing ${filteredLocations.length} locations`
-              : `${customer.firstName} ${customer.lastName} - ${customer.company}`}
-          </Typography>
+         
         </Box>
         <Box sx={{ display: "flex", gap: 1 }}>
           <Button

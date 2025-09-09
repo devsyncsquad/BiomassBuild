@@ -728,7 +728,7 @@ const AddUser = ({ userData, setUserData }) => {
                 type='submit'
                 variant='contained'
                 disabled={loading}
-                startIcon={loading ? <CircularProgress size={20} /> : <Save />}
+                //startIcon={loading ? <CircularProgress size={20} /> : <Save />}
                 sx={{
                   bgcolor: "#228B22",
                   borderRadius: "12px",

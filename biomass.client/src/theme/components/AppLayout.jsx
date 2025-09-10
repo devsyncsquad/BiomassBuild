@@ -246,24 +246,8 @@ const AppLayout = ({ children, user, onLogout }) => {
          <Divider sx={{ borderColor: colors.background.sidebarDark, my: 2 }} />
          <Box sx={{ p: 2 }}>
            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-             <Avatar 
-               sx={{ 
-                 width: 32, 
-                 height: 32, 
-                 bgcolor: colors.primary.main,
-                 fontSize: '0.875rem'
-               }}
-             >
-               {user?.name?.charAt(0) || 'U'}
-             </Avatar>
-             <Box sx={{ ml: 2 }}>
-               <Typography variant="body2" sx={{ color: colors.text.inverse, fontWeight: 500 }}>
-                 {user?.name || 'User'}
-               </Typography>
-               <Typography variant="caption" sx={{ color: colors.text.inverse, opacity: 0.7 }}>
-                 {user?.role || 'User'}
-               </Typography>
-             </Box>
+             
+             
            </Box>
          </Box>
       </StyledDrawer>
@@ -274,31 +258,10 @@ const AppLayout = ({ children, user, onLogout }) => {
                  <StyledAppBar position="fixed" open={open}>
           <StyledToolbar>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                onClick={handleDrawerToggle}
-                edge="start"
-                sx={{ mr: 2 }}
-              >
-                <MenuIcon />
-              </IconButton>
+              
               
               {/* Search Bar */}
-              <Box sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                bgcolor: colors.gray[100], 
-                borderRadius: borderRadius.full,
-                px: 2,
-                py: 0.5,
-                minWidth: 300
-              }}>
-                <SearchIcon sx={{ color: colors.text.secondary, mr: 1 }} />
-                <Typography variant="body2" sx={{ color: colors.text.secondary }}>
-                  Search...
-                </Typography>
-              </Box>
+              
             </Box>
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>

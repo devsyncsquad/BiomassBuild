@@ -82,7 +82,7 @@ namespace Biomass.Server.Services
                 // Create AP Ledger entry
                 var apLedgerEntry = new ApLedger
                 {
-                    VendorId = dto.CostCenterSubId ?? 0, // Use CostCenterSubId as vendor_id
+                    VendorId = dto.VendorId, // Use vendor_id
                     HappenedAt = dto.HappenedAt ?? DateTime.UtcNow,
                     EntryKind = "Payment", // Set to "Payment" as requested
                     Amount = dto.Amount ?? 0,

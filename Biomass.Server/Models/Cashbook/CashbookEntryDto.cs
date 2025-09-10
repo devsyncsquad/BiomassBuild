@@ -19,6 +19,7 @@
         public string? MetaJson { get; set; } // Optional JSON string
         public IFormFile? ReceiptFile { get; set; } // PDF or JPG
         public int? DispatchId { get; set; }
+        public int VendorId { get; set; }
 
     }
 }

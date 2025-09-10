@@ -349,3 +349,23 @@ export const customerLocationsApi = {
     method: "DELETE",
   }),
 };
+
+// Lookup API functions
+export const lookupApi = {
+  getAllLookups: () => apiRequest("/lookups/GetAllLookups"),
+  getLookupsByDomain: (domain) => apiRequest("/lookups/by-domain", {
+    method: "POST",
+    body: JSON.stringify({ Domain: domain }),
+  }),
+  createLookup: (lookupData) => apiRequest("/lookups", {
+    method: "POST",
+    body: JSON.stringify(lookupData),
+  }),
+  updateLookup: (id, lookupData) => apiRequest(`/lookups/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(lookupData),
+  }),
+  deleteLookup: (id) => apiRequest(`/lookups/${id}`, {
+    method: "DELETE",
+  }),
+};

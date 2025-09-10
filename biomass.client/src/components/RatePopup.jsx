@@ -38,7 +38,7 @@ import {
   Refresh as RefreshIcon,
   FilterList as FilterIcon,
 } from "@mui/icons-material";
-import { materialRatesApi, customerLocationsApi, customerApi } from "../utils/api";
+import { materialRatesApi, customerLocationsApi, customerApi, lookupApi } from "../utils/api";
 import "./RatePopup.css";
 
 const RatePopup = ({
@@ -58,13 +58,14 @@ const RatePopup = ({
     companyRate: 0,
     transporterRate: 0,
     dieselRate: 0,
-    materialType: "Paper",
+    materialType: "",
     status: "Active",
   });
 
   const [rates, setRates] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [locations, setLocations] = useState([]);
+  const [materialTypes, setMaterialTypes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -85,6 +86,7 @@ const RatePopup = ({
   useEffect(() => {
     if (open) {
       loadCustomers();
+      loadMaterialTypes();
       if (locationId) {
         loadLocationsByCustomer(customerId);
         loadRatesByLocation(locationId);
@@ -124,6 +126,24 @@ const RatePopup = ({
       }
     } catch (error) {
       console.error("Error loading locations:", error);
+    }
+  };
+
+  const loadMaterialTypes = async () => {
+    try {
+      const response = await lookupApi.getLookupsByDomain("MatrialType");
+      if (response.success) {
+        setMaterialTypes(response.result);
+        // Set default material type to first available if not editing
+        if (!isEditing && response.result.length > 0) {
+          setFormData(prev => ({
+            ...prev,
+            materialType: response.result[0].lookupName
+          }));
+        }
+      }
+    } catch (error) {
+      console.error("Error loading material types:", error);
     }
   };
 
@@ -303,7 +323,7 @@ const RatePopup = ({
       companyRate: rate.companyRate,
       transporterRate: rate.transporterRate,
       dieselRate: rate.dieselRate || 0,
-      materialType: rate.materialType || "Paper",
+      materialType: rate.materialType || "",
       status: rate.status,
     });
     setExistingRatesWarning(null);
@@ -318,7 +338,7 @@ const RatePopup = ({
       companyRate: 0,
       transporterRate: 0,
       dieselRate: 0,
-      materialType: "Paper",
+      materialType: "",
       status: "Active",
     });
     setEditingRate(null);
@@ -707,11 +727,11 @@ const RatePopup = ({
                       }
                       label='Material Type'
                     >
-                      <MenuItem value='Paper'>Paper</MenuItem>
-                      <MenuItem value='Plastic'>Plastic</MenuItem>
-                      <MenuItem value='Glass'>Glass</MenuItem>
-                      <MenuItem value='Metal'>Metal</MenuItem>
-                      <MenuItem value='Textile'>Textile</MenuItem>
+                      {materialTypes.map((materialType) => (
+                        <MenuItem key={materialType.lookupId} value={materialType.lookupName}>
+                          {materialType.lookupName}
+                        </MenuItem>
+                      ))}
                     </Select>
                   </FormControl>
                 </Grid>

@@ -76,8 +76,8 @@ const StyledAppBar = styled(AppBar)(({ theme, open }) => ({
 }));
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
-  minHeight: '64px',
-  padding: '0 24px',
+  minHeight: '48px',
+  padding: '0 16px',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
@@ -110,9 +110,10 @@ const StyledListItemText = styled(ListItemText)(({ theme }) => ({
 }));
 
 const StyledBreadcrumbs = styled(Breadcrumbs)(({ theme }) => ({
-  padding: '12px 24px',
+  padding: '8px 16px',
   backgroundColor: colors.background.paper,
   borderBottom: `1px solid ${colors.gray[200]}`,
+  minHeight: '40px',
   '& .MuiBreadcrumbs-ol': {
     alignItems: 'center',
   },
@@ -120,6 +121,7 @@ const StyledBreadcrumbs = styled(Breadcrumbs)(({ theme }) => ({
     '& .MuiLink-root': {
       color: colors.text.secondary,
       textDecoration: 'none',
+      fontSize: '0.875rem',
       '&:hover': {
         color: colors.primary.main,
       },
@@ -259,27 +261,17 @@ const AppLayout = ({ children, user, onLogout }) => {
           <StyledToolbar>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               
-              
-              {/* Search Bar */}
-              
             </Box>
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              {/* Notifications */}
-              <IconButton color="inherit">
-                <Badge badgeContent={3} color="error">
-                  <NotificationsIcon />
-                </Badge>
-              </IconButton>
-
               {/* User Avatar */}
               <IconButton color="inherit" onClick={onLogout}>
                 <Avatar 
                   sx={{ 
-                    width: 32, 
-                    height: 32, 
+                    width: 28, 
+                    height: 28, 
                     bgcolor: colors.primary.main,
-                    fontSize: '0.875rem'
+                    fontSize: '0.75rem'
                   }}
                 >
                   {user?.name?.charAt(0) || 'U'}
@@ -307,7 +299,7 @@ const AppLayout = ({ children, user, onLogout }) => {
 
         {/* Main Content Area */}
                  <MainContent open={open}>
-          <Box sx={{ mt: '128px' }}> {/* Account for fixed topbar + breadcrumbs */}
+          <Box sx={{ mt: '88px' }}> {/* Account for fixed topbar + breadcrumbs (48px + 40px) */}
             {children}
           </Box>
         </MainContent>

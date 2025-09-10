@@ -49,12 +49,14 @@ export const CustomerLocationForm = ({
     dispatchLoadingChargesEnabled: false,
     dispatchChargeType: "Fixed",
     fixedLoaderCost: 5000,
-    variableChargeType: "LoaderPerMaan",
-    variableChargeAmount: 300,
+    dispatchVariableChargeType: "LoaderPerMaan",
+    dispatchVariableChargeAmount: 300,
     // Labour Charges
     laborChargesEnabled: false,
     laborChargeType: "Fixed",
     laborChargesCost: 3500,
+    laborVariableChargeType: "LaborPerMonth",
+    laborVariableChargeAmount: 300,
     // Vendor Configuration
     defaultBucket: null,
     laborVendor: null,
@@ -159,12 +161,14 @@ export const CustomerLocationForm = ({
         dispatchLoadingChargesEnabled: false,
         dispatchChargeType: "Fixed",
         fixedLoaderCost: 5000,
-        variableChargeType: "LoaderPerMaan",
-        variableChargeAmount: 300,
+        dispatchVariableChargeType: "LoaderPerMaan",
+        dispatchVariableChargeAmount: 300,
         // Labour Charges
         laborChargesEnabled: false,
         laborChargeType: "Fixed",
         laborChargesCost: 3500,
+        laborVariableChargeType: "LaborPerMonth",
+        laborVariableChargeAmount: 300,
         // Vendor Configuration
         defaultBucket: null,
         laborVendor: null,
@@ -260,9 +264,9 @@ export const CustomerLocationForm = ({
         FixedLoaderCost: formData.fixedLoaderCost
           ? parseFloat(formData.fixedLoaderCost)
           : null,
-        VariableChargeType: formData.variableChargeType,
-        VariableChargeAmount: formData.variableChargeAmount
-          ? parseFloat(formData.variableChargeAmount)
+        VariableChargeType: formData.dispatchVariableChargeType,
+        VariableChargeAmount: formData.dispatchVariableChargeAmount
+          ? parseFloat(formData.dispatchVariableChargeAmount)
           : null,
         LaborChargesEnabled: Boolean(formData.laborChargesEnabled),
         LaborChargeType: formData.laborChargeType,
@@ -379,14 +383,12 @@ export const CustomerLocationForm = ({
 
       <DialogContent sx={{ p: 3 }}>
         {/* Customer Location Information Section */}
-        <Box sx={{ mb: 3 }}>
-          <Typography variant='h6' gutterBottom>
-            Customer Location Information
-          </Typography>
+        <Box sx={{ mt: 3 }}>
          
 
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
+            {/* First Row: Customer Name, Location/City, Location Code, Center Dispatch Weight Limit */}
+            <Grid item xs={12} sm={6} md={3}>
               {customerId ? (
                 // Show read-only customer name when customerId is provided
                 <TextField
@@ -404,7 +406,6 @@ export const CustomerLocationForm = ({
                       },
                     },
                   }}
-                  helperText='Customer name is read-only and will be saved with the location'
                 />
               ) : (
                 // Show customer dropdown when no customerId is provided
@@ -442,6 +443,78 @@ export const CustomerLocationForm = ({
                 </FormControl>
               )}
             </Grid>
+
+            <Grid item xs={12} sm={6} md={3}>
+              <TextField
+                fullWidth
+                label='Location/City Name'
+                placeholder='Name'
+                value={formData.locationName}
+                onChange={(e) =>
+                  handleInputChange("locationName", e.target.value)
+                }
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={3}>
+              <TextField
+                fullWidth
+                label='Location Code'
+                placeholder='HJ01'
+                value={formData.locationCode}
+                onChange={(e) =>
+                  handleInputChange("locationCode", e.target.value)
+                }
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={3}>
+              <TextField
+                fullWidth
+                label='Center Dispatch Weight Limit (kg)'
+                type='number'
+                value={formData.centerDispatchWeightLimit}
+                onChange={(e) =>
+                  handleInputChange(
+                    "centerDispatchWeightLimit",
+                    parseFloat(e.target.value)
+                  )
+                }
+              />
+            </Grid>
+
+            {/* Second Row: Advance Percentage and Location Address */}
+            <Grid item xs={12} sm={6} md={4}>
+              <TextField
+                fullWidth
+                label='Advance Percentage allowed'
+                type='number'
+                value={formData.advancePercentageAllowed}
+                onChange={(e) =>
+                  handleInputChange(
+                    "advancePercentageAllowed",
+                    parseFloat(e.target.value)
+                  )
+                }
+                InputProps={{
+                  endAdornment: <Typography variant='body2'>%</Typography>,
+                }}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={8}>
+              <TextField
+                fullWidth
+                label='Location Address'
+                placeholder='Hujra Shah'
+                multiline
+                rows={1}
+                value={formData.address}
+                onChange={(e) => handleInputChange("address", e.target.value)}
+              />
+            </Grid>
           </Grid>
         </Box>
 
@@ -461,83 +534,6 @@ export const CustomerLocationForm = ({
           </Box>
 
           <Grid container spacing={3}>
-            {/* Location Details */}
-            <Grid item xs={12}>
-              <Typography variant='subtitle1' fontWeight='bold' gutterBottom>
-                Location Details
-              </Typography>
-            </Grid>
-
-            <Grid item xs={12} sm={6} md={4}>
-              <TextField
-                fullWidth
-                label='Location/City Name'
-                placeholder='Name'
-                value={formData.locationName}
-                onChange={(e) =>
-                  handleInputChange("locationName", e.target.value)
-                }
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6} md={4}>
-              <TextField
-                fullWidth
-                label='Location Code'
-                placeholder='HJ01'
-                value={formData.locationCode}
-                onChange={(e) =>
-                  handleInputChange("locationCode", e.target.value)
-                }
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6} md={4}>
-              <TextField
-                fullWidth
-                label='Center Dispatch Weight Limit (kg)'
-                type='number'
-                value={formData.centerDispatchWeightLimit}
-                onChange={(e) =>
-                  handleInputChange(
-                    "centerDispatchWeightLimit",
-                    parseFloat(e.target.value)
-                  )
-                }
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6} md={4}>
-              <TextField
-                fullWidth
-                label='Advance Percentage allowed'
-                type='number'
-                value={formData.advancePercentageAllowed}
-                onChange={(e) =>
-                  handleInputChange(
-                    "advancePercentageAllowed",
-                    parseFloat(e.target.value)
-                  )
-                }
-                InputProps={{
-                  endAdornment: <Typography variant='body2'>%</Typography>,
-                }}
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label='Location Address'
-                placeholder='Hujra Shah'
-                multiline
-                rows={2}
-                value={formData.address}
-                onChange={(e) => handleInputChange("address", e.target.value)}
-              />
-            </Grid>
 
             {/* Tolerance and Penalty */}
             <Grid item xs={12}>
@@ -671,7 +667,7 @@ export const CustomerLocationForm = ({
             </Grid>
 
             {/* Dispatch Loading Charges */}
-            <Grid item xs={12} sm={6} md={4}>
+            <Grid item xs={12} sm={6} md={3}>
               <Box
                 sx={{
                   border: "1px solid #e0e0e0",
@@ -755,10 +751,10 @@ export const CustomerLocationForm = ({
                       <Box sx={{ mt: 1 }}>
                         <FormControl size='small' fullWidth sx={{ mb: 1 }}>
                           <Select
-                            value={formData.variableChargeType}
+                            value={formData.dispatchVariableChargeType}
                             onChange={(e) =>
                               handleInputChange(
-                                "variableChargeType",
+                                "dispatchVariableChargeType",
                                 e.target.value
                               )
                             }
@@ -777,10 +773,10 @@ export const CustomerLocationForm = ({
                           size='small'
                           label='Variable Amount'
                           type='number'
-                          value={formData.variableChargeAmount}
+                          value={formData.dispatchVariableChargeAmount}
                           onChange={(e) =>
                             handleInputChange(
-                              "variableChargeAmount",
+                              "dispatchVariableChargeAmount",
                               parseFloat(e.target.value)
                             )
                           }
@@ -793,7 +789,7 @@ export const CustomerLocationForm = ({
             </Grid>
 
             {/* Labour Charges */}
-            <Grid item xs={12} sm={6} md={4}>
+            <Grid item xs={12} sm={6} md={3}>
               <Box
                 sx={{
                   border: "1px solid #e0e0e0",
@@ -868,10 +864,10 @@ export const CustomerLocationForm = ({
                       <Box sx={{ mt: 1 }}>
                         <FormControl size='small' fullWidth sx={{ mb: 1 }}>
                           <Select
-                            value={formData.variableChargeType}
+                            value={formData.laborVariableChargeType}
                             onChange={(e) =>
                               handleInputChange(
-                                "variableChargeType",
+                                "laborVariableChargeType",
                                 e.target.value
                               )
                             }
@@ -890,10 +886,10 @@ export const CustomerLocationForm = ({
                           size='small'
                           label='Variable Amount'
                           type='number'
-                          value={formData.variableChargeAmount}
+                          value={formData.laborVariableChargeAmount}
                           onChange={(e) =>
                             handleInputChange(
-                              "variableChargeAmount",
+                              "laborVariableChargeAmount",
                               parseFloat(e.target.value)
                             )
                           }
@@ -908,7 +904,7 @@ export const CustomerLocationForm = ({
             
 
             {/* Receiving Unloading Cost */}
-            <Grid item xs={12} sm={6} md={4}>
+            <Grid item xs={12} sm={6} md={3}>
               <Box
                 sx={{
                   border: "1px solid #e0e0e0",
@@ -1030,7 +1026,7 @@ export const CustomerLocationForm = ({
             </Grid>
 
             {/* Vendor Configuration */}
-            <Grid item xs={12} sm={6} md={4}>
+            <Grid item xs={12} sm={6} md={3}>
               <Box
                 sx={{
                   border: "1px solid #e0e0e0",

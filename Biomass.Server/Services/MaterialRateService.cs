@@ -378,7 +378,8 @@ namespace Biomass.Server.Services
                         CreatedOn = x.mr.CreatedOn,
                         CustomerName = x.c.CompanyName ?? $"{x.c.FirstName} {x.c.LastName}",
                         LocationName = x.cl.LocationName,
-                        LocationCode = x.cl.LocationCode
+                        LocationCode = x.cl.LocationCode,
+                        MaterialId=x.mr.MaterialId ?? 0 // Handle null MaterialId
                     })
                     .ToListAsync();
 

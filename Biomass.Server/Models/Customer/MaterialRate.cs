@@ -46,6 +46,11 @@ namespace Biomass.Server.Models.Customer
         [Column("createdon")]
         public DateTime CreatedOn { get; set; }
 
+        [Column("material_id")]
+        [StringLength(100)]
+        public int? MaterialId { get; set; }
+
+
         // Navigation properties - but don't create foreign key constraints if they don't exist
         [ForeignKey(nameof(CustomerId))]
         public virtual Customer Customer { get; set; } = null!;
@@ -71,6 +76,8 @@ namespace Biomass.Server.Models.Customer
         public string CustomerName { get; set; } = string.Empty;
         public string LocationName { get; set; } = string.Empty;
         public string LocationCode { get; set; } = string.Empty;
+
+        public int MaterialId { get; set; }
     }
 
     public abstract class MaterialRateRequestBase

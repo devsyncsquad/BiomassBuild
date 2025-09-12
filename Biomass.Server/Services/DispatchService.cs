@@ -1,6 +1,7 @@
 using Biomass.Server.Data;
 using Biomass.Server.Interfaces;
 using Biomass.Server.Models;
+using Biomass.Server.Models.Customer;
 using Biomass.Server.Models.Dispatch;
 using Biomass.Server.Models.Vehicle;
 using Biomass.Server.Models.Vendor;
@@ -19,23 +20,19 @@ namespace Biomass.Server.Services
 
         public async Task<List<DispatchDto>> GetDispatchesAsync()
         {
-            var dispatches = await _context.Dispatches
-                .Include(d => d.Vehicle)
-                .Include(d => d.Location)
+            var dispatches = await _context.VDispatches
                 .OrderByDescending(d => d.CreatedOn)
                 .ToListAsync();
 
-            return dispatches.Select(MapToDto).ToList();
+            return dispatches.Select(MapToDtoFromView).ToList();
         }
 
         public async Task<DispatchDto?> GetDispatchByIdAsync(int id)
         {
-            var dispatch = await _context.Dispatches
-                .Include(d => d.Vehicle)
-                .Include(d => d.Location)
+            var dispatch = await _context.VDispatches
                 .FirstOrDefaultAsync(d => d.DispatchId == id);
 
-            return dispatch != null ? MapToDto(dispatch) : null;
+            return dispatch != null ? MapToDtoFromView(dispatch) : null;
         }
 
         public async Task<int> CreateDispatchAsync(CreateDispatchRequest request)
@@ -263,14 +260,62 @@ namespace Biomass.Server.Services
             }
 
             // Step 3: Get dispatches for those locations with status filter
-            var dispatches = await _context.Dispatches
-                .Include(d => d.Vehicle)
-                .Include(d => d.Location)
+            var dispatches = await _context.VDispatches
                 .Where(d => locationIds.Contains(d.LocationId) && d.Status == status)
                 .OrderByDescending(d => d.CreatedOn)
                 .ToListAsync();
 
-            return dispatches.Select(MapToDto).ToList();
+            return dispatches.Select(MapToDtoFromView).ToList();
+        }
+
+        private static DispatchDto MapToDtoFromView(VDispatchDto vDispatch)
+        {
+            return new DispatchDto
+            {
+                DispatchId = vDispatch.DispatchId,
+                VehicleId = vDispatch.VehicleId,
+                LocationId = vDispatch.LocationId,
+                MaterialType = vDispatch.MaterialType,
+                MaterialRate = vDispatch.MaterialRate,
+                SlipNumber = vDispatch.SlipNumber,
+                SlipPicture = vDispatch.SlipPicture,
+                FirstWeight = vDispatch.FirstWeight,
+                SecondWeight = vDispatch.SecondWeight,
+                NetWeight = vDispatch.NetWeight,
+                LoaderCharges = vDispatch.LoaderCharges,
+                LoaderChargesAuto = vDispatch.LoaderChargesAuto,
+                LoaderChargesType = vDispatch.LoaderChargesType,
+                LaborCharges = vDispatch.LaborCharges,
+                LaborChargesAuto = vDispatch.LaborChargesAuto,
+                LaborChargesType = vDispatch.LaborChargesType,
+                TransporterRate = vDispatch.TransporterRate,
+                TransporterRateAuto = vDispatch.TransporterRateAuto,
+                TransporterChargesType = vDispatch.TransporterChargesType,
+                Amount = vDispatch.Amount,
+                TotalDeduction = vDispatch.TotalDeduction,
+                CreatedBy = vDispatch.CreatedBy,
+                CreatedOn = vDispatch.CreatedOn,
+                Status = vDispatch.Status,
+                PayableWeight = vDispatch.PayableWeight,
+                BucketVendorId = vDispatch.BucketVendorId,
+                LabourVendorId = vDispatch.LabourVendorId,
+                Vehicle = new VehicleDto
+                {
+                    VehicleId = vDispatch.VehicleId,
+                    VehicleNumber = vDispatch.VehicleNumber,
+                    CostCenterId = vDispatch.CostCenterId
+                },
+                Location = new CustomerLocation
+                {
+                    LocationId = vDispatch.LocationId,
+                    LocationName = vDispatch.LocationName ?? string.Empty,
+                    ToleranceLimitKg = vDispatch.ToleranceLimitKg,
+                    ToleranceLimitPercentage = vDispatch.ToleranceLimitPercentage,
+                    AdvancePercentageAllowed = vDispatch.AdvancePercentageAllowed,
+                    CenterDispatchWeightLimit = vDispatch.CenterDispatchWeightLimit,
+                    MaterialPenaltyRatePerKg = vDispatch.MaterialPenaltyRatePerKg
+                }
+            };
         }
 
         private static DispatchDto MapToDto(Dispatch dispatch)
@@ -304,6 +349,8 @@ namespace Biomass.Server.Services
                 PayableWeight = dispatch.PayableWeight,
                 MaterialId = dispatch.MaterialId,
                 TransporterVendorId = dispatch.TransporterVendorId,
+                BucketVendorId = dispatch.BucketVendorId,
+                LabourVendorId = dispatch.LabourVendorId,
                 BucketRatePerMund = dispatch.BucketRatePerMund,
                 LaborRatePerMund = dispatch.LaborRatePerMund,
                 TransporterRatePerMund = dispatch.TransporterRatePerMund,

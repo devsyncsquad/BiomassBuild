@@ -33,6 +33,8 @@ namespace Biomass.Server.Models.Dispatch
         public int? PayableWeight { get; set; }
         public int? MaterialId { get; set; }
         public int? TransporterVendorId { get; set; }
+        public int? BucketVendorId { get; set; }
+        public int? LabourVendorId { get; set; }
         public decimal? BucketRatePerMund { get; set; }
         public decimal? LaborRatePerMund { get; set; }
         public decimal? TransporterRatePerMund { get; set; }

@@ -594,9 +594,43 @@ namespace Biomass.Server.Services
 			return $"/uploads/cashbook_receipts/{fileName}";
 		}
 
-        public Task<ServiceResponse<CashbookDto>> UpdateCashbookStatusAsync(long cashId, string newStatus)
+        public async Task<ServiceResponse<CashbookDto>> UpdateCashbookStatusAsync(long cashId, string newStatus)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var data = _db.Cashbooks.FirstOrDefault(x => x.CashId == cashId);
+                if (data == null)
+                {
+                    return new ServiceResponse<CashbookDto>
+                    {
+                        Success = false,
+                        Message = "Cashbook entry not found"
+                    };
+                }
+
+                data.Status = newStatus;
+                await _db.SaveChangesAsync();
+
+                return new ServiceResponse<CashbookDto>
+                {
+                    Success = true,
+                    Message = "Status updated successfully",
+                    //Data = new CashbookDto
+                    //{
+                    //    CashId = data.CashId,
+                    //    Status = data.Status,
+                    //    // Add other properties as needed
+                    //}
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse<CashbookDto>
+                {
+                    Success = false,
+                    Message = $"Error updating status: {ex.Message}"
+                };
+            }
         }
     }
 }

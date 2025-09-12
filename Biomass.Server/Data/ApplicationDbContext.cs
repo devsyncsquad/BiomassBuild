@@ -50,6 +50,7 @@ namespace Biomass.Server.Data
         public DbSet<Cashbook> Cashbooks { get; set; }
         public DbSet<MoneyAccount> MoneyAccounts { get; set; }
         public DbSet<Dispatch> Dispatches { get; set; }
+        public DbSet<DispatchReceipt> DispatchReceipts { get; set; }
         public DbSet<ApLedger> ApLedgers { get; set; }
         public DbSet<VLocationDto> VLocations { get; set; }
         public DbSet<VDispatchDto> VDispatches { get; set; }
@@ -566,6 +567,54 @@ namespace Biomass.Server.Data
                       .WithMany()
                       .HasForeignKey(d => d.TransporterVendorId)
                       .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // Configure DispatchReceipt entity
+            modelBuilder.Entity<DispatchReceipt>(entity =>
+            {
+                entity.ToTable("dispatch_receipts");
+                entity.HasKey(e => e.ReceiptId);
+                entity.Property(e => e.ReceiptId).HasColumnName("receipt_id");
+                entity.Property(e => e.DispatchId).HasColumnName("dispatchid").IsRequired();
+                entity.Property(e => e.VendorId).HasColumnName("vendor_id").IsRequired();
+                entity.Property(e => e.VehicleId).HasColumnName("vehicle_id");
+                entity.Property(e => e.SlipNumber).HasColumnName("slip_number").HasMaxLength(100);
+                entity.Property(e => e.SlipImageUrl).HasColumnName("slip_image_url").HasMaxLength(500);
+                entity.Property(e => e.WeightGross).HasColumnName("weight_gross").HasColumnType("numeric(18,3)");
+                entity.Property(e => e.WeightTare).HasColumnName("weight_tare").HasColumnType("numeric(18,3)");
+                entity.Property(e => e.WeightNet).HasColumnName("weight_net").HasColumnType("numeric(18,3)");
+                entity.Property(e => e.MaterialTypeId).HasColumnName("material_type_id");
+                entity.Property(e => e.MaterialRate).HasColumnName("material_rate").HasColumnType("numeric(18,4)");
+                entity.Property(e => e.AmountGross).HasColumnName("amount_gross").HasColumnType("numeric(18,2)");
+                entity.Property(e => e.PenaltyAmount).HasColumnName("penalty_amount").HasColumnType("numeric(18,2)").HasDefaultValue(0);
+                entity.Property(e => e.OtherDeduction).HasColumnName("other_deduction").HasColumnType("numeric(18,2)").HasDefaultValue(0);
+                entity.Property(e => e.AdvancesApplied).HasColumnName("advances_applied").HasColumnType("numeric(18,2)").HasDefaultValue(0);
+                entity.Property(e => e.AmountPayable).HasColumnName("amount_payable").HasColumnType("numeric(18,2)");
+                entity.Property(e => e.Remarks).HasColumnName("remarks").HasMaxLength(500);
+                entity.Property(e => e.Status).HasColumnName("status").IsRequired().HasMaxLength(20).HasDefaultValue("Draft");
+                entity.Property(e => e.CreatedBy).HasColumnName("created_by");
+                entity.Property(e => e.CreatedAt).HasColumnName("created_at").IsRequired().HasDefaultValueSql("now()");
+                entity.Property(e => e.PostedAt).HasColumnName("posted_at");
+                entity.Property(e => e.FilesUrl).HasColumnName("files_url").HasMaxLength(500);
+
+                // Configure foreign key relationships
+                entity.HasOne(dr => dr.Dispatch)
+                      .WithMany()
+                      .HasForeignKey(dr => dr.DispatchId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(dr => dr.Vendor)
+                      .WithMany()
+                      .HasForeignKey(dr => dr.VendorId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(dr => dr.Vehicle)
+                      .WithMany()
+                      .HasForeignKey(dr => dr.VehicleId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                // Add status constraint
+                entity.HasCheckConstraint("dispatch_receipts_status_check", "status IN ('Draft', 'Posted', 'Voided')");
             });
 
             // Configure ApLedger entity

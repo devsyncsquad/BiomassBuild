@@ -36,6 +36,7 @@ namespace Biomass.Server.Services
                         DieselRate = x.mr.DieselRate,
                         Route = x.mr.Route,
                         MaterialType = x.mr.MaterialType,
+                        MaterialId = x.mr.MaterialId ?? 0,
                         Status = x.mr.Status,
                         CreatedBy = x.mr.CreatedBy,
                         CreatedOn = x.mr.CreatedOn,
@@ -80,6 +81,7 @@ namespace Biomass.Server.Services
                         DieselRate = x.mr.DieselRate,
                         Route = x.mr.Route,
                         MaterialType = x.mr.MaterialType,
+                        MaterialId = x.mr.MaterialId ?? 0,
                         Status = x.mr.Status,
                         CreatedBy = x.mr.CreatedBy,
                         CreatedOn = x.mr.CreatedOn,
@@ -123,6 +125,7 @@ namespace Biomass.Server.Services
                         DieselRate = x.mr.DieselRate,
                         Route = x.mr.Route,
                         MaterialType = x.mr.MaterialType,
+                        MaterialId = x.mr.MaterialId ?? 0,
                         Status = x.mr.Status,
                         CreatedBy = x.mr.CreatedBy,
                         CreatedOn = x.mr.CreatedOn,
@@ -161,6 +164,20 @@ namespace Biomass.Server.Services
                 // First, deactivate any existing active rates for the same customer, location, and material type
                 await DeactivateExistingRatesAsync(request.CustomerId, request.LocationId, request.MaterialType, request.EffectiveDate);
 
+                // Look up MaterialId from lookups table if MaterialType is provided
+                int? materialId = null;
+                if (!string.IsNullOrEmpty(request.MaterialType))
+                {
+                    var lookup = await _context.Lookups
+                        .FirstOrDefaultAsync(l => l.LookupName == request.MaterialType && 
+                                                 l.LookupDomain == "MaterialType" && 
+                                                 l.Enabled);
+                    materialId = lookup?.LookupId;
+                }
+
+                // Use provided MaterialId or the one found from lookup
+                materialId = request.MaterialId ?? materialId;
+
                 var materialRate = new MaterialRate
                 {
                     CustomerId = request.CustomerId,
@@ -171,6 +188,7 @@ namespace Biomass.Server.Services
                     DieselRate = request.DieselRate,
                     Route = request.Route ?? "", // Handle null route
                     MaterialType = request.MaterialType,
+                    MaterialId = materialId,
                     Status = "Active",
                     CreatedBy = 1, // TODO: Get from current user context
                     CreatedOn = DateTime.UtcNow
@@ -190,9 +208,10 @@ namespace Biomass.Server.Services
                         EffectiveDate = mr.EffectiveDate,
                         CompanyRate = mr.CompanyRate,
                         TransporterRate = mr.TransporterRate,
-                     
+                        DieselRate = mr.DieselRate,
                         Route = mr.Route,
                         MaterialType = mr.MaterialType,
+                        MaterialId = mr.MaterialId ?? 0,
                         Status = mr.Status,
                         CreatedBy = mr.CreatedBy,
                         CreatedOn = mr.CreatedOn,
@@ -254,6 +273,7 @@ namespace Biomass.Server.Services
                        
                         Route = mr.Route,
                         MaterialType = mr.MaterialType,
+                        MaterialId = mr.MaterialId ?? 0,
                         Status = mr.Status,
                         CreatedBy = mr.CreatedBy,
                         CreatedOn = mr.CreatedOn,
@@ -329,6 +349,7 @@ namespace Biomass.Server.Services
                        
                         Route = mr.Route,
                         MaterialType = mr.MaterialType,
+                        MaterialId = mr.MaterialId ?? 0,
                         Status = mr.Status,
                         CreatedBy = mr.CreatedBy,
                         CreatedOn = mr.CreatedOn,
@@ -373,13 +394,14 @@ namespace Biomass.Server.Services
                         DieselRate = x.mr.DieselRate,
                         Route = x.mr.Route,
                         MaterialType = x.mr.MaterialType,
+                        MaterialId = x.mr.MaterialId ?? 0,
                         Status = x.mr.Status,
                         CreatedBy = x.mr.CreatedBy,
                         CreatedOn = x.mr.CreatedOn,
                         CustomerName = x.c.CompanyName ?? $"{x.c.FirstName} {x.c.LastName}",
                         LocationName = x.cl.LocationName,
                         LocationCode = x.cl.LocationCode,
-                        MaterialId=x.mr.MaterialId ?? 0 // Handle null MaterialId
+                        //MaterialId = x.mr.MaterialId ?? 0 // Handle null MaterialId
                     })
                     .ToListAsync();
 
@@ -422,6 +444,7 @@ namespace Biomass.Server.Services
                         DieselRate = x.mr.DieselRate,
                         Route = x.mr.Route,
                         MaterialType = x.mr.MaterialType,
+                        MaterialId = x.mr.MaterialId ?? 0,
                         Status = x.mr.Status,
                         CreatedBy = x.mr.CreatedBy,
                         CreatedOn = x.mr.CreatedOn,

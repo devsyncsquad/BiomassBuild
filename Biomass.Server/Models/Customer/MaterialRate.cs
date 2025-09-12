@@ -104,6 +104,8 @@ namespace Biomass.Server.Models.Customer
         
         [Required]
         public string? EffectiveDate { get; set; }
+
+        public int? MaterialId { get; set; }
     }
 
     public class UpdateMaterialRateRequest : MaterialRateRequestBase

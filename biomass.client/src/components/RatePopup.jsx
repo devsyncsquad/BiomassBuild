@@ -59,6 +59,7 @@ const RatePopup = ({
     transporterRate: 0,
     dieselRate: 0,
     materialType: "",
+    materialId: null,
     status: "Active",
   });
 
@@ -131,14 +132,15 @@ const RatePopup = ({
 
   const loadMaterialTypes = async () => {
     try {
-      const response = await lookupApi.getLookupsByDomain("MatrialType");
+      const response = await lookupApi.getLookupsByDomain("MaterialType");
       if (response.success) {
         setMaterialTypes(response.result);
         // Set default material type to first available if not editing
         if (!isEditing && response.result.length > 0) {
           setFormData(prev => ({
             ...prev,
-            materialType: response.result[0].lookupName
+            materialType: response.result[0].lookupName,
+            materialId: response.result[0].lookupId
           }));
         }
       }
@@ -259,6 +261,7 @@ const RatePopup = ({
         TransporterRate: parseFloat(formData.transporterRate),
         DieselRate: formData.dieselRate ? parseFloat(formData.dieselRate) : null,
         MaterialType: formData.materialType,
+        MaterialId: formData.materialId,
       };
 
       const data = isEditing
@@ -324,6 +327,7 @@ const RatePopup = ({
       transporterRate: rate.transporterRate,
       dieselRate: rate.dieselRate || 0,
       materialType: rate.materialType || "",
+      materialId: rate.materialId || null,
       status: rate.status,
     });
     setExistingRatesWarning(null);
@@ -339,6 +343,7 @@ const RatePopup = ({
       transporterRate: 0,
       dieselRate: 0,
       materialType: "",
+      materialId: null,
       status: "Active",
     });
     setEditingRate(null);
@@ -722,9 +727,13 @@ const RatePopup = ({
                     <InputLabel>Material Type</InputLabel>
                     <Select
                       value={formData.materialType}
-                      onChange={(e) =>
-                        handleInputChange("materialType", e.target.value)
-                      }
+                      onChange={(e) => {
+                        const selectedMaterial = materialTypes.find(mt => mt.lookupName === e.target.value);
+                        handleInputChange("materialType", e.target.value);
+                        if (selectedMaterial) {
+                          handleInputChange("materialId", selectedMaterial.lookupId);
+                        }
+                      }}
                       label='Material Type'
                     >
                       {materialTypes.map((materialType) => (

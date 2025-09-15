@@ -66,8 +66,8 @@ namespace Biomass.Server.Services
                     }
                 }
 
-                // Calculate PayableWeightMund based on NetWeight
-                var payableWeightMund = request.PayableWeight > 0 ? Math.Floor(request.PayableWeight / 40) : 0;
+                // Calculate PayableWeightMund based on PayableWeight
+                var payableWeightMund = request.PayableWeight.HasValue && request.PayableWeight > 0 ? Math.Floor((decimal)request.PayableWeight.Value / 40) : 0;
 
                 // Create the dispatch record
                 var dispatch = new Dispatch
@@ -197,8 +197,8 @@ namespace Biomass.Server.Services
 
             if (dispatch == null) return null;
 
-            // Calculate PayableWeightMund based on NetWeight
-            var payableWeightMund = request.NetWeight.HasValue && request.NetWeight > 0 ? Math.Floor(request.NetWeight.Value / 40) : 0;
+            // Calculate PayableWeightMund based on PayableWeight
+            var payableWeightMund = request.PayableWeight.HasValue && request.PayableWeight > 0 ? Math.Floor((decimal)request.PayableWeight.Value / 40) : 0;
 
             dispatch.VehicleId = request.VehicleId;
             dispatch.LocationId = request.LocationId;

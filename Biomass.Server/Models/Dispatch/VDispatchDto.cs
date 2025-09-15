@@ -122,5 +122,7 @@ namespace Biomass.Server.Models.Dispatch
         
         [Column("material_penalty_rateperkg")]
         public decimal? MaterialPenaltyRatePerKg { get; set; }
+
+
     }
 }

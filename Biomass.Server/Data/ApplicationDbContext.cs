@@ -534,6 +534,7 @@ namespace Biomass.Server.Data
                 entity.Property(e => e.CreatedOn).HasColumnName("createdon");
                 entity.Property(e => e.Status).HasColumnName("status").HasMaxLength(20);
                 entity.Property(e => e.PayableWeight).HasColumnName("payable_weight");
+                entity.Property(e => e.PayableWeightMund).HasColumnName("payable_weight_mund").HasColumnType("numeric(18,2)");
                 entity.Property(e => e.BucketVendorId).HasColumnName("bucket_vendor_id");
                 entity.Property(e => e.LabourVendorId).HasColumnName("labour_vendor_id");
                 entity.Property(e => e.MaterialId).HasColumnName("material_id");

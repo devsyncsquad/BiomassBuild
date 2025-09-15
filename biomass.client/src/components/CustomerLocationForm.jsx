@@ -48,6 +48,7 @@ export const CustomerLocationForm = ({
     materialPenaltyRatePerKg: 9,
     dispatchLoadingChargesEnabled: false,
     dispatchChargeType: "Fixed",
+    centerEnabled: true,
     fixedLoaderCost: 5000,
     dispatchVariableChargeType: "LoaderPerMaan",
     dispatchVariableChargeAmount: 300,
@@ -140,6 +141,7 @@ export const CustomerLocationForm = ({
         customerName: locationData.customerName || "",
         toleranceLimitPercentage: locationData.toleranceLimitPercentage || 0,
         toleranceLimitKg: locationData.toleranceLimitKg || 0,
+        centerEnabled: locationData.centerDispatchWeightLimit > 0,
       });
       setIsEditing(true);
       console.log("Setting form to EDIT mode for existing location");
@@ -160,6 +162,7 @@ export const CustomerLocationForm = ({
         materialPenaltyRatePerKg: 9,
         dispatchLoadingChargesEnabled: false,
         dispatchChargeType: "Fixed",
+        centerEnabled: true,
         fixedLoaderCost: 5000,
         dispatchVariableChargeType: "LoaderPerMaan",
         dispatchVariableChargeAmount: 300,
@@ -187,6 +190,14 @@ export const CustomerLocationForm = ({
     setFormData((prev) => ({
       ...prev,
       [field]: value,
+    }));
+  };
+
+  const handleCenterToggle = (checked) => {
+    setFormData((prev) => ({
+      ...prev,
+      centerEnabled: checked,
+      centerDispatchWeightLimit: checked ? prev.centerDispatchWeightLimit : 0,
     }));
   };
 
@@ -457,36 +468,44 @@ export const CustomerLocationForm = ({
               />
             </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
-              <TextField
-                fullWidth
-                label='Location Code'
-                placeholder='HJ01'
-                value={formData.locationCode}
-                onChange={(e) =>
-                  handleInputChange("locationCode", e.target.value)
-                }
-                required
-              />
-            </Grid>
+            
 
-            <Grid item xs={12} sm={6} md={3}>
-              <TextField
-                fullWidth
-                label='Center Dispatch Weight Limit (kg)'
-                type='number'
-                value={formData.centerDispatchWeightLimit}
-                onChange={(e) =>
-                  handleInputChange(
-                    "centerDispatchWeightLimit",
-                    parseFloat(e.target.value)
-                  )
-                }
-              />
+            <Grid item xs={12} sm={6} md={6}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={formData.centerEnabled}
+                      onChange={(e) => handleCenterToggle(e.target.checked)}
+                      color="primary"
+                    />
+                  }
+                  label={
+                    <Typography variant="body2" color="text.secondary">
+                      Center Enabled
+                    </Typography>
+                  }
+                />
+                <TextField
+                  fullWidth
+                  label='Center Dispatch Weight Limit (kg)'
+                  type='number'
+                  value={formData.centerDispatchWeightLimit}
+                  onChange={(e) =>
+                    handleInputChange(
+                      "centerDispatchWeightLimit",
+                      parseFloat(e.target.value)
+                    )
+                  }
+                  disabled={!formData.centerEnabled}
+                  helperText={!formData.centerEnabled ? "Center is disabled - weight limit set to 0" : ""}
+                  size="small"
+                />
+              </Box>
             </Grid>
 
             {/* Second Row: Advance Percentage and Location Address */}
-            <Grid item xs={12} sm={6} md={4}>
+            <Grid item xs={12} sm={6} md={3}>
               <TextField
                 fullWidth
                 label='Advance Percentage allowed'
@@ -503,8 +522,19 @@ export const CustomerLocationForm = ({
                 }}
               />
             </Grid>
-
-            <Grid item xs={12} sm={6} md={8}>
+            <Grid item xs={12} sm={6} md={3}>
+              <TextField
+                fullWidth
+                label='Location Code'
+                placeholder='HJ01'
+                value={formData.locationCode}
+                onChange={(e) =>
+                  handleInputChange("locationCode", e.target.value)
+                }
+                required
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={6}>
               <TextField
                 fullWidth
                 label='Location Address'

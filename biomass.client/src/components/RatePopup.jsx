@@ -132,7 +132,7 @@ const RatePopup = ({
 
   const loadMaterialTypes = async () => {
     try {
-      const response = await lookupApi.getLookupsByDomain("MaterialType");
+      const response = await lookupApi.getLookupsByDomain("MatrialType");
       if (response.success) {
         setMaterialTypes(response.result);
         // Set default material type to first available if not editing

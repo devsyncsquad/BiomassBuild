@@ -31,6 +31,7 @@ namespace Biomass.Server.Models.Dispatch
         public DateTime CreatedOn { get; set; }
         public string? Status { get; set; }
         public int? PayableWeight { get; set; }
+        public decimal? PayableWeightMund { get; set; }
         public int? MaterialId { get; set; }
         public int? TransporterVendorId { get; set; }
         public int? BucketVendorId { get; set; }
@@ -117,6 +118,8 @@ namespace Biomass.Server.Models.Dispatch
 
         public int? PayableWeight { get; set; }
 
+        public decimal? PayableWeightMund { get; set; }
+
         public decimal? BucketRatePerMund { get; set; }
 
         public decimal? LaborRatePerMund { get; set; }
@@ -178,6 +181,8 @@ namespace Biomass.Server.Models.Dispatch
         public string? Status { get; set; }
 
         public int? PayableWeight { get; set; }
+
+        public decimal? PayableWeightMund { get; set; }
 
         public int? MaterialId { get; set; }
 

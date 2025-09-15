@@ -92,6 +92,9 @@ namespace Biomass.Server.Models.Dispatch
         [Column("payable_weight")]
         public int? PayableWeight { get; set; }
 
+        [Column("payable_weight_mund")]
+        public decimal? PayableWeightMund { get; set; }
+
         [Column("bucket_vendor_id")]
         public int? BucketVendorId { get; set; }
 

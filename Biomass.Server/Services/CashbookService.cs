@@ -55,8 +55,10 @@ namespace Biomass.Server.Services
 					//Meta = string.IsNullOrWhiteSpace(dto.MetaJson) ? null : JsonDocument.Parse(dto.MetaJson).RootElement,
 					ReceiptPath = filePath,
 					CostCenterSubId=dto.CostCenterSubId,
-					DispatchId = dto.DispatchId
-				};
+					DispatchId = dto.DispatchId,
+					TransferGroupId=dto.TransferGroupId,
+					TransferRole=dto.TransferRole
+                };
             try
             {
                 _db.Add(entry);

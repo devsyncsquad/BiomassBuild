@@ -2,6 +2,8 @@
 {
     public class CashbookEntryDto
     {
+        internal string TransferGroupId;
+
         public DateTime? HappenedAt { get; set; } = DateTime.UtcNow;
         public int? CashKindId { get; set; }
         public decimal? Amount { get; set; }
@@ -20,6 +22,6 @@
         public IFormFile? ReceiptFile { get; set; } // PDF or JPG
         public int? DispatchId { get; set; }
         public int VendorId { get; set; }
-
+        public string TransferRole { get; internal set; }
     }
 }

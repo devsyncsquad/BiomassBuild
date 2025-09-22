@@ -77,12 +77,13 @@ export const CustomerLocationForm = ({
   // Fetch customers and vendors when form opens
   useEffect(() => {
     if (open) {
-      if (!customerId) {
+      // Always fetch customers when editing to ensure the selected customer is available
+      if (!customerId || (locationData && locationData.locationId)) {
         fetchCustomers();
       }
       fetchVendors();
     }
-  }, [open, customerId]);
+  }, [open, customerId, locationData]);
 
   const fetchCustomers = async () => {
     setLoadingCustomers(true);
@@ -137,11 +138,20 @@ export const CustomerLocationForm = ({
     if (isEditingExisting) {
       setFormData({
         ...locationData,
-        customerId: customerId,
+        customerId: locationData.customerId || customerId,
         customerName: locationData.customerName || "",
         toleranceLimitPercentage: locationData.toleranceLimitPercentage || 0,
         toleranceLimitKg: locationData.toleranceLimitKg || 0,
         centerEnabled: locationData.centerDispatchWeightLimit > 0,
+        // Fix vendor fields mapping
+        defaultBucket: locationData.defaultBucket || locationData.DefaultBucket || null,
+        laborVendor: locationData.laborVendor || locationData.LaborVendor || null,
+        // Fix variable charge fields mapping
+        dispatchVariableChargeType: locationData.dispatchVariableChargeType || locationData.VariableChargeType,
+        dispatchVariableChargeAmount: locationData.dispatchVariableChargeAmount || locationData.VariableChargeAmount,
+        // Note: Labor variable charges don't exist in backend - only fixed labor charges
+        laborVariableChargeType: locationData.laborVariableChargeType,
+        laborVariableChargeAmount: locationData.laborVariableChargeAmount,
       });
       setIsEditing(true);
       console.log("Setting form to EDIT mode for existing location");
@@ -281,9 +291,9 @@ export const CustomerLocationForm = ({
           : null,
         LaborChargesEnabled: Boolean(formData.laborChargesEnabled),
         LaborChargeType: formData.laborChargeType,
-        LaborChargesCost: formData.laborChargesCost
-          ? parseFloat(formData.laborChargesCost)
-          : null,
+        LaborChargesCost: formData.laborChargeType === "Variable" 
+          ? (formData.laborVariableChargeAmount ? parseFloat(formData.laborVariableChargeAmount) : null)
+          : (formData.laborChargesCost ? parseFloat(formData.laborChargesCost) : null),
         DefaultBucket: formData.defaultBucket || null,
         LaborVendor: formData.laborVendor || null,
         ReceivingUnloadingCostEnabled: Boolean(
@@ -400,8 +410,8 @@ export const CustomerLocationForm = ({
           <Grid container spacing={2}>
             {/* First Row: Customer Name, Location/City, Location Code, Center Dispatch Weight Limit */}
             <Grid item xs={12} sm={6} md={3}>
-              {customerId ? (
-                // Show read-only customer name when customerId is provided
+              {customerId && !isEditing ? (
+                // Show read-only customer name when customerId is provided and not editing
                 <TextField
                   fullWidth
                   label='Customer Name'
@@ -419,9 +429,15 @@ export const CustomerLocationForm = ({
                   }}
                 />
               ) : (
-                // Show customer dropdown when no customerId is provided
+                // Show customer dropdown when editing or when no customerId is provided
                 <FormControl fullWidth required>
                   <InputLabel>Select Customer</InputLabel>
+                  {console.log("Customer dropdown debug:", { 
+                    formDataCustomerId: formData.customerId, 
+                    customers: customers.length, 
+                    isEditing,
+                    customerId 
+                  })}
                   <Select
                     value={formData.customerId || ""}
                     onChange={(e) => {
@@ -1077,6 +1093,11 @@ export const CustomerLocationForm = ({
 
                 <FormControl fullWidth size='small' sx={{ mb: 2 }}>
                   <InputLabel>Select Loader Vendor</InputLabel>
+                  {console.log("Loader Vendor debug:", { 
+                    formDataDefaultBucket: formData.defaultBucket, 
+                    vendors: vendors.length,
+                    vendorIds: vendors.map(v => v.vendorId)
+                  })}
                   <Select
                     value={formData.defaultBucket || ''}
                     onChange={(e) =>
@@ -1098,6 +1119,11 @@ export const CustomerLocationForm = ({
 
                 <FormControl fullWidth size='small'>
                   <InputLabel>Select Labor Vendor</InputLabel>
+                  {console.log("Labor Vendor debug:", { 
+                    formDataLaborVendor: formData.laborVendor, 
+                    vendors: vendors.length,
+                    vendorIds: vendors.map(v => v.vendorId)
+                  })}
                   <Select
                     value={formData.laborVendor || ''}
                     onChange={(e) =>

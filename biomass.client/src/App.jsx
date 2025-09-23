@@ -8,6 +8,8 @@ import {
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { SnackbarProvider } from "notistack";
+import { Provider } from "react-redux";
+import { store } from "./redux/store";
 import Dashboard from "./components/Dashboard";
 import DashboardEnhanced from "./components/DashboardEnhanced";
 import Login from "./components/Login";
@@ -392,13 +394,14 @@ const DashboardHome = () => {
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <SnackbarProvider maxSnack={3}>
-        <Router
-          future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
-        >
-          <Routes>
+    <Provider store={store}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <SnackbarProvider maxSnack={3}>
+          <Router
+            future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+          >
+            <Routes>
             {/* Public routes */}
             <Route path='/login' element={<Login />} />
             <Route path='/signup' element={<Signup />} />
@@ -508,6 +511,7 @@ function App() {
         </Router>
       </SnackbarProvider>
     </ThemeProvider>
+    </Provider>
   );
 }
 

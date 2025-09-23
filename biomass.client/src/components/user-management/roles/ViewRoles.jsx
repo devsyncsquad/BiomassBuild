@@ -26,40 +26,40 @@ import {
 import { Edit, Delete, Search, Security, Refresh } from "@mui/icons-material";
 import axios from "axios";
 import { getAuthHeaders } from "../../../utils/auth";
+import { useGetRoleListQuery } from "../../../redux/apis/userManagementApi";
 
 const ViewRoles = ({ setInitialData }) => {
-  const [roles, setRoles] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [error, setError] = useState("");
+  
+  // Use RTK Query instead of local state
+  const {
+    data: rolesResponse,
+    isLoading: loading,
+    error: rolesError,
+    refetch: refetchRoles,
+  } = useGetRoleListQuery();
 
-  useEffect(() => {
-    fetchRoles();
-  }, []);
+  // Debug logging
+  console.log("ViewRoles RTK Query Debug:", {
+    rolesResponse,
+    loading,
+    rolesError,
+    errorDetails: rolesError?.data || rolesError?.message
+  });
 
-  const fetchRoles = async () => {
-    try {
-      setLoading(true);
-      setError("");
-      const response = await axios.get(
-        "https://localhost:7084/api/UserManagement/GetRoleList",
-        {
-          headers: getAuthHeaders(),
-        }
-      );
+  // Extract roles from response
+  const roles = rolesResponse?.result || [];
+  const error = rolesError ? 
+    `Failed to fetch roles: ${rolesError?.data?.message || rolesError?.message || 'Unknown error'}` : "";
 
-      if (response.data && response.data.success) {
-        setRoles(response.data.result || []);
-      } else {
-        setError(response.data?.message || "Failed to fetch roles");
-      }
-    } catch (error) {
-      console.error("Error fetching roles:", error);
-      setError("Failed to fetch roles. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Debug logging
+  console.log("ViewRoles RTK Query Debug:", {
+    rolesResponse,
+    extractedRoles: roles,
+    rolesLength: roles.length,
+    loading,
+    rolesError
+  });
 
   const handleEditRole = (role) => {
     setInitialData(role);
@@ -76,8 +76,8 @@ const ViewRoles = ({ setInitialData }) => {
         );
 
         if (response.data && response.data.success) {
-          // Remove role from local state
-          setRoles(roles.filter((role) => role.roleId !== roleId));
+          // Refetch roles to update the list
+          refetchRoles();
         } else {
           alert(response.data?.message || "Failed to delete role");
         }
@@ -135,7 +135,7 @@ const ViewRoles = ({ setInitialData }) => {
         <Button
           variant='outlined'
           startIcon={<Refresh />}
-          onClick={fetchRoles}
+          onClick={refetchRoles}
           disabled={loading}
           sx={{
             borderColor: "#228B22",
@@ -162,6 +162,7 @@ const ViewRoles = ({ setInitialData }) => {
           {error}
         </Alert>
       )}
+
 
       {/* Search Bar */}
       <Card

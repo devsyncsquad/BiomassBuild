@@ -391,7 +391,7 @@ const ViewUsers = ({ setUserData }) => {
                     </TableCell>
                     <TableCell>
                       <Chip
-                        label={`Role ${user.roleId}`}
+                        label={user.role?.roleName || `N/A`}
                         size='small'
                         sx={{
                           bgcolor: "rgba(34, 139, 34, 0.1)",

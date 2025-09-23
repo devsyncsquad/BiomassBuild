@@ -43,7 +43,9 @@ namespace Biomass.Server.Controllers
             var response = new ServiceResponse<List<UserWithCustomers>>();
             try
             {
-                var users = _context.Users.ToList();
+                var users = _context.Users
+                    .Include(u => u.Role) // Include role information
+                    .ToList();
                 var userWithCustomers = new List<UserWithCustomers>();
 
                 foreach (var user in users)

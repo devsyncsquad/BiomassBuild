@@ -25,7 +25,7 @@ import {
 import { Security, Save, Clear } from "@mui/icons-material";
 
 // Component Imports
-import { useGetRoleListQuery } from "../../../redux/apis/userManagementApi";
+import { useGetRoleListQuery, useSaveRoleMutation, useUpdateRoleMutation } from "../../../redux/apis/userManagementApi";
 
 // Utility Imports
 import { getAuthHeaders, getCurrentUser } from "../../../utils/auth";
@@ -57,6 +57,10 @@ const AddRole = ({ initialData, onRoleSaved, onCancel }) => {
     error: rolesError,
     refetch: refetchRoleList,
   } = useGetRoleListQuery();
+
+  // RTK Query mutations
+  const [saveRole] = useSaveRoleMutation();
+  const [updateRole] = useUpdateRoleMutation();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -141,18 +145,7 @@ const AddRole = ({ initialData, onRoleSaved, onCancel }) => {
         };
 
         console.log("Updating role:", updateData);
-        console.log("API URL:", `${baseUrl}/api/UserManagement/UpdateRole`);
-        console.log("Headers:", getAuthHeaders());
-        console.log("Original creator ID:", formData.createdBy);
-        console.log("Current updater ID:", user.empId);
-
-        response = await axios.put(
-          `${baseUrl}/api/UserManagement/UpdateRole`,
-          updateData,
-          {
-            headers: getAuthHeaders(),
-          }
-        );
+        response = await updateRole(updateData).unwrap();
       } else {
         // Create new role - set current user as both creator and updater
         const createData = {
@@ -167,23 +160,12 @@ const AddRole = ({ initialData, onRoleSaved, onCancel }) => {
         };
 
         console.log("Creating role:", createData);
-        console.log("API URL:", `${baseUrl}/api/UserManagement/SaveRole`);
-        console.log("Headers:", getAuthHeaders());
-        console.log("Creator ID:", user.empId);
-        console.log("Updater ID:", user.empId);
-
-        response = await axios.post(
-          `${baseUrl}/api/UserManagement/SaveRole`,
-          createData,
-          {
-            headers: getAuthHeaders(),
-          }
-        );
+        response = await saveRole(createData).unwrap();
       }
 
-      console.log("API Response:", response.data);
+      console.log("API Response:", response);
 
-      if (response.data && response.data.success) {
+      if (response && response.success) {
         setSuccessMessage(
           isUpdate ? "Role updated successfully!" : "Role created successfully!"
         );
@@ -207,15 +189,15 @@ const AddRole = ({ initialData, onRoleSaved, onCancel }) => {
 
         // Notify parent component
         if (onRoleSaved) {
-          onRoleSaved(response.data.result);
+          onRoleSaved(response.result);
         }
 
-        enqueueSnackbar(response.data.message || "Role saved successfully", {
+        enqueueSnackbar(response.message || "Role saved successfully", {
           variant: "success",
           autoHideDuration: 5000,
         });
       } else {
-        const errorMsg = response.data?.message || "Failed to save role";
+        const errorMsg = response?.message || "Failed to save role";
         setErrors({ submit: errorMsg });
         enqueueSnackbar(errorMsg, {
           variant: "error",
@@ -224,20 +206,20 @@ const AddRole = ({ initialData, onRoleSaved, onCancel }) => {
       }
     } catch (error) {
       console.error("Error saving role:", error);
-      console.error("Error response:", error.response?.data);
-      console.error("Error status:", error.response?.status);
+      console.error("Error response:", error.data);
+      console.error("Error status:", error.status);
 
       let errorMessage = "Error saving role. Please try again.";
 
-      if (error.response?.status === 400) {
+      if (error.status === 400) {
         errorMessage =
-          error.response.data?.message ||
+          error.data?.message ||
           "Validation error. Please check your input.";
-      } else if (error.response?.status === 401) {
+      } else if (error.status === 401) {
         errorMessage = "Unauthorized. Please check your authentication.";
-      } else if (error.response?.status === 409) {
+      } else if (error.status === 409) {
         errorMessage = "Role name already exists.";
-      } else if (error.response?.status === 500) {
+      } else if (error.status === 500) {
         errorMessage = "Server error. Please try again later.";
       }
 

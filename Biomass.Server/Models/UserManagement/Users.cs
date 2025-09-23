@@ -25,5 +25,8 @@ namespace Biomass.Server.Models.UserManagement
 
         [NotMapped]
         public List<int> CustomerIds { get; set; } = new List<int>();
+
+        // Navigation property for Role
+        public virtual Roles? Role { get; set; }
     }
 } 

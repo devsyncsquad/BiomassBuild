@@ -52,8 +52,11 @@ namespace Biomass.Server.Controllers
                 // Generate JWT token
                 var token = GenerateJwtToken(user);
 
+                // Get role name
+                var roleName = await GetRoleNameAsync(user.RoleId);
+
                 // Create base response
-                var baseResponse = new AuthenticateResponse(user, token);
+                var baseResponse = new AuthenticateResponse(user, token, roleName);
 
                 // Get user's customers
                 var customers = await GetUserCustomersAsync(user.UserId);
@@ -187,6 +190,27 @@ namespace Biomass.Server.Controllers
                 // Log the exception in production
                 // For now, return empty list if there's an error
                 return new List<UserAssignedMenus>();
+            }
+        }
+
+        private async Task<string?> GetRoleNameAsync(int? roleId)
+        {
+            try
+            {
+                if (roleId == null || roleId == 0)
+                    return null;
+
+                var role = await _context.Roles
+                    .Where(r => r.RoleId == roleId && r.Enabled == "Y")
+                    .FirstOrDefaultAsync();
+
+                return role?.RoleName;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception in production
+                // For now, return null if there's an error
+                return null;
             }
         }
 

@@ -87,19 +87,34 @@ namespace Biomass.Server.Services
             vehicle.WeightAllowed = request.WeightAllowed;
 
             // Update driver if provided
-            if (request.Driver != null && vehicle.Driver != null)
+            if (request.Driver != null)
             {
-                var updatedDriver = await _driverService.UpdateDriverAsync(vehicle.Driver.DriverId, request.Driver);
-                if (updatedDriver != null)
+                // Check if we should update existing driver or create new one
+                if (vehicle.Driver != null && request.Driver.DriverId > 0)
                 {
-                    vehicle.Driver = updatedDriver;
+                    // Update existing driver
+                    var updatedDriver = await _driverService.UpdateDriverAsync(vehicle.Driver.DriverId, request.Driver);
+                    if (updatedDriver != null)
+                    {
+                        vehicle.Driver = updatedDriver;
+                    }
                 }
-            }
-            else if (request.Driver != null)
-            {
-                var newDriver = await _driverService.CreateDriverAsync(request.Driver);
-                newDriver.VehicleId = vehicle.VehicleId;
-                vehicle.Driver = newDriver;
+                else if (vehicle.Driver != null && request.Driver.DriverId == 0)
+                {
+                    // Update existing driver with new data (driverId = 0 means use existing driver)
+                    var updatedDriver = await _driverService.UpdateDriverAsync(vehicle.Driver.DriverId, request.Driver);
+                    if (updatedDriver != null)
+                    {
+                        vehicle.Driver = updatedDriver;
+                    }
+                }
+                else if (vehicle.Driver == null)
+                {
+                    // Create new driver for vehicle that doesn't have one
+                    var newDriver = await _driverService.CreateDriverAsync(request.Driver);
+                    newDriver.VehicleId = vehicle.VehicleId;
+                    vehicle.Driver = newDriver;
+                }
             }
 
             await _context.SaveChangesAsync();

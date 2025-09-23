@@ -118,12 +118,22 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
     setLoading(true);
     setError(null);
 
+    // Validate CNIC
+    if (formData.driver.cnic && formData.driver.cnic.length !== 13) {
+      setError("CNIC must be exactly 13 digits");
+      setLoading(false);
+      return;
+    }
+
     try {
-      // Convert capacity to number
+      // Convert data types and prepare submission data
       const submitData = {
         ...formData,
-        capacity: parseFloat(formData.capacity),
-        vendorId: parseInt(formData.vendorId),
+        capacity: parseFloat(formData.capacity) || 0,
+        vendorId: parseInt(formData.vendorId) || 0,
+        isWeightAllocated: formData.isWeightAllocated ? "true" : "false",
+        weightAllowed: formData.isWeightAllocated ? (parseFloat(formData.weightAllowed) || 0) : 0,
+        costCenterId: parseInt(formData.costCenterId) || 0,
       };
 
       // If vehicle exists, it's an update operation
@@ -150,14 +160,70 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
         );
       }
     } catch (err) {
-      setError(
-        err.response?.data?.message ||
-          err.message ||
-          "An error occurred while saving the vehicle"
-      );
+      // Enhanced error handling for better user experience
+      let errorMessage = "An error occurred while saving the vehicle";
+      
+      if (err.response?.data) {
+        const errorData = err.response.data;
+        
+        // Handle validation errors
+        if (errorData.errors) {
+          const errorMessages = [];
+          
+          Object.keys(errorData.errors).forEach(field => {
+            const fieldErrors = errorData.errors[field];
+            if (Array.isArray(fieldErrors)) {
+              fieldErrors.forEach(error => {
+                // Convert field names to user-friendly labels
+                const fieldLabel = getFieldLabel(field);
+                errorMessages.push(`${fieldLabel}: ${error}`);
+              });
+            }
+          });
+          
+          if (errorMessages.length > 0) {
+            errorMessage = errorMessages.join("\n");
+          } else {
+            errorMessage = errorData.title || errorData.message || errorMessage;
+          }
+        } else if (errorData.message) {
+          errorMessage = errorData.message;
+        } else if (errorData.title) {
+          errorMessage = errorData.title;
+        }
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Helper function to convert field names to user-friendly labels
+  const getFieldLabel = (fieldName) => {
+    const fieldLabels = {
+      'request': 'Request',
+      'isWeightAllocated': 'Weight Allocation',
+      'vehicleNumber': 'Vehicle Number',
+      'vehicleType': 'Vehicle Type',
+      'capacity': 'Capacity',
+      'fuelType': 'Fuel Type',
+      'status': 'Status',
+      'vehicleRegNumber': 'Registration Number',
+      'vendorId': 'Vendor',
+      'weightAllowed': 'Weight Allowed',
+      'costCenterId': 'Cost Center ID',
+      'driver.fullName': 'Driver Name',
+      'driver.cnic': 'Driver CNIC',
+      'driver.licenseNumber': 'License Number',
+      'driver.phoneNumber': 'Phone Number',
+      'driver.address': 'Driver Address',
+      'driver.status': 'Driver Status',
+    };
+    
+    return fieldLabels[fieldName] || fieldName;
   };
 
   return (
@@ -185,7 +251,7 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
       <form onSubmit={handleSubmit}>
         <DialogContent sx={{ p: { xs: 2, sm: 3 } }}>
           {error && (
-            <Alert severity='error' sx={{ mb: 2 }}>
+            <Alert severity='error' sx={{ mb: 2, whiteSpace: 'pre-line' }}>
               {error}
             </Alert>
           )}
@@ -307,6 +373,7 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
                       setFormData((prev) => ({
                         ...prev,
                         isWeightAllocated: e.target.checked,
+                        weightAllowed: e.target.checked ? prev.weightAllowed : 0,
                       }))
                     }
                     name='isWeightAllocated'
@@ -316,18 +383,21 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
               />
             </Grid>
 
-            {formData.isWeightAllocated && (
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  type='number'
-                  label='Weight Allowed'
-                  name='weightAllowed'
-                  value={formData.weightAllowed}
-                  onChange={handleChange}
-                />
-              </Grid>
-            )}
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                type='number'
+                label='Weight Allowed'
+                name='weightAllowed'
+                value={formData.isWeightAllocated ? formData.weightAllowed : 0}
+                onChange={handleChange}
+                disabled={!formData.isWeightAllocated}
+                inputProps={{
+                  min: 0,
+                  step: 0.01,
+                }}
+              />
+            </Grid>
 
             <Grid item xs={12} sm={6}>
               <TextField
@@ -366,6 +436,13 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
                 name='driver.cnic'
                 value={formData.driver.cnic}
                 onChange={handleChange}
+                inputProps={{
+                  minLength: 13,
+                  maxLength: 13,
+                  pattern: "[0-9]{13}",
+                }}
+                helperText="CNIC must be exactly 13 digits"
+                error={formData.driver.cnic && formData.driver.cnic.length !== 13}
               />
             </Grid>
 

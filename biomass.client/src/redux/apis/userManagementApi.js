@@ -4,8 +4,18 @@ import { getBaseUrl, getHeaders } from '../../utils/api';
 export const userManagementApi = createApi({
   reducerPath: 'userManagementApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: getBaseUrl(),
-    prepareHeaders: () => getHeaders(),
+    baseUrl: getBaseUrl().replace('/api', ''), // Remove /api since endpoints already include it
+    prepareHeaders: (headers) => {
+      const authHeaders = getHeaders();
+      // Set headers properly for RTK Query
+      if (authHeaders.Authorization) {
+        headers.set('Authorization', authHeaders.Authorization);
+      }
+      if (authHeaders['Content-Type']) {
+        headers.set('Content-Type', authHeaders['Content-Type']);
+      }
+      return headers;
+    },
   }),
   tagTypes: ['Users', 'Roles', 'MainMenus', 'SubMenus', 'MenuRoles', 'Menus'],
   endpoints: (builder) => ({

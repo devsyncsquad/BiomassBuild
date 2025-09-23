@@ -14,6 +14,7 @@ namespace Biomass.Server.Models
         public string? Token { get; set; }
         public int? EmpId { get; set; }
         public int? RoleId { get; set; }
+        public string? RoleName { get; set; }
         public string? ApplicationVersion { get; set; }
         public string? CanMask { get; set; }
         public string? CanTamper { get; set; }
@@ -35,6 +36,7 @@ namespace Biomass.Server.Models
             Token = baseResponse.Token;
             EmpId = baseResponse.EmpId;
             RoleId = baseResponse.RoleId;
+            RoleName = baseResponse.RoleName;
             ApplicationVersion = baseResponse.ApplicationVersion;
             CanMask = baseResponse.CanMask;
             CanTamper = baseResponse.CanTamper;

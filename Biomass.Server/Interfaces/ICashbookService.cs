@@ -184,5 +184,8 @@ namespace Biomass.Server.Interfaces
 		
 		// Update Status
 		Task<ServiceResponse<CashbookDto>> UpdateCashbookStatusAsync(long cashId, string newStatus);
+		
+		// Transfer Operations
+		Task<(long OutId, long InId)> SaveTransferCashbookEntriesAsync(CashbookTransferEntryDto dto);
 	}
 }

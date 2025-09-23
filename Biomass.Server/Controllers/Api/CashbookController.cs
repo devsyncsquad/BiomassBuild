@@ -25,6 +25,14 @@ namespace Biomass.Server.Controllers.Api
             return Ok(new { CashId = id });
         }
 
+        [HttpPost("CreateTransferCashbookEntry")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> CreateTransferCashbookEntry([FromForm] CashbookTransferEntryDto dto)
+        {
+            var (outId, inId) = await _service.SaveTransferCashbookEntriesAsync(dto);
+            return Ok(new { OutId = outId, InId = inId });
+        }
+
         [HttpPost("CashInsert")]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> CashInsert([FromForm] CashbookEntryDto dto)

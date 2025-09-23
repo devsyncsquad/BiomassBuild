@@ -79,7 +79,8 @@ namespace Biomass.Server.Services
                 Status = request.Status,
                 CreatedBy = request.CreatedBy,
                 CreatedAt = DateTime.UtcNow,
-                FilesUrl = request.FilesUrl
+                FilesUrl = request.FilesUrl,
+                BiltyReceived=request.BiltyReceived
             };
 
             _context.DispatchReceipts.Add(dispatchReceipt);
@@ -149,6 +150,7 @@ namespace Biomass.Server.Services
             dispatchReceipt.Remarks = request.Remarks;
             dispatchReceipt.Status = request.Status;
             dispatchReceipt.FilesUrl = request.FilesUrl;
+            dispatchReceipt.BiltyReceived = request.BiltyReceived;
 
             // Calculate amount payable if not provided
             if (!request.AmountPayable.HasValue && request.AmountGross.HasValue)

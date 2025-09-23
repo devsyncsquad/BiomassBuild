@@ -86,6 +86,9 @@ namespace Biomass.Server.Models.Dispatch
         [StringLength(500)]
         public string? FilesUrl { get; set; }
 
+        [Column("bilty_received", TypeName = "boolen")]
+        public bool? BiltyReceived { get; set; }
+
         // Navigation properties
         public virtual Dispatch Dispatch { get; set; } = null!;
         public virtual Vendor.Vendor Vendor { get; set; } = null!;

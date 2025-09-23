@@ -88,6 +88,8 @@ namespace Biomass.Server.Models.Dispatch
 
         [StringLength(500)]
         public string? FilesUrl { get; set; }
+
+        public bool? BiltyReceived { get; set; }
     }
 
     /// <summary>
@@ -137,5 +139,7 @@ namespace Biomass.Server.Models.Dispatch
 
         [StringLength(500)]
         public string? FilesUrl { get; set; }
+
+        public bool? BiltyReceived { get; set; }
     }
 }

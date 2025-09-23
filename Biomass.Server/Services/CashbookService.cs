@@ -56,8 +56,8 @@ namespace Biomass.Server.Services
 					ReceiptPath = filePath,
 					CostCenterSubId=dto.CostCenterSubId,
 					DispatchId = dto.DispatchId,
-					TransferGroupId=dto.TransferGroupId,
-					TransferRole=dto.TransferRole
+                    //TransferGroupId = dto.TransferGroupId,
+					//TransferRole=dto.TransferRole
                 };
             try
             {
@@ -70,6 +70,94 @@ namespace Biomass.Server.Services
             return entry.CashId;
         }
 
+        ////////////////
+        public async Task<(long OutId, long InId)> SaveTransferCashbookEntriesAsync(CashbookTransferEntryDto dto)
+        {
+            // Make sure both From and To are provided
+            if ((dto.MoneyAccountFrom == null && dto.WalletEmployeeFrom == null) ||
+                (dto.MoneyAccountTo == null && dto.WalletEmployeeTo == null))
+            {
+                throw new ArgumentException("Both From and To accounts must be specified.");
+            }
+
+            // Ensure both entries share same TransferGroupId
+            var groupId = Guid.NewGuid();
+
+            // Save receipt file (if any)
+            string filePath = null;
+            if (dto.ReceiptFile != null)
+            {
+                var timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmssfff");
+                var fileName = $"{timestamp}_{dto.ReceiptFile.FileName}";
+                filePath = Path.Combine(_uploadFolder, fileName);
+
+                using var stream = new FileStream(filePath, FileMode.Create);
+                await dto.ReceiptFile.CopyToAsync(stream);
+            }
+
+            // "Out" entry
+            var outEntry = new Cashbook
+            {
+                HappenedAt = dto.HappenedAt ?? DateTime.UtcNow,
+                CashKindId = dto.CashKindId,
+                Amount = dto.Amount,
+                Currency = dto.Currency,
+                MoneyAccountId = dto.MoneyAccountFrom,
+                WalletEmployeeId = dto.WalletEmployeeFrom,
+                CategoryId = (int)dto.CategoryId,
+                CostCenterId = dto.CostCenterId,
+                PaymentModeId = dto.PaymentModeId,
+                ReferenceNo = dto.ReferenceNo,
+                CounterpartyName = dto.CounterpartyName,
+                Remarks = dto.Remarks,
+                Status = dto.Status,
+                ReceiptPath = filePath,
+                CostCenterSubId = dto.CostCenterSubId,
+                DispatchId = dto.DispatchId,
+                TransferGroupId = groupId,
+                TransferRole = "Out"
+            };
+
+            // "In" entry
+            var inEntry = new Cashbook
+            {
+                HappenedAt = dto.HappenedAt ?? DateTime.UtcNow,
+                CashKindId = dto.CashKindId,
+                Amount = dto.Amount,
+                Currency = dto.Currency,
+                MoneyAccountId = dto.MoneyAccountTo,
+                WalletEmployeeId = dto.WalletEmployeeTo,
+                CategoryId = (int)dto.CategoryId,
+                CostCenterId = dto.CostCenterId,
+                PaymentModeId = dto.PaymentModeId,
+                ReferenceNo = dto.ReferenceNo,
+                CounterpartyName = dto.CounterpartyName,
+                Remarks = dto.Remarks,
+                Status = dto.Status,
+                ReceiptPath = filePath,
+                CostCenterSubId = dto.CostCenterSubId,
+                DispatchId = dto.DispatchId,
+                TransferGroupId = groupId,
+                TransferRole = "In"
+            };
+
+            try
+            {
+                _db.Add(outEntry);
+                _db.Add(inEntry);
+                await _db.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saving transfer entries: {ex.Message}");
+                throw;
+            }
+
+            return (outEntry.CashId, inEntry.CashId);
+        }
+
+
+        ///////////////////
         public async Task<ServiceResponse<CashbookDto>> CashInsertAsync(CashbookEntryDto dto)
         {
             var response = new ServiceResponse<CashbookDto>();

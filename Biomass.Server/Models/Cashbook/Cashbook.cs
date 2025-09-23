@@ -74,8 +74,8 @@ namespace Biomass.Server.Models.Cashbook
 		[Column("dispatch_id")]
 		public long? DispatchId { get; set; }
 
-        [Column("transfer_group_Id")]
-        public string? TransferGroupId { get; set; }
+        [Column("transfer_group_id")]
+        public Guid? TransferGroupId { get; set; }
 
         [Column("transfer_role")]
         public string? TransferRole { get; set; }

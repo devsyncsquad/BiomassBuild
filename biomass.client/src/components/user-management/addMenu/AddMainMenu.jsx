@@ -177,9 +177,7 @@ const AddMenu = ({ menuData, onMenuSaved, onRefresh }) => {
       console.log("API Response:", response.data);
 
       if (response.data && response.data.success) {
-        setSuccessMessage(
-          isUpdate ? "Menu updated successfully!" : "Menu created successfully!"
-        );
+        
 
         // Reset form for new menu creation
         if (!isUpdate) {

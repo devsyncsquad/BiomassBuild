@@ -49,7 +49,6 @@ const AddRole = ({ initialData, onRoleSaved, onCancel }) => {
   });
   const [isRoleSaveLoading, setIsRoleSaveLoading] = useState(false);
   const [errors, setErrors] = useState({});
-  const [successMessage, setSuccessMessage] = useState("");
 
   const {
     data: rolesData,
@@ -110,7 +109,6 @@ const AddRole = ({ initialData, onRoleSaved, onCancel }) => {
 
     setIsRoleSaveLoading(true);
     setErrors({});
-    setSuccessMessage("");
 
     try {
       // Check if user is authenticated
@@ -166,10 +164,6 @@ const AddRole = ({ initialData, onRoleSaved, onCancel }) => {
       console.log("API Response:", response);
 
       if (response && response.success) {
-        setSuccessMessage(
-          isUpdate ? "Role updated successfully!" : "Role created successfully!"
-        );
-
         // Reset form for new role creation
         if (!isUpdate) {
           setFormData({
@@ -249,7 +243,6 @@ const AddRole = ({ initialData, onRoleSaved, onCancel }) => {
         updatedAt: new Date().toISOString(),
       });
       setErrors({});
-      setSuccessMessage("");
     }
   };
 
@@ -329,13 +322,6 @@ const AddRole = ({ initialData, onRoleSaved, onCancel }) => {
         </Box>
 
         <CardContent sx={{ p: 4 }}>
-          {/* Success Message */}
-          {successMessage && (
-            <Alert severity='success' sx={{ mb: 3, borderRadius: "12px" }}>
-              {successMessage}
-            </Alert>
-          )}
-
           {/* Error Message */}
           {errors.submit && (
             <Alert severity='error' sx={{ mb: 3, borderRadius: "12px" }}>

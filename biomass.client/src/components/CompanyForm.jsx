@@ -110,13 +110,17 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    if (e) {
+      e.preventDefault();
+    }
     if (!validateForm()) {
       return;
     }
 
     setLoading(true);
     setError("");
+    setErrors({});
 
     try {
       const iconUrl =
@@ -180,32 +184,41 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
           },
           body: JSON.stringify(createData),
         });
-
-        const result = await response.json();
-
-        // Logo upload functionality is currently disabled in the backend
-        // TODO: Implement logo upload when backend endpoint is available
       }
 
+      const responseData = await response.json();
+      
       if (!response.ok) {
-        const result = await response.json();
-        throw new Error(result.message || "Failed to save company");
+        throw new Error(responseData.message || "Failed to save company");
       }
 
-      // Get the result from the response
-      let finalResult;
-      if (company) {
-        // For update operations, we need to get the result from the response
-        finalResult = await response.json();
+      if (responseData.success) {
+        // Call onSaved first to trigger refetch
+        await onSaved();
+        
+        // Reset form and close dialog
+        setFormData({
+          companyName: "",
+          companyAddress: "",
+          ntn: "",
+          strn: "",
+          pra: "",
+          contactPersonName: "",
+          contactPersonPhone: "",
+          companyDescription: "",
+          industry: "",
+          companySize: "",
+          location: "",
+          logoPath: "",
+          logo: null,
+        });
+        setLogoPreview("");
+        setError("");
+        setErrors({});
+        setIsEditing(false);
+        onClose();
       } else {
-        // For create operations, we already have the result
-        finalResult = result;
-      }
-
-      if (finalResult.success) {
-        onSaved();
-      } else {
-        setError(finalResult.message || "Failed to save company");
+        setError(responseData.message || "Failed to save company");
       }
     } catch (error) {
       console.error("Error saving company:", error);
@@ -311,14 +324,14 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
             }}
           >
             <Box>
-              <Typography variant='h4' sx={{ fontWeight: 700, mb: 1 }}>
+              <Typography variant='h4' sx={{ color: "white", fontWeight: 700, mb: 1 }}>
                 {company
                   ? isViewMode
                     ? "Company Details"
                     : "Edit Company"
                   : "Add New Company"}
               </Typography>
-              <Typography variant='h6' sx={{ opacity: 0.9, fontWeight: 300 }}>
+              <Typography variant='h6' sx={{color: "white", opacity: 0.9, fontWeight: 300 }}>
                 {company
                   ? "Update company information and compliance details"
                   : "Create a new company profile with complete details"}

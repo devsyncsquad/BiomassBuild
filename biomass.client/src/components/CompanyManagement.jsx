@@ -254,11 +254,21 @@ const CompanyManagement = () => {
     setIsViewMode(false);
   };
 
-  const handleCompanySaved = () => {
-    console.log("Company saved, showing snackbar...");
-    handleFormClose();
-    fetchCompanies();
-    showSnackbar("Company saved successfully!");
+  const handleCompanySaved = async () => {
+    console.log("Company saved, refreshing data...");
+    try {
+      await fetchCompanies(); // Fetch first to ensure we have the latest data
+      handleFormClose();
+      showSnackbar(
+        selectedCompany
+          ? "Company updated successfully!"
+          : "Company created successfully!",
+        "success"
+      );
+    } catch (error) {
+      console.error("Error refreshing companies:", error);
+      showSnackbar("Company saved but failed to refresh list. Please reload.", "warning");
+    }
   };
 
   const getCompanyInitials = (companyName) => {

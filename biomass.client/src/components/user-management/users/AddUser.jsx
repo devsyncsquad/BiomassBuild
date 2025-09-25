@@ -39,7 +39,7 @@ import axios from "axios";
 import { getAuthHeaders } from "../../../utils/auth";
 import { getBaseUrl } from "../../../utils/api";
 
-const AddUser = ({ userData, setUserData }) => {
+const AddUser = ({ userData, setUserData, onSuccess }) => {
   // Get current user from localStorage
   const getCurrentUser = () => {
     try {
@@ -261,6 +261,10 @@ const AddUser = ({ userData, setUserData }) => {
           });
         }
         setUserData(null); // Clear editing state
+        // Call onSuccess to trigger data refetch
+        if (onSuccess) {
+          onSuccess();
+        }
       } else {
         setErrors({ submit: response.data?.message || "Failed to save user" });
       }
@@ -585,16 +589,7 @@ const AddUser = ({ userData, setUserData }) => {
                           <Chip
                             key={value}
                             label={
-                              customers.find((c) => c.customerId === value)
-                                ?.companyName ||
-                              `${
-                                customers.find((c) => c.customerId === value)
-                                  ?.firstName
-                              } ${
-                                customers.find((c) => c.customerId === value)
-                                  ?.lastName
-                              }` ||
-                              ""
+                              `${customers.find((c) => c.customerId === value)?.firstName} ${customers.find((c) => c.customerId === value)?.lastName}` || ""
                             }
                             size='small'
                             sx={{
@@ -638,7 +633,6 @@ const AddUser = ({ userData, setUserData }) => {
                         />
                         <ListItemText
                           primary={
-                            customer.companyName ||
                             `${customer.firstName} ${customer.lastName}`
                           }
                         />
@@ -648,28 +642,7 @@ const AddUser = ({ userData, setUserData }) => {
                 </FormControl>
               </Grid>
 
-              <Grid item xs={12} md={4}>
-                <TextField
-                  fullWidth
-                  name='reportingTo'
-                  label='Reporting To (Employee ID)'
-                  type='number'
-                  value={formData.reportingTo}
-                  onChange={handleChange}
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: "12px",
-                      "&:hover .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#228B22",
-                      },
-                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#228B22",
-                        borderWidth: "2px",
-                      },
-                    },
-                  }}
-                />
-              </Grid>
+              
 
               <Grid item xs={12} md={4}>
                 <TextField

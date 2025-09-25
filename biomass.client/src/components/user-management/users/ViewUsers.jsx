@@ -37,8 +37,10 @@ import {
 import axios from "axios";
 import { getAuthHeaders } from "../../../utils/auth";
 import { getBaseUrl } from "../../../utils/api";
+import AddUser from './AddUser';
 
-const ViewUsers = ({ setUserData }) => {
+const ViewUsers = () => {
+  const [selectedUserData, setSelectedUserData] = useState(null);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -121,7 +123,7 @@ const ViewUsers = ({ setUserData }) => {
   };
 
   const handleEditUser = (user) => {
-    setUserData(user);
+    setSelectedUserData(user);
   };
 
   const handleDeleteUser = async (userId) => {
@@ -135,8 +137,8 @@ const ViewUsers = ({ setUserData }) => {
         );
 
         if (response.data && response.data.success) {
-          // Remove user from local state
-          setUsers(users.filter((user) => user.userId !== userId));
+          // Refetch users to get updated list
+          await fetchUsers();
         } else {
           alert(response.data?.message || "Failed to delete user");
         }
@@ -156,14 +158,10 @@ const ViewUsers = ({ setUserData }) => {
         }
       );
 
-      if (response.data && response.data.success) {
-        // Update user status in local state
-        setUsers(
-          users.map((user) =>
-            user.userId === userId ? { ...user, enabled: "N" } : user
-          )
-        );
-      } else {
+        if (response.data && response.data.success) {
+          // Refetch users to get updated list
+          await fetchUsers();
+        } else {
         alert(response.data?.message || "Failed to deactivate user");
       }
     } catch (error) {
@@ -196,6 +194,13 @@ const ViewUsers = ({ setUserData }) => {
 
   return (
     <Box sx={{ width: "100%", p: 3 }}>
+      {/* Add/Edit User Form */}
+      <AddUser 
+        userData={selectedUserData}
+        setUserData={setSelectedUserData}
+        onSuccess={fetchUsers}
+      />
+      
       {/* Header */}
       {/* <Box
         sx={{

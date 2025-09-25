@@ -42,5 +42,9 @@ namespace Biomass.Server.Models.Customer
         public bool? labor_charges_enabled { get; set; }
         public string? labor_charge_type { get; set; }
         public decimal? labor_charges_cost { get; set; }
+
+        public int? default_bucket { get; set; }
+        public int? labor_vendor { get; set; }
+
     }
 }

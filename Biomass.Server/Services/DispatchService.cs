@@ -308,6 +308,8 @@ namespace Biomass.Server.Services
                 PayableWeightMund = vDispatch.PayableWeightMund,
                 BucketVendorId = vDispatch.BucketVendorId,
                 LabourVendorId = vDispatch.LabourVendorId,
+                TransporterVendorId=vDispatch.TransporterVendorId,
+                MaterialId=vDispatch.MaterialId,
                 Vehicle = new VehicleDto
                 {
                     VehicleId = vDispatch.VehicleId,

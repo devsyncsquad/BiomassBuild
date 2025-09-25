@@ -124,5 +124,12 @@ namespace Biomass.Server.Models.Dispatch
         public decimal? MaterialPenaltyRatePerKg { get; set; }
 
 
+        [Column("transporter_vendor_id")]
+        public int? TransporterVendorId { get; set; }
+
+        [Column("material_id")]
+        public int? MaterialId { get; set; }
+
+
     }
 }

@@ -949,13 +949,13 @@ const RatePopup = ({
         )}
 
         {activeTab === 1 && (
-          <Box sx={{ p: 3 }}>
+          <Box sx={{ p: 3, }}>
             {/* Previous Rates Tab */}
-            <Box sx={{ mb: 3 }}>
-              <Typography variant='h6' gutterBottom>
+            <Box sx={{ mb: 3, backgroundColor: "green" }}>
+              <Typography variant='h6' gutterBottom color="white">
                 Previous Rates History
               </Typography>
-              <Typography variant='body2' color='text.secondary' gutterBottom>
+              <Typography variant='body2' gutterBottom color="white">
                 View and filter historical material rates
               </Typography>
             </Box>
@@ -1075,15 +1075,32 @@ const RatePopup = ({
                   </Grid>
                 </Grid>
 
-                <Box sx={{ mt: 2, display: "flex", gap: 2 }}>
+                <Box sx={{ mt: 2, display: "flex", gap: 2}}>
                   <Button
                     variant='contained'
                     onClick={applyFilters}
-                    startIcon={<FilterIcon />}
+                    startIcon={<FilterIcon sx={{ color: "white" }} />}
+                    sx={{
+                      bgcolor: "#228B22",
+                      color: "white",
+                      "&:hover": {
+                        bgcolor: "#1B5E20",
+                      },
+                    }}
                   >
                     Apply Filters
                   </Button>
-                  <Button variant='outlined' onClick={clearFilters}>
+                  <Button
+                    variant='contained'
+                    onClick={clearFilters}
+                    sx={{
+                      bgcolor: "#228B22",
+                      color: "white",
+                      "&:hover": {
+                        bgcolor: "#1B5E20",
+                      },
+                    }}
+                  >
                     Clear Filters
                   </Button>
                 </Box>

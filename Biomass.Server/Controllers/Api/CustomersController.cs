@@ -71,5 +71,14 @@ namespace Biomass.Server.Controllers.Api
             var response = await _customerService.GetCustomerCountAsync();
             return Ok(response);
         }
+
+		[HttpGet("GetCustomersByUserId/{userId}")]
+        public async Task<IActionResult> GetCustomersByUserId(int userId)
+        {
+            var response = await _customerService.GetCustomersByUserIdAsync(userId);
+            if (!response.Success)
+                return BadRequest(response);
+            return Ok(response);
+        }
     }
 } 

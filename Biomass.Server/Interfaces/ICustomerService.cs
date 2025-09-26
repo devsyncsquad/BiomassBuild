@@ -13,5 +13,6 @@ namespace Biomass.Server.Interfaces
         Task<ServiceResponse<bool>> DeleteCustomerAsync(int customerId);
         Task<ServiceResponse<List<CustomerDto>>> SearchCustomersAsync(string searchTerm, string status = "all");
         Task<ServiceResponse<int>> GetCustomerCountAsync();
+        Task<ServiceResponse<List<VUserCustomer>>> GetCustomersByUserIdAsync(int userId);
     }
 }

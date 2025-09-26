@@ -357,5 +357,28 @@ namespace Biomass.Server.Services
 
             return response;
         }
+
+        public async Task<ServiceResponse<List<VUserCustomer>>> GetCustomersByUserIdAsync(int userId)
+        {
+            var response = new ServiceResponse<List<VUserCustomer>>();
+
+            try
+            {
+                var customers = await _context.VUserCustomers
+                    .Where(v => v.UserId == userId)
+                    .ToListAsync();
+
+                response.Result = customers;
+                response.Success = true;
+                response.Message = "Customers retrieved successfully";
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = $"Error retrieving customers for user: {ex.Message}";
+            }
+
+            return response;
+        }
     }
 } 

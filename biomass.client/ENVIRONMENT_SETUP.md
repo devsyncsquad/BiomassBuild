@@ -11,7 +11,7 @@ This document explains how to configure environment variables for different depl
 The application uses the following environment variable for API configuration:
 
 ```bash
-VITE_LIVE_APP_BASEURL=https://localhost:7084/api
+VITE_LIVE_APP_BASEURL=http://100.42.177.77:88/api
 ```
 
 **Note**: In Vite, environment variables must be prefixed with `VITE_` to be accessible in the frontend code.
@@ -24,7 +24,7 @@ VITE_LIVE_APP_BASEURL=https://localhost:7084/api
 
 ```bash
 # .env
-VITE_LIVE_APP_BASEURL=https://localhost:7084/api
+VITE_LIVE_APP_BASEURL=http://100.42.177.77:88/api
 ```
 
 2. For production, create a `.env.production` file:
@@ -41,19 +41,19 @@ Set the environment variable in your system:
 **Windows (PowerShell):**
 
 ```powershell
-$env:VITE_LIVE_APP_BASEURL="https://localhost:7084/api"
+$env:VITE_LIVE_APP_BASEURL="http://100.42.177.77:88/api"
 ```
 
 **Windows (Command Prompt):**
 
 ```cmd
-set VITE_LIVE_APP_BASEURL=https://localhost:7084/api
+set VITE_LIVE_APP_BASEURL=http://100.42.177.77:88/api
 ```
 
 **Linux/macOS:**
 
 ```bash
-export VITE_LIVE_APP_BASEURL="https://localhost:7084/api"
+export VITE_LIVE_APP_BASEURL="http://100.42.177.77:88/api"
 ```
 
 ### Option 3: Package.json Scripts
@@ -63,7 +63,7 @@ Add environment variables to your npm scripts in `package.json`:
 ```json
 {
   "scripts": {
-    "dev": "VITE_LIVE_APP_BASEURL=https://localhost:7084/api vite",
+    "dev": "VITE_LIVE_APP_BASEURL=http://100.42.177.77:88/api vite",
     "build": "VITE_LIVE_APP_BASEURL=https://your-production-domain.com/api vite build"
   }
 }
@@ -73,18 +73,18 @@ Add environment variables to your npm scripts in `package.json`:
 
 The application is currently configured to use:
 
-- **Development**: `https://localhost:7084/api`
+- **Development**: `http://100.42.177.77:88/api`
 - **Fallback**: If no environment variable is set, it defaults to the development URL
 
 ## API Endpoints
 
 With the current configuration, the following endpoints are available:
 
-- **Authentication**: `https://localhost:7084/api/users/authenticate`
-- **User Management**: `https://localhost:7084/api/UserManagement/*`
-- **Customers**: `https://localhost:7084/api/Customers/*`
-- **Companies**: `https://localhost:7084/api/companies/*`
-- **Vendors**: `https://localhost:7084/api/vendors/*`
+- **Authentication**: `http://100.42.177.77:88/api/users/authenticate`
+- **User Management**: `http://100.42.177.77:88/api/UserManagement/*`
+- **Customers**: `http://100.42.177.77:88/api/Customers/*`
+- **Companies**: `http://100.42.177.77:88/api/companies/*`
+- **Vendors**: `http://100.42.177.77:88/api/vendors/*`
 
 ## Troubleshooting
 

@@ -32,7 +32,7 @@ import { getAuthHeaders, getCurrentUser } from "../../../utils/auth";
 import SectionHeader from "../shared/SectionHeader";
 import CardContainer from "../shared/CardContainer";
 
-const baseUrl = import.meta.env.VITE_APP_BASE_URL || "https://localhost:7084";
+import { getBaseUrl } from "../../../utils/api";
 
 const AssignMenus = () => {
   // State management
@@ -79,13 +79,13 @@ const AssignMenus = () => {
       // Fetch all data in parallel
       const [rolesResponse, menusResponse, menuRolesResponse] =
         await Promise.all([
-          fetch(`${baseUrl}/api/UserManagement/GetRoleList`, {
+          fetch(`${getBaseUrl()}/UserManagement/GetRoleList`, {
             headers: getAuthHeaders(),
           }),
-          fetch(`${baseUrl}/api/UserManagement/GetMenuList`, {
+          fetch(`${getBaseUrl()}/UserManagement/GetMenuList`, {
             headers: getAuthHeaders(),
           }),
-          fetch(`${baseUrl}/api/UserManagement/GetMenuRoleList`, {
+          fetch(`${getBaseUrl()}/UserManagement/GetMenuRoleList`, {
             headers: getAuthHeaders(),
           }),
         ]);
@@ -122,7 +122,7 @@ const AssignMenus = () => {
     try {
       // Get user's role first
       const userRoleResponse = await fetch(
-        `${baseUrl}/api/UserManagement/GetUserRolesByUserId?userId=${user.empId}`,
+        `${getBaseUrl()}/UserManagement/GetUserRolesByUserId?userId=${user.empId}`,
         {
           headers: getAuthHeaders(),
         }
@@ -139,7 +139,7 @@ const AssignMenus = () => {
 
           // Fetch menus for this role
           const userMenusResponse = await fetch(
-            `${baseUrl}/api/UserManagement/GetMenuRolesByRoleId?roleId=${userRole.roleId}`,
+            `${getBaseUrl()}/UserManagement/GetMenuRolesByRoleId?roleId=${userRole.roleId}`,
             {
               headers: getAuthHeaders(),
             }
@@ -163,7 +163,7 @@ const AssignMenus = () => {
 
     try {
       const response = await fetch(
-        `${baseUrl}/api/UserManagement/GetMenuRoleList?roleId=${selectedRole}`,
+        `${getBaseUrl()}/UserManagement/GetMenuRoleList?roleId=${selectedRole}`,
         {
           headers: getAuthHeaders(),
         }
@@ -198,7 +198,7 @@ const AssignMenus = () => {
       // Assign selected unassigned menus
       if (selectedUnassignedMenus.length > 0) {
         const assignPromises = selectedUnassignedMenus.map((menuId) =>
-          fetch(`${baseUrl}/api/UserManagement/SaveMenuRole`, {
+          fetch(`${getBaseUrl()}/UserManagement/SaveMenuRole`, {
             method: "POST",
             headers: {
               ...getAuthHeaders(),
@@ -222,7 +222,7 @@ const AssignMenus = () => {
           );
           if (menuRole) {
             return fetch(
-              `${baseUrl}/api/UserManagement/DeleteMenuRoleById?roleId=${selectedRole}&menuId=${menuId}`,
+              `${getBaseUrl()}/UserManagement/DeleteMenuRoleById?roleId=${selectedRole}&menuId=${menuId}`,
               {
                 method: "DELETE",
                 headers: getAuthHeaders(),

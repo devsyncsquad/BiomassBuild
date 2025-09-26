@@ -123,7 +123,30 @@ const ViewUsers = () => {
   };
 
   const handleEditUser = (user) => {
-    setSelectedUserData(user);
+    console.log("Editing user:", user);
+    // Extract role information
+    const roleInfo = user.role ? {
+      roleId: user.role.roleId,
+      roleName: user.role.roleName
+    } : null;
+    
+    // Prepare user data with all necessary fields
+    const userData = {
+      ...user,
+      userId: user.userId, // Ensure userId is set for edit mode
+      roleId: user.roleId || (roleInfo ? roleInfo.roleId : ""),
+      role: roleInfo,
+      passwordHash: user.password || user.passwordHash || "" // Include password for editing
+    };
+    
+    console.log("Setting selectedUserData to:", userData);
+    setSelectedUserData(userData);
+    
+    // Navigate to the form section
+    const formElement = document.getElementById('userForm');
+    if (formElement) {
+      formElement.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   const handleDeleteUser = async (userId) => {
@@ -194,64 +217,17 @@ const ViewUsers = () => {
 
   return (
     <Box sx={{ width: "100%", p: 3 }}>
-      {/* Add/Edit User Form */}
-      <AddUser 
-        userData={selectedUserData}
-        setUserData={setSelectedUserData}
-        onSuccess={fetchUsers}
-      />
-      
-      {/* Header */}
-      {/* <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          mb: 4,
-          p: 3,
-          background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
-          borderRadius: "16px",
-          border: "1px solid #e2e8f0",
-        }}
-      >
-        <Box>
-          <Typography
-            variant='h5'
-            sx={{
-              fontWeight: 700,
-              color: "#228B22",
-              mb: 1,
-            }}
-          >
-            User Management
-          </Typography>
-          <Typography variant='body2' sx={{ color: "#64748b" }}>
-            Manage and monitor all system users, their roles, and permissions
-          </Typography>
+      {/* Show Form when editing or adding */}
+      {selectedUserData ? (
+        <Box sx={{ mb: 4 }}>
+          <AddUser 
+            userData={selectedUserData.userId ? selectedUserData : null}
+            setUserData={setSelectedUserData}
+            onSuccess={fetchUsers}
+          />
         </Box>
-        <Button
-          variant='outlined'
-          startIcon={<Refresh />}
-          onClick={handleRefresh}
-          disabled={loading}
-          sx={{
-            borderColor: "#228B22",
-            color: "#228B22",
-            "&:hover": {
-              borderColor: "#1B5E20",
-              bgcolor: "rgba(34, 139, 34, 0.04)",
-              transform: "translateY(-1px)",
-              boxShadow: "0 4px 12px rgba(34, 139, 34, 0.15)",
-            },
-            transition: "all 0.2s ease",
-            borderRadius: "12px",
-            px: 3,
-            py: 1,
-          }}
-        >
-          Refresh
-        </Button>
-      </Box> */}
+      ) : (
+        <>
 
       {/* Error Alert */}
       {error && (
@@ -269,9 +245,9 @@ const ViewUsers = () => {
         }}
       >
         <CardContent sx={{ p: 3 }}>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            {/* <FilterList sx={{ color: "#228B22", fontSize: "1.5rem" }} /> */}
-            <TextField
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2, justifyContent: "space-between" }}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2, flex: 1 }}>
+                  <TextField
               fullWidth
               placeholder='Search users by name, username, or employee number...'
               value={searchTerm}
@@ -295,21 +271,38 @@ const ViewUsers = () => {
                     borderWidth: "2px",
                   },
                 },
-              }}
-            />
-          </Box>
-        </CardContent>
-      </Card>
+                  }}
+                />
+                </Box>
+                {!selectedUserData && (
+                  <Button
+                    variant="contained"
+                    startIcon={<Person />}
+                    onClick={() => setSelectedUserData({})}
+                    sx={{
+                      bgcolor: "#228B22",
+                      borderRadius: "12px",
+                      "&:hover": {
+                        bgcolor: "#1B5E20",
+                      },
+                    }}
+                  >
+                    Add New User
+                  </Button>
+                )}
+              </Box>
+            </CardContent>
+          </Card>
 
       {/* Loading State */}
-      {loading && (
+      {loading && !selectedUserData && (
         <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
           <CircularProgress sx={{ color: "#228B22" }} size={48} />
         </Box>
       )}
 
-      {/* Users Table */}
-      {!loading && filteredUsers.length > 0 && (
+      {/* Users Table - Only show when not adding/editing */}
+      {!loading && !selectedUserData && filteredUsers.length > 0 && (
         <Card
           sx={{
             borderRadius: "16px",
@@ -506,8 +499,8 @@ const ViewUsers = () => {
         </Card>
       )}
 
-      {/* No Results Message */}
-      {!loading && filteredUsers.length === 0 && (
+      {/* No Results Message - Only show when not adding/editing */}
+      {!loading && !selectedUserData && filteredUsers.length === 0 && (
         <Box sx={{ textAlign: "center", py: 6 }}>
           <Typography variant='h6' sx={{ color: "#64748b", mb: 1 }}>
             {users.length === 0
@@ -518,6 +511,8 @@ const ViewUsers = () => {
             Try adjusting your search terms or add new users to get started.
           </Typography>
         </Box>
+      )}
+      </>
       )}
     </Box>
   );

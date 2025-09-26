@@ -45,6 +45,7 @@ namespace Biomass.Server.Services
             existingLookup.LookupDomain = lookup.LookupDomain;
             existingLookup.Enabled = lookup.Enabled;
             existingLookup.SortOrder = lookup.SortOrder;
+            existingLookup.ShowInDispatch = lookup.ShowInDispatch;
 
             await _context.SaveChangesAsync();
             return existingLookup;

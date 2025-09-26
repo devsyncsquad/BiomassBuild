@@ -26,6 +26,7 @@ import {
   Description as DescriptionIcon
 } from '@mui/icons-material';
 import './VendorRegistration.css';
+import { getBaseUrl } from '../utils/api';
 
 
 const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave, onEdit }) => {
@@ -66,7 +67,7 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave, onEdit 
       });
       
       // Set image previews for existing images (handle relative URLs)
-      const baseUrl = import.meta.env.VITE_LIVE_APP_BASEURL || "https://localhost:7084";
+      const baseUrl = getBaseUrl().replace('/api', ''); // Remove /api for image URLs
       setCnicFrontPreview(vendor.vendorCnicFrontPic ? `${baseUrl}${vendor.vendorCnicFrontPic}` : '');
       setCnicBackPreview(vendor.vendorCnicBackPic ? `${baseUrl}${vendor.vendorCnicBackPic}` : '');
     } else if (!vendor && open) {

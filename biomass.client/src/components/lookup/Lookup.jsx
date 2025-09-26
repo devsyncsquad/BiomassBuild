@@ -4,12 +4,14 @@ import {
   Button,
   Card,
   CardContent,
+  Checkbox,
   Chip,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   FormControl,
+  FormControlLabel,
   Grid,
   IconButton,
   InputLabel,
@@ -41,6 +43,7 @@ import {
   Schedule as ScheduleIcon,
 } from "@mui/icons-material";
 import axios from "axios";
+import { getBaseUrl } from "../../utils/api";
 
 const Lookup = () => {
   // State management
@@ -76,22 +79,30 @@ const Lookup = () => {
 
   // Form state
   const [formData, setFormData] = useState({
+    lookupId: 0,
     lookupName: "",
     lookupDomain: "",
     enabled: true,
     sortOrder: 0,
+    showInDispatch: "false",
+    createdOn: new Date().toISOString(),
+    createdBy: 0
   });
 
   // Ensure formData is always properly initialized
   const safeFormData = {
+    lookupId: formData?.lookupId || 0,
     lookupName: formData?.lookupName || "",
     lookupDomain: formData?.lookupDomain || "",
     enabled: formData?.enabled === true || formData?.enabled === "true",
     sortOrder: formData?.sortOrder || 0,
+    showInDispatch: formData?.showInDispatch || "false",
+    createdOn: formData?.createdOn || new Date().toISOString(),
+    createdBy: formData?.createdBy || 0
   };
 
   // API base URL
-  const API_BASE = "https://localhost:7084/api/lookups";
+  const API_BASE = `${getBaseUrl()}/lookups`;
 
   // Error boundary function
   const handleError = (error, errorInfo) => {
@@ -138,8 +149,10 @@ const Lookup = () => {
     try {
       // Use the unpaginated API to get all lookups
       const response = await axios.get(`${API_BASE}/GetAllLookups`);
+      console.log("API Response:", response.data);
       if (response.data?.success) {
         const allItems = response.data.result || [];
+        console.log("All Lookups:", allItems);
         setAllLookups(allItems);
 
         // Extract unique domains
@@ -342,10 +355,14 @@ const Lookup = () => {
   const handleAddNew = () => {
     setEditingLookup(null);
     setFormData({
+      lookupId: 0,
       lookupName: "",
       lookupDomain: "",
       enabled: true,
       sortOrder: 0,
+      showInDispatch: "false",
+      createdOn: new Date().toISOString(),
+      createdBy: 0
     });
     setModalOpen(true);
   };
@@ -358,13 +375,36 @@ const Lookup = () => {
         return;
       }
 
+      console.log("Editing lookup:", lookup);
+      
+      // Store the original lookup data for reference
       setEditingLookup(lookup);
-      setFormData({
+      
+      // Convert showInDispatch to string "true"/"false" if it's a boolean
+      const showInDispatch = typeof lookup.showInDispatch === 'boolean' 
+        ? lookup.showInDispatch.toString()
+        : lookup.showInDispatch || "false";
+      
+      // Convert enabled to boolean if it's a string
+      const enabled = typeof lookup.enabled === 'string'
+        ? lookup.enabled.toLowerCase() === 'true' || lookup.enabled === 'Y'
+        : !!lookup.enabled;
+      
+      // Prepare form data with all fields
+      const newFormData = {
+        lookupId: lookup.lookupId,
         lookupName: lookup.lookupName || "",
         lookupDomain: lookup.lookupDomain || "",
-        enabled: lookup.enabled === true || lookup.enabled === "true",
+        enabled: enabled,
         sortOrder: lookup.sortOrder || 0,
-      });
+        showInDispatch: showInDispatch,
+        createdOn: lookup.createdOn || new Date().toISOString(),
+        createdBy: lookup.createdBy || 0
+      };
+      
+      console.log("Setting form data to:", newFormData);
+      
+      setFormData(newFormData);
       setModalOpen(true);
     } catch (error) {
       console.error("Error in handleEdit:", error);
@@ -420,13 +460,24 @@ const Lookup = () => {
       }
 
       let response;
+      console.log("Form data before save:", formData);
+      
+      // Ensure showInDispatch is a string
+      const submitData = {
+        ...formData,
+        showInDispatch: formData.showInDispatch?.toString() || "false"
+      };
+      
+      console.log("Submit data:", submitData);
+      
       if (editingLookup && editingLookup.lookupId) {
+        console.log("Updating lookup with ID:", editingLookup.lookupId);
         response = await axios.put(
           `${API_BASE}/${editingLookup.lookupId}`,
-          formData
+          submitData
         );
       } else {
-        response = await axios.post(API_BASE, formData);
+        response = await axios.post(API_BASE, submitData);
       }
 
       if (response.data?.success) {
@@ -863,6 +914,9 @@ const Lookup = () => {
                   Sort Order
                 </TableCell>
                 <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                  Show in Dispatch
+                </TableCell>
+                <TableCell sx={{ color: "white", fontWeight: "bold" }}>
                   Created
                 </TableCell>
                 <TableCell sx={{ color: "white", fontWeight: "bold" }}>
@@ -934,6 +988,13 @@ const Lookup = () => {
                           {getStatusChip(lookup.enabled, lookup.sortOrder)}
                         </TableCell>
                         <TableCell>{lookup.sortOrder || 0}</TableCell>
+                        <TableCell>
+                          <Chip
+                            label={lookup.showInDispatch === "true" ? "Yes" : "No"}
+                            color={lookup.showInDispatch === "true" ? "success" : "default"}
+                            size="small"
+                          />
+                        </TableCell>
                         <TableCell>
                           {lookup.createdOn
                             ? formatDate(lookup.createdOn)
@@ -1067,6 +1128,21 @@ const Lookup = () => {
                 }
                 inputProps={{ min: 0 }}
                 helperText='Optional, ≥ 0'
+              />
+            </Grid>
+            <Grid item xs={12}>
+                <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={safeFormData.showInDispatch === "true"}
+                    onChange={(e) =>
+                      handleFormChange("showInDispatch", e.target.checked ? "true" : "false")
+                    }
+                    color="primary"
+                  />
+                }
+                label="Show in Dispatch"
+                sx={{ userSelect: 'none' }}
               />
             </Grid>
           </Grid>

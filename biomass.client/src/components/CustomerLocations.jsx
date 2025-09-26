@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { getBaseUrl } from "../utils/api";
 import {
   Box,
   Typography,
@@ -90,7 +91,7 @@ const CustomerLocations = ({ customer, onClose }) => {
       try {
         // Fetch locations for the selected customer
         const response = await axios.get(
-          `https://localhost:7084/api/customerlocations/GetLocationsByCustomerId/${customer.customerId}`
+          `${getBaseUrl()}/customerlocations/GetLocationsByCustomerId/${customer.customerId}`
         );
         if (response.data.success) {
           setLocations(response.data.result);
@@ -100,7 +101,7 @@ const CustomerLocations = ({ customer, onClose }) => {
         // Fallback to get all locations if customer-specific fails
         try {
           const response = await axios.get(
-            "https://localhost:7084/api/customerlocations/GetAllLocations"
+            `${getBaseUrl()}/customerlocations/GetAllLocations`
           );
           if (response.data.success) {
             setLocations(response.data.result);
@@ -117,7 +118,7 @@ const CustomerLocations = ({ customer, onClose }) => {
   const fetchMaterialRates = async (locationId) => {
     try {
       const response = await axios.get(
-        `https://localhost:7084/api/materialrates/location/${locationId}`
+        `${getBaseUrl()}/materialrates/location/${locationId}`
       );
       if (response.data.success) {
         setMaterialRates(response.data.result);
@@ -317,7 +318,7 @@ const CustomerLocations = ({ customer, onClose }) => {
     if (window.confirm("Are you sure you want to delete this location?")) {
       try {
         await axios.delete(
-          `https://localhost:7084/api/customerlocations/DeleteLocation/${locationId}`
+          `${getBaseUrl()}/customerlocations/DeleteLocation/${locationId}`
         );
         setLocations((prev) =>
           prev.filter((loc) => loc.locationId !== locationId)

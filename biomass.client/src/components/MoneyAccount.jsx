@@ -47,6 +47,7 @@ import {
   StarBorder as StarBorderIcon,
 } from "@mui/icons-material";
 import axios from "axios";
+import { getBaseUrl } from "../utils/api";
 
 const MoneyAccount = () => {
   const [moneyAccounts, setMoneyAccounts] = useState([]);
@@ -113,7 +114,7 @@ const MoneyAccount = () => {
       setError(null);
 
       const baseUrl =
-        import.meta.env.VITE_LIVE_APP_BASEURL || "https://localhost:7084/api";
+        getBaseUrl();
       const response = await axios.get(
         `${baseUrl}/MoneyAccount/GetAllMoneyAccount`,
         {
@@ -205,7 +206,7 @@ const MoneyAccount = () => {
     try {
       setLoading(true);
       const baseUrl =
-        import.meta.env.VITE_LIVE_APP_BASEURL || "https://localhost:7084/api";
+        getBaseUrl();
       const response = await axios.get(
         `${baseUrl}/MoneyAccount/GetById/${account.moneyAccountId}`,
         {
@@ -287,7 +288,7 @@ const MoneyAccount = () => {
       setError(null);
 
       const baseUrl =
-        import.meta.env.VITE_LIVE_APP_BASEURL || "https://localhost:7084/api";
+        getBaseUrl();
       let response;
 
       if (isEditMode && selectedAccount) {
@@ -405,7 +406,7 @@ const MoneyAccount = () => {
     try {
       setLoading(true);
       const baseUrl =
-        import.meta.env.VITE_LIVE_APP_BASEURL || "https://localhost:7084/api";
+        getBaseUrl();
       const response = await axios.delete(
         `${baseUrl}/MoneyAccount/DeleteMoneyAccount/${accountToDelete.moneyAccountId}`,
         {
@@ -447,7 +448,7 @@ const MoneyAccount = () => {
     try {
       setLoading(true);
       const baseUrl =
-        import.meta.env.VITE_LIVE_APP_BASEURL || "https://localhost:7084/api";
+        getBaseUrl();
       const response = await axios.put(
         `${baseUrl}/MoneyAccount/SetDefault/${account.moneyAccountId}`,
         {},

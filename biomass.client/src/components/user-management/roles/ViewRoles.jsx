@@ -26,6 +26,7 @@ import {
 import { Edit, Delete, Search, Security, Refresh } from "@mui/icons-material";
 import axios from "axios";
 import { getAuthHeaders } from "../../../utils/auth";
+import { getBaseUrl } from "../../../utils/api";
 import { useGetRoleListQuery } from "../../../redux/apis/userManagementApi";
 
 const ViewRoles = ({ setInitialData }) => {
@@ -69,7 +70,7 @@ const ViewRoles = ({ setInitialData }) => {
     if (window.confirm("Are you sure you want to delete this role?")) {
       try {
         const response = await axios.delete(
-          `https://localhost:7084/api/UserManagement/DeleteRoleById?roleId=${roleId}`,
+          `${getBaseUrl()}/UserManagement/DeleteRoleById?roleId=${roleId}`,
           {
             headers: getAuthHeaders(),
           }

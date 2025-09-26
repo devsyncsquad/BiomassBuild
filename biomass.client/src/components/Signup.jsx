@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { getBaseUrl } from "../utils/api";
 import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
@@ -72,7 +73,7 @@ const Signup = () => {
       };
 
       const response = await axios.post(
-        "https://localhost:7084/api/UserManagement/SaveUser",
+        `${getBaseUrl()}/UserManagement/SaveUser`,
         userData
       );
 

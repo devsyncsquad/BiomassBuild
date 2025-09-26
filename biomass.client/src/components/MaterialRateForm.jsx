@@ -20,6 +20,7 @@ import {
 } from "@mui/material";
 import { Save as SaveIcon, Cancel as CancelIcon } from "@mui/icons-material";
 import axios from "axios";
+import { getBaseUrl } from "../utils/api";
 
 export const MaterialRateForm = ({
   open,
@@ -90,7 +91,7 @@ export const MaterialRateForm = ({
   const loadCustomers = async () => {
     try {
       const response = await axios.get(
-        "https://localhost:7084/api/customers/GetAllCustomers"
+        `${getBaseUrl()}/customers/GetAllCustomers`
       );
       if (response.data.success) {
         setCustomers(response.data.result);
@@ -104,7 +105,7 @@ export const MaterialRateForm = ({
     if (!customerId) return;
     try {
       const response = await axios.get(
-        `https://localhost:7084/api/customerlocations/GetLocationsByCustomerId/${customerId}`
+        `${getBaseUrl()}/customerlocations/GetLocationsByCustomerId/${customerId}`
       );
       if (response.data.success) {
         setLocations(response.data.result);
@@ -155,8 +156,8 @@ export const MaterialRateForm = ({
 
     try {
       const url = isEditing
-        ? `https://localhost:7084/api/materialrates/UpdateMaterialRate/${materialRateData.rateId}`
-        : "https://localhost:7084/api/materialrates/CreateMaterialRate";
+        ? `${getBaseUrl()}/materialrates/UpdateMaterialRate/${materialRateData.rateId}`
+        : `${getBaseUrl()}/materialrates/CreateMaterialRate`;
 
       const method = isEditing ? "put" : "post";
 

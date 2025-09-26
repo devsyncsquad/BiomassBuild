@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { getBaseUrl } from "../utils/api";
 import {
   Dialog,
   DialogTitle,
@@ -124,7 +125,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
 
     try {
       const iconUrl =
-        import.meta.env.VITE_LIVE_APP_BASEURL || "https://localhost:7084/api";
+        getBaseUrl();
       let response;
 
       if (company) {
@@ -397,7 +398,7 @@ const CompanyForm = ({ company, isViewMode, onClose, onSaved }) => {
                         (company?.logoPath
                           ? `${
                               import.meta.env.VITE_LIVE_APP_BASEURL ||
-                              "https://localhost:7084/api"
+                              getBaseUrl()
                             }/Companies/${company.companyId}/logo`
                           : null)
                       }

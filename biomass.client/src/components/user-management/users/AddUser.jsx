@@ -53,6 +53,7 @@ const AddUser = ({ userData, setUserData, onSuccess }) => {
   const currentUser = getCurrentUser();
 
   const [formData, setFormData] = useState({
+    userId: 0,
     firstName: "",
     lastName: "",
     username: "",
@@ -82,20 +83,41 @@ const AddUser = ({ userData, setUserData, onSuccess }) => {
   // Load user data for editing
   useEffect(() => {
     if (userData) {
-      setFormData({
+      console.log("Setting form data from userData:", userData);
+      
+      // Ensure numeric fields are properly parsed
+      const empNo = userData.empNo ? parseInt(userData.empNo) : "";
+      const reportingTo = userData.reportingTo ? parseInt(userData.reportingTo) : 0;
+      
+      // Handle roleId from either direct property or nested role object
+      const roleId = userData.roleId ? parseInt(userData.roleId) : 
+                    (userData.role?.roleId ? parseInt(userData.role.roleId) : "");
+      
+      // Handle customerIds - ensure it's an array
+      const customerIds = Array.isArray(userData.customerIds) ? userData.customerIds :
+                         (userData.customerIds ? [userData.customerIds] : []);
+      
+      // Get password from either password or passwordHash field
+      const password = userData.password || userData.passwordHash || "";
+      
+      const newFormData = {
+        userId: userData.userId,
         firstName: userData.firstName || "",
         lastName: userData.lastName || "",
         username: userData.username || "",
-        passwordHash: "", // Don't show password when editing
-        empNo: userData.empNo || "",
+        passwordHash: password, // Show existing password when editing
+        empNo: empNo,
         phoneNumber: userData.phoneNumber || "",
         isTeamLead: userData.isTeamLead || "N",
         enabled: userData.enabled || "Y",
-        comments: userData.comments || "",
-        reportingTo: userData.reportingTo || 0,
-        roleId: userData.roleId || "",
-        customerIds: userData.customerIds || [],
-      });
+        comments: userData.comments || "User updated via user management",
+        reportingTo: reportingTo,
+        roleId: roleId,
+        customerIds: customerIds
+      };
+      
+      console.log("Setting form data to:", newFormData);
+      setFormData(newFormData);
     }
   }, [userData]);
 
@@ -279,6 +301,7 @@ const AddUser = ({ userData, setUserData, onSuccess }) => {
   const handleCancel = () => {
     setUserData(null);
     setFormData({
+      userId: 0,
       firstName: "",
       lastName: "",
       username: "",
@@ -297,7 +320,7 @@ const AddUser = ({ userData, setUserData, onSuccess }) => {
   };
 
   return (
-    <Box sx={{ width: "100%", p: 3 }}>
+    <Box sx={{ width: "100%", p: 3 }} id="userForm">
       <Card
         sx={{
           borderRadius: "16px",

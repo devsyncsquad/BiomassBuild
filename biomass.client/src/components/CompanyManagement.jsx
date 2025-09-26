@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { getBaseUrl } from "../utils/api";
 import {
   Box,
   Typography,
@@ -106,7 +107,7 @@ const CompanyManagement = () => {
     try {
       setLoading(true);
       const iconUrl =
-        import.meta.env.VITE_LIVE_APP_BASEURL || "https://localhost:7084/api";
+        getBaseUrl();
       const response = await fetch(`${iconUrl}/Companies/GetAllCompanies`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -505,7 +506,7 @@ const CompanyManagement = () => {
                           company.logoPath
                             ? `${
                                 import.meta.env.VITE_LIVE_APP_BASEURL ||
-                                "https://localhost:7084/api"
+                                getBaseUrl()
                               }/Companies/${company.companyId}/logo`
                             : null
                         }

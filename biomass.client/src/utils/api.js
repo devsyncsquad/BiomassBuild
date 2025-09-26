@@ -7,8 +7,13 @@ export const getBaseUrl = () => {
     return import.meta.env.VITE_LIVE_APP_BASEURL;
   }
 
-  // Fallback to default development URL
-  return "https://localhost:7084/api";
+  // In development, use relative URLs to leverage Vite proxy
+  if (import.meta.env.DEV) {
+    return "/api";
+  }
+
+  // Fallback to default development URL for production
+  return "http://100.42.177.77:88/api";
 };
 
 // Common headers for API requests

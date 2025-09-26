@@ -396,7 +396,7 @@ const Lookup = () => {
 
     try {
       const response = await axios.delete(
-        `${API_BASE}/DeleteLookup/${deleteConfirm.lookupId}`
+        `${API_BASE}/${deleteConfirm.lookupId}`
       );
       if (response.data?.success) {
         setDeleteConfirm(null);
@@ -422,11 +422,11 @@ const Lookup = () => {
       let response;
       if (editingLookup && editingLookup.lookupId) {
         response = await axios.put(
-          `${API_BASE}/UpdateLookup/${editingLookup.lookupId}`,
+          `${API_BASE}/${editingLookup.lookupId}`,
           formData
         );
       } else {
-        response = await axios.post(`${API_BASE}/CreateLookup`, formData);
+        response = await axios.post(API_BASE, formData);
       }
 
       if (response.data?.success) {

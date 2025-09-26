@@ -137,26 +137,93 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
     setLoading(true);
     setError(null);
 
-    // Validate required fields
-    const requiredFields = {
-      vehicleNumber: "Vehicle Number",
-      vehicleType: "Vehicle Type",
-      fuelType: "Fuel Type"
+    // Validate required fields and field lengths according to database schema
+    const validations = {
+      vehicleNumber: {
+        required: true,
+        maxLength: 50,
+        label: "Vehicle Number",
+        unique: true
+      },
+      vehicleType: {
+        required: true,
+        maxLength: 50,
+        label: "Vehicle Type"
+      },
+      fuelType: {
+        required: true,
+        maxLength: 50,
+        label: "Fuel Type"
+      },
+      status: {
+        maxLength: 20,
+        label: "Status"
+      },
+      capacity: {
+        type: "decimal",
+        label: "Capacity",
+        validate: (value) => {
+          if (value && (isNaN(value) || value < 0)) {
+            return "Capacity must be a positive number";
+          }
+          // Check decimal places (10,2)
+          if (value && value.toString().split('.')[1]?.length > 2) {
+            return "Capacity can have maximum 2 decimal places";
+          }
+          return null;
+        }
+      },
+      weightAllowed: {
+        type: "integer",
+        label: "Weight Allowed",
+        validate: (value) => {
+          if (value && (!Number.isInteger(Number(value)) || Number(value) < 0)) {
+            return "Weight Allowed must be a positive integer";
+          }
+          return null;
+        }
+      }
     };
 
-    const missingFields = Object.entries(requiredFields)
-      .filter(([key]) => !formData[key])
-      .map(([_, label]) => label);
+    // Collect validation errors
+    const validationErrors = [];
 
-    if (missingFields.length > 0) {
-      setError(`Required fields missing: ${missingFields.join(", ")}`);
-      setLoading(false);
-      return;
-    }
+    // Check required fields and their constraints
+    Object.entries(validations).forEach(([field, rules]) => {
+      const value = formData[field]?.toString().trim();
+
+      // Required field check
+      if (rules.required && !value) {
+        validationErrors.push(`${rules.label} is required`);
+        return;
+      }
+
+      // Max length check
+      if (rules.maxLength && value && value.length > rules.maxLength) {
+        validationErrors.push(`${rules.label} cannot exceed ${rules.maxLength} characters`);
+      }
+
+      // Custom validation
+      if (rules.validate && value) {
+        const error = rules.validate(value);
+        if (error) {
+          validationErrors.push(error);
+        }
+      }
+    });
 
     // Validate CNIC
-    if (formData.driver.cnic && formData.driver.cnic.length !== 13) {
-      setError("CNIC must be exactly 13 digits");
+    if (formData.driver.cnic) {
+      if (formData.driver.cnic.length !== 13) {
+        validationErrors.push("CNIC must be exactly 13 digits");
+      } else if (!/^\d+$/.test(formData.driver.cnic)) {
+        validationErrors.push("CNIC must contain only numbers");
+      }
+    }
+
+    // Check for validation errors
+    if (validationErrors.length > 0) {
+      setError(validationErrors.join("\n"));
       setLoading(false);
       return;
     }
@@ -226,8 +293,12 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
       if (err.response?.data) {
         const errorData = err.response.data;
         
+        // Handle specific database errors
+        if (err.response.status === 500 && errorData.message?.includes("duplicate key value violates unique constraint")) {
+          errorMessage = "A vehicle with this vehicle number already exists. Please use a different vehicle number.";
+        }
         // Handle validation errors
-        if (errorData.errors) {
+        else if (errorData.errors) {
           const errorMessages = [];
           
           Object.entries(errorData.errors).forEach(([field, fieldErrors]) => {
@@ -248,12 +319,20 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
             errorMessage = errorData.title || errorData.message || errorMessage;
           }
         } else if (errorData.message) {
-          errorMessage = errorData.message;
+          // Try to make database errors more user-friendly
+          if (errorData.message.includes("numeric field overflow")) {
+            errorMessage = "One or more numeric values are too large. Please check capacity and weight values.";
+          } else if (errorData.message.includes("invalid input syntax for type numeric")) {
+            errorMessage = "Please enter valid numbers for numeric fields (Capacity, Weight).";
+          } else {
+            errorMessage = errorData.message;
+          }
         } else if (errorData.title) {
           errorMessage = errorData.title;
         }
         
         // Log the actual error for debugging
+        console.log('Original Error:', err.response.data);
         console.log('Processed Error Message:', errorMessage);
       } else if (err.message) {
         errorMessage = err.message;

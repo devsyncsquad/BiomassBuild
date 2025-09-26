@@ -3,6 +3,7 @@ using Biomass.Server.Interfaces;
 using Biomass.Server.Models.Driver;
 using Biomass.Server.Models.Vehicle;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace Biomass.Server.Services
 {
@@ -37,9 +38,20 @@ namespace Biomass.Server.Services
 
         public async Task<VehicleDto> CreateVehicleWithDriverAsync(CreateVehicleRequest request)
         {
+            // Normalize once (optional but recommended)
+            var number = (request.VehicleNumber ?? string.Empty).Trim();
+
+            // 1) Pre-check for duplicates (fast path, avoids 500)
+            var exists = await _context.Vehicles
+                .AsNoTracking()
+                .AnyAsync(v => v.VehicleNumber == number);
+
+            if (exists)
+                throw new InvalidOperationException($"Vehicle number '{number}' already exists.");
+
             var vehicle = new Vehicle
             {
-                VehicleNumber = request.VehicleNumber,
+                VehicleNumber = number,
                 VehicleType = request.VehicleType,
                 Capacity = request.Capacity,
                 FuelType = request.FuelType,
@@ -53,7 +65,16 @@ namespace Biomass.Server.Services
             };
 
             _context.Vehicles.Add(vehicle);
-            await _context.SaveChangesAsync();
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex) when (ex.InnerException is PostgresException pg && pg.SqlState == "23505")
+            {
+                // 2) Safety net in case of race condition
+                throw new InvalidOperationException($"Vehicle number '{number}' already exists.");
+            }
 
             // Create driver if provided
             if (request.Driver != null)

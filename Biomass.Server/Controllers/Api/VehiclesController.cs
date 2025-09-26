@@ -51,15 +51,26 @@ namespace Biomass.Server.Controllers.Api
         }
 
         [HttpPost]
-        public async Task<ActionResult<ServiceResponse<VehicleDto>>> CreateVehicle([FromBody] CreateVehicleRequest request)
+        public async Task<ActionResult<ServiceResponse<VehicleDto>>> CreateVehicle(CreateVehicleRequest request)
         {
-            var vehicle = await _vehicleService.CreateVehicleWithDriverAsync(request);
-            return Ok(new ServiceResponse<VehicleDto>
+            try
             {
-                Result = vehicle,
-                Message = "Vehicle created successfully",
-                Success = true
-            });
+                var dto = await _vehicleService.CreateVehicleWithDriverAsync(request);
+                return Ok(new ServiceResponse<VehicleDto>
+                {
+                    Result = dto,
+                    Success = true,
+                    Message = "Vehicle created successfully"
+                });
+            }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("already exists"))
+            {
+                return Conflict(new ServiceResponse<VehicleDto>
+                {
+                    Success = false,
+                    Message = ex.Message
+                });
+            }
         }
 
         [HttpPut("{id}")]

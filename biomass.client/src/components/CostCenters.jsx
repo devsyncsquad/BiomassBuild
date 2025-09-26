@@ -16,6 +16,7 @@ import {
   Grid,
   IconButton,
   InputLabel,
+  InputAdornment,
   MenuItem,
   Paper,
   Select,
@@ -36,6 +37,7 @@ import {
   Edit as EditIcon,
   FilterList as FilterIcon,
   AccountTree as AccountTreeIcon,
+  Search as SearchIcon,
 } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
 import { getApiBaseUrl } from "../config/config";
@@ -45,6 +47,7 @@ const CostCenters = () => {
   const [costCenters, setCostCenters] = useState([]);
   const [filteredCostCenters, setFilteredCostCenters] = useState([]);
   const [filterType, setFilterType] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
   const [editingCostCenter, setEditingCostCenter] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -68,7 +71,7 @@ const CostCenters = () => {
 
   useEffect(() => {
     applyFilter();
-  }, [filterType, costCenters]);
+  }, [filterType, searchTerm, costCenters]);
 
   // Reset to first page when filter changes
   useEffect(() => {
@@ -129,25 +132,38 @@ const CostCenters = () => {
 
   const applyFilter = () => {
     console.log("Applying filter. Filter type:", filterType);
+    console.log("Search term:", searchTerm);
     console.log("Total cost centers:", costCenters.length);
-    console.log("Cost centers data:", costCenters);
 
     let filtered = [...costCenters];
 
+    // Apply type filter
     switch (filterType) {
       case "parent":
-        filtered = costCenters.filter((cc) => !cc.isChild); // Changed from is_child to isChild
+        filtered = filtered.filter((cc) => !cc.isChild);
         break;
       case "child":
-        filtered = costCenters.filter((cc) => cc.isChild); // Changed from is_child to isChild
+        filtered = filtered.filter((cc) => cc.isChild);
         break;
       default:
-        filtered = costCenters;
         break;
+    }
+
+    // Apply search filter if search term exists
+    if (searchTerm.trim()) {
+      const searchLower = searchTerm.toLowerCase();
+      filtered = filtered.filter(
+        (cc) =>
+          (cc.name || "").toLowerCase().includes(searchLower) ||
+          (cc.code || "").toLowerCase().includes(searchLower) ||
+          (cc.status || "").toLowerCase().includes(searchLower)
+      );
     }
 
     console.log("Filtered results:", filtered);
     setFilteredCostCenters(filtered);
+    // Reset to first page when filter changes
+    setPage(0);
   };
 
   // Pagination handlers
@@ -232,7 +248,7 @@ const CostCenters = () => {
 
         console.log("Updating cost center:", updateData);
         const response = await axios.put(
-          `${apiBaseUrl}/CostCenters/UpdateCostCenter/${editingCostCenter.costCenterId}`,
+          `${apiBaseUrl}/cost-centers/${editingCostCenter.costCenterId}`,
           updateData
         );
 
@@ -257,18 +273,18 @@ const CostCenters = () => {
           );
         }
       } else {
-        // Create new cost center
+        // Create new cost center with proper structure
         const createData = {
           name: formData.name.trim(),
-          parentCostCenterId: formData.hasParent
-            ? formData.parentCostCenterId
-            : null,
+          parentCostCenterId: formData.hasParent ? formData.parentCostCenterId : null,
           isActive: true,
+          code: `${formData.name.substring(0, 3).toUpperCase()}_${Math.random().toString(36).substring(2, 8).toUpperCase()}`, // Generate unique code with random string
+          createdAt: new Date().toISOString()
         };
 
         console.log("Creating cost center:", createData);
         const response = await axios.post(
-          `${apiBaseUrl}/CostCenters/CreateCostCenter`,
+          `${apiBaseUrl}/cost-centers`,
           createData
         );
 
@@ -466,7 +482,39 @@ const CostCenters = () => {
       <Card sx={{ mb: 3, boxShadow: 2 }}>
         <CardContent>
           <Grid container spacing={3} alignItems='center'>
-            <Grid item xs={12} md={8}>
+            {/* Search Bar */}
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                variant="outlined"
+                placeholder="Search by name, code or status..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon sx={{ color: 'green' }} />
+                    </InputAdornment>
+                  ),
+                  sx: {
+                    borderRadius: 2,
+                    '&:hover': {
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'green',
+                      },
+                    },
+                    '&.Mui-focused': {
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'green',
+                      },
+                    },
+                  }
+                }}
+              />
+            </Grid>
+
+            {/* Filter Type */}
+            <Grid item xs={12} md={3}>
               <FormControl fullWidth>
                 <InputLabel>Filter Type</InputLabel>
                 <Select
@@ -480,13 +528,14 @@ const CostCenters = () => {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12} md={4}>
+
+            {/* Count Display */}
+            <Grid item xs={12} md={3}>
               <Typography variant='body2' color='text.secondary'>
                 Showing {filteredCostCenters.length} of {costCenters.length}{" "}
                 cost centers
               </Typography>
             </Grid>
-           
           </Grid>
         </CardContent>
       </Card>

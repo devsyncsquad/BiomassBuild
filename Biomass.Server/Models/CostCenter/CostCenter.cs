@@ -12,13 +12,11 @@ namespace Biomass.Server.Models.CostCenter
 		[Column("cost_center_id")]
 		public int CostCenterId { get; set; }
 
-		[Required]
 		[Column("code")]
-		public string Code { get; set; } = string.Empty;
+		public string? Code { get; set; } = string.Empty;
 
-		[Required]
 		[Column("name")]
-		public string Name { get; set; } = string.Empty;
+		public string? Name { get; set; } = string.Empty;
 
 		[Column("is_active")]
 		public bool IsActive { get; set; } = true;

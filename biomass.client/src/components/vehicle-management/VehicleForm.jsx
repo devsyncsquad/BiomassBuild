@@ -21,6 +21,7 @@ import {
 import axios from "axios";
 import { useVendors } from "../../hooks/useVendors";
 import { useLookupsByDomain } from "../../hooks/useLookups";
+import { getBaseUrl } from "../../utils/api";
 
 const forestGreen = "#228B22";
 const forestGreenHover = "#1b6b1b";
@@ -32,6 +33,24 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
   // Fetch vendors and lookups
   const { data: vendorsResponse } = useVendors();
   const { data: vehicleTypesResponse } = useLookupsByDomain("VEHICLE_TYPE");
+
+  // State for cost centers
+  const [costCenters, setCostCenters] = useState([]);
+
+  // Fetch cost centers
+  useEffect(() => {
+    const fetchCostCenters = async () => {
+      try {
+        const response = await axios.get(`${getBaseUrl()}/cost-centers/GetAllCostCentersView`);
+        if (response.data && response.data.result) {
+          setCostCenters(response.data.result);
+        }
+      } catch (error) {
+        console.error('Error fetching cost centers:', error);
+      }
+    };
+    fetchCostCenters();
+  }, []);
 
   // Extract vendors and vehicle types from response
   const vendors = vendorsResponse?.result || [];
@@ -118,6 +137,23 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
     setLoading(true);
     setError(null);
 
+    // Validate required fields
+    const requiredFields = {
+      vehicleNumber: "Vehicle Number",
+      vehicleType: "Vehicle Type",
+      fuelType: "Fuel Type"
+    };
+
+    const missingFields = Object.entries(requiredFields)
+      .filter(([key]) => !formData[key])
+      .map(([_, label]) => label);
+
+    if (missingFields.length > 0) {
+      setError(`Required fields missing: ${missingFields.join(", ")}`);
+      setLoading(false);
+      return;
+    }
+
     // Validate CNIC
     if (formData.driver.cnic && formData.driver.cnic.length !== 13) {
       setError("CNIC must be exactly 13 digits");
@@ -125,30 +161,51 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
       return;
     }
 
+    // Log the form data before submission
+    console.log("Form Data:", formData);
+
     try {
       // Convert data types and prepare submission data
+      // Prepare the request data with PascalCase property names for backend
+      // Prepare data to match the working Swagger example
       const submitData = {
-        ...formData,
+        vehicleNumber: formData.vehicleNumber,
+        vehicleType: formData.vehicleType,
         capacity: parseFloat(formData.capacity) || 0,
+        fuelType: formData.fuelType,
+        status: formData.status,
+        vehicleRegNumber: formData.vehicleRegNumber,
         vendorId: parseInt(formData.vendorId) || 0,
+        costCenterId: parseInt(formData.costCenterId) || 0,
         isWeightAllocated: formData.isWeightAllocated ? "true" : "false",
         weightAllowed: formData.isWeightAllocated ? (parseFloat(formData.weightAllowed) || 0) : 0,
-        costCenterId: parseInt(formData.costCenterId) || 0,
+        driver: formData.driver.fullName ? {
+          fullName: formData.driver.fullName,
+          cnic: formData.driver.cnic,
+          licenseNumber: formData.driver.licenseNumber,
+          phoneNumber: formData.driver.phoneNumber,
+          address: formData.driver.address,
+          status: formData.driver.status || "Active"
+        } : null
       };
 
       // If vehicle exists, it's an update operation
       const isUpdate = !!vehicle?.vehicleId;
 
+      // Log the request data
+      console.log("Request Data:", submitData);
+
       const response = await axios({
         method: isUpdate ? "put" : "post",
-        url: `https://localhost:7084/api/vehicles${
-          isUpdate ? `/${vehicle.vehicleId}` : ""
-        }`,
-        data: {
+        url: `${getBaseUrl()}/vehicles${isUpdate ? `/${vehicle.vehicleId}` : ""}`,
+        data: isUpdate ? {
           ...submitData,
-          vehicleId: isUpdate ? vehicle.vehicleId : undefined,
-        },
+          vehicleId: vehicle.vehicleId
+        } : submitData,
       });
+
+      // Log the response
+      console.log("API Response:", response.data);
 
       if (response.data.success) {
         onSuccess?.();
@@ -161,6 +218,9 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
       }
     } catch (err) {
       // Enhanced error handling for better user experience
+      console.error('API Error:', err);
+      console.error('Error Response:', err.response?.data);
+      
       let errorMessage = "An error occurred while saving the vehicle";
       
       if (err.response?.data) {
@@ -170,14 +230,15 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
         if (errorData.errors) {
           const errorMessages = [];
           
-          Object.keys(errorData.errors).forEach(field => {
-            const fieldErrors = errorData.errors[field];
+          Object.entries(errorData.errors).forEach(([field, fieldErrors]) => {
             if (Array.isArray(fieldErrors)) {
               fieldErrors.forEach(error => {
-                // Convert field names to user-friendly labels
                 const fieldLabel = getFieldLabel(field);
                 errorMessages.push(`${fieldLabel}: ${error}`);
               });
+            } else if (typeof fieldErrors === 'string') {
+              const fieldLabel = getFieldLabel(field);
+              errorMessages.push(`${fieldLabel}: ${fieldErrors}`);
             }
           });
           
@@ -191,6 +252,9 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
         } else if (errorData.title) {
           errorMessage = errorData.title;
         }
+        
+        // Log the actual error for debugging
+        console.log('Processed Error Message:', errorMessage);
       } else if (err.message) {
         errorMessage = err.message;
       }
@@ -400,14 +464,24 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
             </Grid>
 
             <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                type='number'
-                label='Cost Center ID'
-                name='costCenterId'
-                value={formData.costCenterId}
-                onChange={handleChange}
-              />
+              <FormControl fullWidth>
+                <InputLabel>Cost Center</InputLabel>
+                <Select
+                  name='costCenterId'
+                  value={formData.costCenterId}
+                  onChange={handleChange}
+                  label='Cost Center'
+                >
+                  <MenuItem value="">
+                    <em>None</em>
+                  </MenuItem>
+                  {costCenters.map((center) => (
+                    <MenuItem key={center.costCenterId} value={center.costCenterId}>
+                      {center.name} ({center.code})
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Grid>
 
             {/* Driver Information */}

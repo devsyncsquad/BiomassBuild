@@ -25,6 +25,8 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  TextField,
+  InputAdornment,
 } from "@mui/material";
 import {
   Add as AddIcon,
@@ -35,6 +37,7 @@ import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   Info as InfoIcon,
+  Search as SearchIcon,
 } from "@mui/icons-material";
 import VehicleForm from "./VehicleForm";
 import useVehicles from "../../hooks/useVehicles";
@@ -47,8 +50,21 @@ const VehicleManagement = () => {
   // Pagination state
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [searchTerm, setSearchTerm] = useState("");
   
   const { vehicles, loading, error, stats, totalCount, totalPages, refetchVehicles } = useVehicles(page, pageSize);
+
+  // Filter vehicles based on search term
+  const filteredVehicles = vehicles.filter(vehicle => {
+    if (!searchTerm) return true;
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      (vehicle.vehicleNumber || '').toLowerCase().includes(searchLower) ||
+      (vehicle.vehicleType || '').toLowerCase().includes(searchLower) ||
+      (vehicle.capacity?.toString() || '').includes(searchLower) ||
+      (vehicle.status || '').toLowerCase().includes(searchLower)
+    );
+  });
 
   const handleAddVehicle = () => {
     setSelectedVehicle(null);
@@ -294,40 +310,37 @@ const VehicleManagement = () => {
       {/* Vehicle List */}
       {!loading && !error && (
         <>
-          {/* Pagination Controls */}
-          <Box sx={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'center', 
-            mb: 2,
-            px: 2
-          }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Typography variant="body2" color="text.secondary">
-                Showing {vehicles.length} of {totalCount} vehicles
-              </Typography>
-              <FormControl size="small" sx={{ minWidth: 120 }}>
-                <InputLabel>Per Page</InputLabel>
-                <Select
-                  value={pageSize}
-                  label="Per Page"
-                  onChange={handlePageSizeChange}
-                >
-                  <MenuItem value={5}>5</MenuItem>
-                  <MenuItem value={10}>10</MenuItem>
-                  <MenuItem value={20}>20</MenuItem>
-                  <MenuItem value={50}>50</MenuItem>
-                </Select>
-              </FormControl>
-            </Box>
-            <Pagination
-              count={totalPages}
-              page={page}
-              onChange={handlePageChange}
-              color="primary"
-              size="medium"
-              showFirstButton
-              showLastButton
+          
+
+          {/* Search Bar */}
+          <Box sx={{ mb: 2, px: 2 }}>
+            <TextField
+              fullWidth
+              variant="outlined"
+              placeholder="Search by Vehicle Number, Type, Capacity, or Status..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ color: 'green' }} />
+                  </InputAdornment>
+                ),
+                sx: {
+                  borderRadius: 2,
+                  bgcolor: 'white',
+                  '&:hover': {
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'green',
+                    },
+                  },
+                  '&.Mui-focused': {
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'green',
+                    },
+                  },
+                }
+              }}
             />
           </Box>
 
@@ -335,18 +348,18 @@ const VehicleManagement = () => {
             <Table>
               <TableHead>
                 <TableRow sx={{ bgcolor: "green" }}>
-                  <TableCell>Vehicle Number</TableCell>
-                  <TableCell>Type</TableCell>
-                  <TableCell>Capacity</TableCell>
-                  <TableCell>Fuel Type</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Driver</TableCell>
-                  <TableCell align='center'>Actions</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: "white" }}>Vehicle Number</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: "white" }}>Type</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: "white" }}>Capacity</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: "white" }}>Fuel Type</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: "white" }}>Status</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: "white" }}>Driver</TableCell>
+                  <TableCell align='center' sx={{ fontWeight: 700, color: "white" }}>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {vehicles.map((vehicle) => (
-                  <TableRow key={vehicle.vehicleId}>
+                {filteredVehicles.map((vehicle) => (
+                  <TableRow key={vehicle.vehicleId} sx={{ "&:nth-of-type(even)": { bgcolor: "#fafbfc" }, "&:hover": { bgcolor: "#f0f4ff", transform: "scale(1.001)", transition: "all 0.2s ease" }, transition: "all 0.2s ease" }}>
                     <TableCell>{vehicle.vehicleNumber}</TableCell>
                     <TableCell>{vehicle.vehicleType}</TableCell>
                     <TableCell>{vehicle.capacity}</TableCell>

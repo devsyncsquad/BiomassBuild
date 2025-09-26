@@ -13,13 +13,13 @@ import {
   Button
 } from '@mui/material';
 
-const baseUrl = import.meta.env.VITE_APP_BASE_URL || 'https://localhost:7084';
+import { getBaseUrl } from "../../../utils/api";
 const CompanyManagement = () => {
   const [companies, setCompanies] = useState([]);
   const [editedEmails, setEditedEmails] = useState({});
 
   useEffect(() => {
-    fetch(`${baseUrl}Company/GetCompanyList`, {
+    fetch(`${getBaseUrl()}/Company/GetCompanyList`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}` // Adjust token storage if needed
       }
@@ -44,7 +44,7 @@ const CompanyManagement = () => {
     const email = editedEmails[id];
     if (!email) return;
 
-    fetch(`${baseUrl}Company/UpdateEmail`, {
+    fetch(`${getBaseUrl()}/Company/UpdateEmail`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -68,7 +68,7 @@ const CompanyManagement = () => {
   const email = editedEmails[id];
   if (!email) return;
 
-  fetch(`${baseUrl}Company/SendEmails`, {
+  fetch(`${getBaseUrl()}/Company/SendEmails`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',

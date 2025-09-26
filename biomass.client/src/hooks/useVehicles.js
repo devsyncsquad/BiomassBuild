@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { getBaseUrl } from "../utils/api";
 
 const useVehicles = (page = 1, pageSize = 10) => {
   const [vehicles, setVehicles] = useState([]);
@@ -17,7 +18,7 @@ const useVehicles = (page = 1, pageSize = 10) => {
   const fetchVehicles = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("https://localhost:7084/api/vehicles", {
+      const response = await axios.get(`${getBaseUrl()}/vehicles`, {
         params: {
           page,
           pageSize,

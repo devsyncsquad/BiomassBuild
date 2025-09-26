@@ -27,8 +27,7 @@ import { Menu, Save, Clear } from "@mui/icons-material";
 
 // Utility Imports
 import { getAuthHeaders, getCurrentUser } from "../../../utils/auth";
-
-const baseUrl = import.meta.env.VITE_APP_BASE_URL || "https://localhost:7084";
+import { getBaseUrl } from "../../../utils/api";
 
 const AddMenu = ({ menuData, onMenuSaved, onRefresh }) => {
   // Get current user from auth utility
@@ -132,13 +131,13 @@ const AddMenu = ({ menuData, onMenuSaved, onRefresh }) => {
         };
 
         console.log("Updating menu:", updateData);
-        console.log("API URL:", `${baseUrl}/api/UserManagement/UpdateMenu`);
+        console.log("API URL:", `${getBaseUrl()}/UserManagement/UpdateMenu`);
         console.log("Headers:", getAuthHeaders());
         console.log("Original creator ID:", formData.createdBy);
         console.log("Current updater ID:", user.empId);
 
         response = await axios.put(
-          `${baseUrl}/api/UserManagement/UpdateMenu`,
+          `${getBaseUrl()}/UserManagement/UpdateMenu`,
           updateData,
           {
             headers: getAuthHeaders(),
@@ -160,13 +159,13 @@ const AddMenu = ({ menuData, onMenuSaved, onRefresh }) => {
         };
 
         console.log("Creating menu:", createData);
-        console.log("API URL:", `${baseUrl}/api/UserManagement/SaveMenu`);
+        console.log("API URL:", `${getBaseUrl()}/UserManagement/SaveMenu`);
         console.log("Headers:", getAuthHeaders());
         console.log("Creator ID:", user.empId);
         console.log("Updater ID:", user.empId);
 
         response = await axios.post(
-          `${baseUrl}/api/UserManagement/SaveMenu`,
+          `${getBaseUrl()}/UserManagement/SaveMenu`,
           createData,
           {
             headers: getAuthHeaders(),

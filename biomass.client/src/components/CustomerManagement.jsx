@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { getBaseUrl } from "../utils/api";
 import {
   Box,
   Typography,
@@ -90,7 +91,7 @@ const CustomerManagement = () => {
   const fetchCompanies = async () => {
     try {
       const baseUrl =
-        import.meta.env.VITE_LIVE_APP_BASEURL || "https://localhost:7084/api";
+        getBaseUrl();
       const response = await axios.get(`${baseUrl}/Companies/GetAllCompanies`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -134,7 +135,7 @@ const CustomerManagement = () => {
   const fetchCustomers = async () => {
     try {
       const baseUrl =
-        import.meta.env.VITE_LIVE_APP_BASEURL || "https://localhost:7084/api";
+        getBaseUrl();
       const response = await axios.get(`${baseUrl}/Customers/GetAllCustomers`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -312,7 +313,7 @@ const CustomerManagement = () => {
 
       let response;
       const baseUrl =
-        import.meta.env.VITE_LIVE_APP_BASEURL || "https://localhost:7084/api";
+        getBaseUrl();
 
       if (isEditing) {
         response = await axios.put(
@@ -407,7 +408,7 @@ const CustomerManagement = () => {
     ) {
       try {
         const baseUrl =
-          import.meta.env.VITE_LIVE_APP_BASEURL || "https://localhost:7084/api";
+          getBaseUrl();
         const response = await axios.delete(
           `${baseUrl}/Customers/DeleteCustomer/${customer.customerId}`,
           {

@@ -51,6 +51,12 @@ export default defineConfig({
             '^/weatherforecast': {
                 target,
                 secure: false
+            },
+            '^/api': {
+                target: 'https://localhost:7084',
+                changeOrigin: true,
+                secure: false,
+                rewrite: (path) => path.replace(/^\/api/, '/api')
             }
         },
         port: parseInt(env.DEV_SERVER_PORT || '53731'),

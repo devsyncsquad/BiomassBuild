@@ -24,7 +24,7 @@ import {
   InputLabel,
 } from "@mui/material";
 import { Save as SaveIcon, Cancel as CancelIcon } from "@mui/icons-material";
-import { customerApi, customerLocationsApi } from "../utils/api";
+import { customerApi, customerLocationsApi, getBaseUrl } from "../utils/api";
 
 export const CustomerLocationForm = ({
   open,
@@ -107,7 +107,7 @@ export const CustomerLocationForm = ({
   const fetchVendors = async () => {
     setLoadingVendors(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_LIVE_APP_BASEURL || 'https://localhost:7084/api'}/vendors/labor-and-loader`);
+      const response = await fetch(`${getBaseUrl()}/vendors/labor-and-loader`);
       const data = await response.json();
       
       if (data.success) {
@@ -312,7 +312,7 @@ export const CustomerLocationForm = ({
       // Only add Status for edit operations
       const data = isNewLocation
         ? backendData
-        : { ...backendData, Status: "active" };
+        : { ...backendData, Status: "Active" };
 
       console.log("Sending data to backend:", data);
       console.log("Is new location:", isNewLocation);

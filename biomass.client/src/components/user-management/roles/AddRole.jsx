@@ -30,7 +30,7 @@ import { useGetRoleListQuery, useSaveRoleMutation, useUpdateRoleMutation } from 
 // Utility Imports
 import { getAuthHeaders, getCurrentUser } from "../../../utils/auth";
 
-const baseUrl = import.meta.env.VITE_APP_BASE_URL || "https://localhost:7084";
+import { getBaseUrl } from "../../../utils/api";
 
 const AddRole = ({ initialData, onRoleSaved, onCancel }) => {
   // Get current user from auth utility

@@ -117,12 +117,12 @@ function main() {
   console.log('   import { apiCall } from "../utils/apiClient.js";');
   console.log('');
   console.log('2. Replace hardcoded URLs:');
-  console.log('   // Before: axios.get("https://localhost:7084/api/users")');
+  console.log('   // Before: axios.get("http://100.42.177.77:88/api/users")');
   console.log('   // After:  apiCall.get("/users")');
   console.log('');
   console.log('3. For direct fetch calls:');
   console.log('   import { getApiUrl } from "../config/config.js";');
-  console.log('   // Before: fetch("https://localhost:7084/api/users")');
+  console.log('   // Before: fetch("http://100.42.177.77:88/api/users")');
   console.log('   // After:  fetch(getApiUrl("/users"))');
   console.log('');
   console.log('📖 See API_CENTRALIZATION_GUIDE.md for detailed instructions.');

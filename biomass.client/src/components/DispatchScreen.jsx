@@ -27,6 +27,7 @@ import {
   Refresh as RefreshIcon,
 } from "@mui/icons-material";
 import axios from "axios";
+import { getBaseUrl } from "../utils/api";
 
 const DispatchScreen = () => {
   const [selectedLocationId, setSelectedLocationId] = useState("");
@@ -52,7 +53,7 @@ const DispatchScreen = () => {
   const loadLocations = async () => {
     try {
       const response = await axios.get(
-        "https://localhost:7084/api/customerlocations/GetAllLocations"
+        `${getBaseUrl()}/customerlocations/GetAllLocations`
       );
       if (response.data.success) {
         setLocations(response.data.result);
@@ -71,7 +72,7 @@ const DispatchScreen = () => {
 
     try {
       const response = await axios.get(
-        `https://localhost:7084/api/customerlocations/GetLocationCostsForDispatch/${locationId}`
+        `${getBaseUrl()}/customerlocations/GetLocationCostsForDispatch/${locationId}`
       );
       if (response.data.success) {
         setLocationCosts(response.data.result);

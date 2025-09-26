@@ -25,8 +25,7 @@ import { Edit, Delete, Add, Menu as MenuIcon } from "@mui/icons-material";
 
 // Utility Imports
 import { getAuthHeaders, getCurrentUser } from "../../../utils/auth";
-
-const baseUrl = import.meta.env.VITE_APP_BASE_URL || "https://localhost:7084";
+import { getBaseUrl } from "../../../utils/api";
 
 const ViewMenus = ({ setMenuData }) => {
   const [menus, setMenus] = useState([]);
@@ -56,7 +55,7 @@ const ViewMenus = ({ setMenuData }) => {
       console.log("Fetching menus from API...");
 
       const response = await fetch(
-        `${baseUrl}/api/UserManagement/GetMenuList`,
+        `${getBaseUrl()}/UserManagement/GetMenuList`,
         {
           headers: getAuthHeaders(),
         }
@@ -94,7 +93,7 @@ const ViewMenus = ({ setMenuData }) => {
         console.log("Deleting menu with ID:", menuId);
 
         const response = await fetch(
-          `${baseUrl}/api/UserManagement/DeleteMenuById?menuId=${menuId}`,
+          `${getBaseUrl()}/UserManagement/DeleteMenuById?menuId=${menuId}`,
           {
             method: "DELETE",
             headers: getAuthHeaders(),
@@ -136,7 +135,7 @@ const ViewMenus = ({ setMenuData }) => {
     try {
       console.log("Updating menu:", updatedMenu);
 
-      const response = await fetch(`${baseUrl}/api/UserManagement/UpdateMenu`, {
+      const response = await fetch(`${getBaseUrl()}/UserManagement/UpdateMenu`, {
         method: "PUT",
         headers: getAuthHeaders(),
         body: JSON.stringify(updatedMenu),

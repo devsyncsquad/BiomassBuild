@@ -32,6 +32,7 @@ import {
   Warning as WarningIcon,
   Cancel as CancelIcon,
   Star as StarIcon,
+  Delete as DeleteIcon,
 } from "@mui/icons-material";
 import VendorRegistration from "./VendorRegistration";
 import "./VendorManagement.css";
@@ -40,11 +41,15 @@ import {
   useCreateVendor,
   useUpdateVendor,
   useVendorStats,
+  useDeleteVendor,
 } from "../hooks/useVendors";
 import { debounce } from "lodash";
 import { colors, borderRadius } from "../theme/theme";
 import { green } from "@mui/material/colors";
 import { dark } from "@mui/material/styles/createPalette";
+import axios from "axios";
+import { getAuthHeaders } from "../utils/auth";
+import { getBaseUrl } from "../utils/api";
 
 const VendorManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -64,6 +69,7 @@ const VendorManagement = () => {
   const { data: statsData, isLoading: isLoadingStats } = useVendorStats();
   const createVendorMutation = useCreateVendor();
   const updateVendorMutation = useUpdateVendor();
+  const deleteVendorMutation = useDeleteVendor();
 
   // Debug logs
   console.log("Vendors Data:", vendorsData);
@@ -233,6 +239,31 @@ const VendorManagement = () => {
     setSelectedVendor(vendor);
     setIsEditMode(true);
     setOpenVendorForm(true);
+  };
+
+  const handleDeleteVendor = async (vendor) => {
+    // Show confirmation dialog
+    if (window.confirm(`Are you sure you want to delete "${vendor.vendorName}"? This action cannot be undone.`)) {
+      try {
+        await deleteVendorMutation.mutateAsync(vendor.vendorId);
+        
+        // Show success message
+        setSnackbar({
+          open: true,
+          message: `Vendor "${vendor.vendorName}" deleted successfully!`,
+          severity: "success",
+        });
+      } catch (error) {
+        console.error("Error deleting vendor:", error);
+        
+        // Show error message
+        setSnackbar({
+          open: true,
+          message: error.response?.data?.message || "Failed to delete vendor. Please try again.",
+          severity: "error",
+        });
+      }
+    }
   };
 
   return (
@@ -613,6 +644,23 @@ const VendorManagement = () => {
                   >
                     View Details
                   </Button>
+                  <IconButton
+                    size='small'
+                    onClick={() => handleDeleteVendor(vendor)}
+                    sx={{
+                      color: '#ef4444',
+                      bgcolor: 'rgba(239, 69, 70, 0.1)',
+                      border: '1px solid rgba(239, 69, 70, 0.3)',
+                      "&:hover": {
+                        bgcolor: 'rgba(239, 69, 70, 0.2)',
+                        border: '1px solid rgba(239, 69, 70, 0.5)',
+                      },
+                      minWidth: '40px',
+                      height: '32px',
+                    }}
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
                 </Box>
               </CardContent>
             </Card>

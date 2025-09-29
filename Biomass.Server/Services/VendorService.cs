@@ -167,6 +167,40 @@ namespace Biomass.Server.Services
             }
         }
 
+        public async Task<bool> DeleteVendorAsync(int id)
+        {
+            try
+            {
+                var vendor = await _context.Vendors.FirstOrDefaultAsync(v => v.VendorId == id);
+                
+                if (vendor == null)
+                {
+                    return false; // Vendor not found
+                }
+
+                // Delete associated files if they exist
+                if (!string.IsNullOrEmpty(vendor.VendorCnicFrontPic))
+                {
+                    await _fileService.DeleteFileAsync(vendor.VendorCnicFrontPic);
+                }
+
+                if (!string.IsNullOrEmpty(vendor.VendorCnicBackPic))
+                {
+                    await _fileService.DeleteFileAsync(vendor.VendorCnicBackPic);
+                }
+
+                // Remove the vendor from the database
+                _context.Vendors.Remove(vendor);
+                await _context.SaveChangesAsync();
+
+                return true; // Successfully deleted
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error deleting vendor: {ex.Message}");
+            }
+        }
+
         private VendorDto MapToVendorDto(Vendor vendor)
         {
             return new VendorDto

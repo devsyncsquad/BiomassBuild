@@ -172,12 +172,30 @@ namespace Biomass.Server.Controllers.Api
         {
             try
             {
-                // TODO: Implement delete functionality in VendorService
+                var result = await _vendorService.DeleteVendorAsync(id);
+                
+                if (!result)
+                {
+                    return NotFound(new ServiceResponse<bool>
+                    {
+                        Success = false,
+                        Message = "Vendor not found"
+                    });
+                }
+
                 return Ok(new ServiceResponse<bool>
                 {
                     Success = true,
                     Result = true,
                     Message = "Vendor deleted successfully"
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new ServiceResponse<bool>
+                {
+                    Success = false,
+                    Message = ex.Message
                 });
             }
             catch (Exception ex)

@@ -75,3 +75,17 @@ export const useUpdateVendor = () => {
     }
   });
 };
+
+// Delete a vendor
+export const useDeleteVendor = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id) => apiRequest(`/vendors/delete/${id}`, {
+      method: 'DELETE'
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: vendorKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: vendorKeys.stats() });
+    }
+  });
+};

@@ -11,5 +11,6 @@ namespace Biomass.Server.Interfaces
         Task<VendorDto> CreateVendorAsync(CreateVendorRequest request, int userId);
         Task<VendorDto> UpdateVendorAsync(int id, UpdateVendorRequest request, int userId);
         Task<List<VendorDto>> GetLaborAndLoaderVendorsAsync();
+        Task<bool> DeleteVendorAsync(int id);
     }
 }

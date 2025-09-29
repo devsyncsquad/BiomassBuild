@@ -39,7 +39,7 @@ import axios from "axios";
 import { getAuthHeaders } from "../../../utils/auth";
 import { getBaseUrl } from "../../../utils/api";
 
-const AddUser = ({ userData, setUserData, onSuccess }) => {
+const AddUser = ({ userData, setUserData, onSuccess, onError }) => {
   // Get current user from localStorage
   const getCurrentUser = () => {
     try {
@@ -262,37 +262,47 @@ const AddUser = ({ userData, setUserData, onSuccess }) => {
       }
 
       if (response.data && response.data.success) {
-        setSuccessMessage(
-          userData ? "User updated successfully!" : "User created successfully!"
-        );
-        if (!userData) {
-          // Reset form for new user creation
-          setFormData({
-            firstName: "",
-            lastName: "",
-            username: "",
-            passwordHash: "",
-            empNo: "",
-            phoneNumber: "",
-            isTeamLead: "N",
-            enabled: "Y",
-            comments: "User created via user management",
-            reportingTo: 0,
-            roleId: "",
-            customerIds: [],
-          });
-        }
+        const successMessage = userData ? "User updated successfully!" : "User created successfully!";
+        
+        // Always reset form after successful operation (both add and edit)
+        setFormData({
+          userId: 0,
+          firstName: "",
+          lastName: "",
+          username: "",
+          passwordHash: "",
+          empNo: "",
+          phoneNumber: "",
+          isTeamLead: "N",
+          enabled: "Y",
+          comments: "User created via user management",
+          reportingTo: 0,
+          roleId: "",
+          customerIds: [],
+        });
+        
         setUserData(null); // Clear editing state
-        // Call onSuccess to trigger data refetch
+        setErrors({}); // Clear any errors
+        setSuccessMessage(successMessage);
+        
+        // Call onSuccess with the message to trigger data refetch and show notification
         if (onSuccess) {
-          onSuccess();
+          onSuccess(successMessage);
         }
       } else {
-        setErrors({ submit: response.data?.message || "Failed to save user" });
+        const errorMessage = response.data?.message || "Failed to save user";
+        setErrors({ submit: errorMessage });
+        if (onError) {
+          onError(errorMessage);
+        }
       }
     } catch (error) {
       console.error("Error saving user:", error);
-      setErrors({ submit: "Failed to save user. Please try again." });
+      const errorMessage = "Failed to save user. Please try again.";
+      setErrors({ submit: errorMessage });
+      if (onError) {
+        onError(errorMessage);
+      }
     } finally {
       setLoading(false);
     }

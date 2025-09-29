@@ -37,10 +37,8 @@ import {
 import axios from "axios";
 import { getAuthHeaders } from "../../../utils/auth";
 import { getBaseUrl } from "../../../utils/api";
-import AddUser from './AddUser';
 
-const ViewUsers = () => {
-  const [selectedUserData, setSelectedUserData] = useState(null);
+const ViewUsers = ({ setUserData, onError, onSuccess, refreshTrigger }) => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -51,6 +49,14 @@ const ViewUsers = () => {
     fetchUsers();
     fetchCustomers();
   }, []);
+
+  // Listen for refreshTrigger to automatically refresh users list
+  useEffect(() => {
+    if (refreshTrigger > 0) {
+      console.log("Refreshing users list due to refreshTrigger:", refreshTrigger);
+      fetchUsers();
+    }
+  }, [refreshTrigger]);
 
   const fetchUsers = async () => {
     try {
@@ -124,6 +130,8 @@ const ViewUsers = () => {
 
   const handleEditUser = (user) => {
     console.log("Editing user:", user);
+    // Determine if this is a new user being added or existing user being edited
+    
     // Extract role information
     const roleInfo = user.role ? {
       roleId: user.role.roleId,
@@ -136,13 +144,17 @@ const ViewUsers = () => {
       userId: user.userId, // Ensure userId is set for edit mode
       roleId: user.roleId || (roleInfo ? roleInfo.roleId : ""),
       role: roleInfo,
-      passwordHash: user.password || user.passwordHash || "" // Include password for editing
+      passwordHash: user.passwordHash || "" // Include password for editing
     };
     
-    console.log("Setting selectedUserData to:", userData);
-    setSelectedUserData(userData);
+    console.log("Setting edited user data to:", userData);
     
-    // Navigate to the form section
+    // Set the user data in the parent component so the AddUser form can populate
+    if (setUserData) {
+      setUserData(userData);
+    }
+    
+    // Optional: Scroll to the form
     const formElement = document.getElementById('userForm');
     if (formElement) {
       formElement.scrollIntoView({ behavior: 'smooth' });
@@ -160,14 +172,22 @@ const ViewUsers = () => {
         );
 
         if (response.data && response.data.success) {
-          // Refetch users to get updated list
-          await fetchUsers();
+          // Call onSuccess to trigger refresh and show notification
+          if (onSuccess) {
+            onSuccess('User deleted successfully!');
+          }
         } else {
-          alert(response.data?.message || "Failed to delete user");
+          const errorMessage = response.data?.message || "Failed to delete user";
+          if (onError) {
+            onError(errorMessage);
+          }
         }
       } catch (error) {
         console.error("Error deleting user:", error);
-        alert("Failed to delete user. Please try again.");
+        const errorMessage = "Failed to delete user. Please try again.";
+        if (onError) {
+          onError(errorMessage);
+        }
       }
     }
   };
@@ -182,14 +202,22 @@ const ViewUsers = () => {
       );
 
         if (response.data && response.data.success) {
-          // Refetch users to get updated list
-          await fetchUsers();
+          // Call onSuccess to trigger refresh and show notification
+          if (onSuccess) {
+            onSuccess('User deactivated successfully!');
+          }
         } else {
-        alert(response.data?.message || "Failed to deactivate user");
-      }
+          const errorMessage = response.data?.message || "Failed to deactivate user";
+          if (onError) {
+            onError(errorMessage);
+          }
+        }
     } catch (error) {
       console.error("Error deactivating user:", error);
-      alert("Failed to deactivate user. Please try again.");
+      const errorMessage = "Failed to deactivate user. Please try again.";
+      if (onError) {
+        onError(errorMessage);
+      }
     }
   };
 
@@ -217,18 +245,6 @@ const ViewUsers = () => {
 
   return (
     <Box sx={{ width: "100%", p: 3 }}>
-      {/* Show Form when editing or adding */}
-      {selectedUserData ? (
-        <Box sx={{ mb: 4 }}>
-          <AddUser 
-            userData={selectedUserData.userId ? selectedUserData : null}
-            setUserData={setSelectedUserData}
-            onSuccess={fetchUsers}
-          />
-        </Box>
-      ) : (
-        <>
-
       {/* Error Alert */}
       {error && (
         <Alert severity='error' sx={{ mb: 3, borderRadius: "12px" }}>
@@ -239,15 +255,13 @@ const ViewUsers = () => {
       {/* Search Bar */}
       <Card
         sx={{
-          // mb: 4,
           borderRadius: "16px",
           boxShadow: "0 4px 20px rgba(34, 139, 34, 0.08)",
         }}
       >
         <CardContent sx={{ p: 3 }}>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 2, justifyContent: "space-between" }}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 2, flex: 1 }}>
-                  <TextField
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <TextField
               fullWidth
               placeholder='Search users by name, username, or employee number...'
               value={searchTerm}
@@ -271,38 +285,21 @@ const ViewUsers = () => {
                     borderWidth: "2px",
                   },
                 },
-                  }}
-                />
-                </Box>
-                {!selectedUserData && (
-                  <Button
-                    variant="contained"
-                    startIcon={<Person />}
-                    onClick={() => setSelectedUserData({})}
-                    sx={{
-                      bgcolor: "#228B22",
-                      borderRadius: "12px",
-                      "&:hover": {
-                        bgcolor: "#1B5E20",
-                      },
-                    }}
-                  >
-                    Add New User
-                  </Button>
-                )}
-              </Box>
-            </CardContent>
-          </Card>
+              }}
+            />
+          </Box>
+        </CardContent>
+      </Card>
 
       {/* Loading State */}
-      {loading && !selectedUserData && (
+      {loading && (
         <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
           <CircularProgress sx={{ color: "#228B22" }} size={48} />
         </Box>
       )}
 
-      {/* Users Table - Only show when not adding/editing */}
-      {!loading && !selectedUserData && filteredUsers.length > 0 && (
+      {/* Users Table */}
+      {!loading && filteredUsers.length > 0 && (
         <Card
           sx={{
             borderRadius: "16px",
@@ -499,8 +496,8 @@ const ViewUsers = () => {
         </Card>
       )}
 
-      {/* No Results Message - Only show when not adding/editing */}
-      {!loading && !selectedUserData && filteredUsers.length === 0 && (
+      {/* No Results Message */}
+      {!loading && filteredUsers.length === 0 && (
         <Box sx={{ textAlign: "center", py: 6 }}>
           <Typography variant='h6' sx={{ color: "#64748b", mb: 1 }}>
             {users.length === 0
@@ -511,8 +508,6 @@ const ViewUsers = () => {
             Try adjusting your search terms or add new users to get started.
           </Typography>
         </Box>
-      )}
-      </>
       )}
     </Box>
   );

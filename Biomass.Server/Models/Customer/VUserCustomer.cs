@@ -61,3 +61,4 @@ namespace Biomass.Server.Models.Customer
         public int? CompanyId { get; set; }
     }
 }
+

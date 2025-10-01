@@ -156,7 +156,7 @@ namespace Biomass.Server.Services
             try
             {
                 var vendors = await _context.Vendors
-                    .Where(v => v.IsLabour == true && v.IsVehicleLoader == true && v.Status == "Active")
+                    .Where(v => v.IsLabour == true || v.IsVehicleLoader == true && v.Status == "Active")
                     .ToListAsync();
 
                 return vendors.Select(MapToVendorDto).ToList();

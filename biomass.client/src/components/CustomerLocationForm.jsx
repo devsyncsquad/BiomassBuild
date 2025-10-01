@@ -74,6 +74,13 @@ export const CustomerLocationForm = ({
   const [vendors, setVendors] = useState([]);
   const [loadingVendors, setLoadingVendors] = useState(false);
 
+  // Helper functions to get vendor names
+  const getVendorName = (vendorId) => {
+    if (!vendorId || !vendors.length) return '';
+    const vendor = vendors.find(v => v.vendorId === vendorId || v.VendorId === vendorId);
+    return vendor ? (vendor.vendorName || vendor.VendorName) : '';
+  };
+
   // Fetch customers and vendors when form opens
   useEffect(() => {
     if (open) {
@@ -81,6 +88,7 @@ export const CustomerLocationForm = ({
       if (!customerId || (locationData && locationData.locationId)) {
         fetchCustomers();
       }
+      // Always fetch vendors to ensure vendor names are available for display
       fetchVendors();
     }
   }, [open, customerId, locationData]);
@@ -1092,13 +1100,18 @@ export const CustomerLocationForm = ({
                 </Typography>
 
                 <FormControl fullWidth size='small' sx={{ mb: 2 }}>
-                  <InputLabel>Select Loader Vendor</InputLabel>
+                  <InputLabel id="loader-vendor-label">Select Loader Vendor</InputLabel>
                   {console.log("Loader Vendor debug:", { 
                     formDataDefaultBucket: formData.defaultBucket, 
                     vendors: vendors.length,
-                    vendorIds: vendors.map(v => v.vendorId)
+                    vendorIds: vendors.map(v => v.vendorId || v.VendorId),
+                    vendorNames: vendors.map(v => v.vendorName || v.VendorName),
+                    selectedVendorName: getVendorName(formData.defaultBucket),
+                    vendorsData: vendors,
+                    loadingVendors: loadingVendors
                   })}
                   <Select
+                    labelId="loader-vendor-label"
                     value={formData.defaultBucket || ''}
                     onChange={(e) =>
                       handleInputChange("defaultBucket", e.target.value ? parseInt(e.target.value) : null)
@@ -1107,24 +1120,29 @@ export const CustomerLocationForm = ({
                     disabled={loadingVendors}
                   >
                     <MenuItem value=''>
-                      <em>Select a vendor</em>
+                      <em>{loadingVendors ? 'Loading vendors...' : 'Select a vendor'}</em>
                     </MenuItem>
                     {vendors.map((vendor) => (
-                      <MenuItem key={vendor.vendorId} value={vendor.vendorId}>
-                        {vendor.vendorName}
+                      <MenuItem key={vendor.vendorId || vendor.VendorId} value={vendor.vendorId || vendor.VendorId}>
+                        {vendor.vendorName || vendor.VendorName}
                       </MenuItem>
                     ))}
                   </Select>
                 </FormControl>
 
                 <FormControl fullWidth size='small'>
-                  <InputLabel>Select Labor Vendor</InputLabel>
+                  <InputLabel id="labor-vendor-label">Select Labor Vendor</InputLabel>
                   {console.log("Labor Vendor debug:", { 
                     formDataLaborVendor: formData.laborVendor, 
                     vendors: vendors.length,
-                    vendorIds: vendors.map(v => v.vendorId)
+                    vendorIds: vendors.map(v => v.vendorId || v.VendorId),
+                    vendorNames: vendors.map(v => v.vendorName || v.VendorName),
+                    selectedVendorName: getVendorName(formData.laborVendor),
+                    vendorsData: vendors,
+                    loadingVendors: loadingVendors
                   })}
                   <Select
+                    labelId="labor-vendor-label"
                     value={formData.laborVendor || ''}
                     onChange={(e) =>
                       handleInputChange("laborVendor", e.target.value ? parseInt(e.target.value) : null)
@@ -1133,11 +1151,11 @@ export const CustomerLocationForm = ({
                     disabled={loadingVendors}
                   >
                     <MenuItem value=''>
-                      <em>Select a vendor</em>
+                      <em>{loadingVendors ? 'Loading vendors...' : 'Select a vendor'}</em>
                     </MenuItem>
                     {vendors.map((vendor) => (
-                      <MenuItem key={vendor.vendorId} value={vendor.vendorId}>
-                        {vendor.vendorName}
+                      <MenuItem key={vendor.vendorId || vendor.VendorId} value={vendor.vendorId || vendor.VendorId}>
+                        {vendor.vendorName || vendor.VendorName}
                       </MenuItem>
                     ))}
                   </Select>

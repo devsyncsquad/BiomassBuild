@@ -676,7 +676,7 @@ const CostCenters = () => {
             alignItems: "center",
           }}
         >
-          <Typography variant='h6'>
+          <Typography variant='h6' sx={{ color: "white" }}>
             {isEditMode ? "Edit Cost Center" : "Add New Cost Center"}
           </Typography>
         </DialogTitle>
@@ -770,7 +770,7 @@ const CostCenters = () => {
           <Button
             onClick={handleCloseDialog}
             variant='outlined'
-            disabled={saving}
+            disabled={saving} sx={{ color: "black", borderColor: "black" }}
           >
             Cancel
           </Button>

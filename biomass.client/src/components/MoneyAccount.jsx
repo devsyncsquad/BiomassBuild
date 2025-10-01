@@ -451,7 +451,7 @@ const MoneyAccount = () => {
       if (response.data.success) {
         setSnackbar({
           open: true,
-          message: "Money account deleted successfully",
+          message: "Money account deactivated successfully",
           severity: "success",
         });
         setDeleteDialogOpen(false);
@@ -460,7 +460,7 @@ const MoneyAccount = () => {
       } else {
         setSnackbar({
           open: true,
-          message: response.data.message || "Failed to delete money account",
+          message: response.data.message || "Failed to deactivate money account",
           severity: "error",
         });
       }

@@ -47,7 +47,7 @@ import {
   StarBorder as StarBorderIcon,
 } from "@mui/icons-material";
 import axios from "axios";
-import { getBaseUrl } from "../utils/api";
+import { getBaseUrl, lookupApi } from "../utils/api";
 
 const MoneyAccount = () => {
   const [moneyAccounts, setMoneyAccounts] = useState([]);
@@ -72,6 +72,8 @@ const MoneyAccount = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [kindLookupId, setKindLookupId] = useState(6); // Default to Bank
+  const [accountTypes, setAccountTypes] = useState([]);
+  const [loadingAccountTypes, setLoadingAccountTypes] = useState(false);
 
   const [formData, setFormData] = useState({
     accountCode: "",
@@ -101,6 +103,35 @@ const MoneyAccount = () => {
   useEffect(() => {
     loadMoneyAccounts();
   }, [page, pageSize, kindLookupId]);
+
+  // Load account types from lookup API
+  useEffect(() => {
+    loadAccountTypes();
+  }, []);
+
+  // Load account types from lookup API
+  const loadAccountTypes = async () => {
+    try {
+      setLoadingAccountTypes(true);
+      const response = await lookupApi.getLookupsByDomain("MoneyAccountKind");
+      
+      if (response.success) {
+        setAccountTypes(response.result || []);
+        // Set default to first available account type if none selected
+        if (response.result && response.result.length > 0 && !kindLookupId) {
+          setKindLookupId(response.result[0].lookupId);
+        }
+      } else {
+        console.error("Failed to load account types:", response.message);
+        setAccountTypes([]);
+      }
+    } catch (error) {
+      console.error("Error loading account types:", error);
+      setAccountTypes([]);
+    } finally {
+      setLoadingAccountTypes(false);
+    }
+  };
 
   // Get current user info for createdBy and updatedBy
   const getCurrentUser = () => {
@@ -687,6 +718,7 @@ const MoneyAccount = () => {
                     value={kindLookupId}
                     label='Account Type'
                     onChange={(e) => setKindLookupId(e.target.value)}
+                    disabled={loadingAccountTypes}
                     sx={{
                       borderRadius: 2,
                       "& .MuiOutlinedInput-notchedOutline": {
@@ -696,9 +728,18 @@ const MoneyAccount = () => {
                       },
                     }}
                   >
-                    <MenuItem value={6}>Bank</MenuItem>
-                    <MenuItem value={7}>Wallet</MenuItem>
-                    <MenuItem value={8}>Cash</MenuItem>
+                    {loadingAccountTypes ? (
+                      <MenuItem disabled>
+                        <CircularProgress size={20} sx={{ mr: 1 }} />
+                        Loading account types...
+                      </MenuItem>
+                    ) : (
+                      accountTypes.map((accountType) => (
+                        <MenuItem key={accountType.lookupId} value={accountType.lookupId}>
+                          {accountType.lookupName}
+                        </MenuItem>
+                      ))
+                    )}
                   </Select>
                 </FormControl>
               </Grid>
@@ -1082,13 +1123,22 @@ const MoneyAccount = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, kindLookupId: e.target.value })
                     }
-                    disabled={!isEditMode && selectedAccount}
+                    disabled={!isEditMode && selectedAccount || loadingAccountTypes}
                     label='Account Type *'
                     variant='outlined'
                   >
-                    <MenuItem value={6}>Bank</MenuItem>
-                    <MenuItem value={7}>Wallet</MenuItem>
-                    <MenuItem value={8}>Cash</MenuItem>
+                    {loadingAccountTypes ? (
+                      <MenuItem disabled>
+                        <CircularProgress size={20} sx={{ mr: 1 }} />
+                        Loading account types...
+                      </MenuItem>
+                    ) : (
+                      accountTypes.map((accountType) => (
+                        <MenuItem key={accountType.lookupId} value={accountType.lookupId}>
+                          {accountType.lookupName}
+                        </MenuItem>
+                      ))
+                    )}
                   </Select>
                 </FormControl>
               </Grid>

@@ -355,6 +355,11 @@ export const customerLocationsApi = {
   }),
 };
 
+// Employee API functions
+export const employeeApi = {
+  getAllEmployees: (page = 1, pageSize = 20) => apiRequest(`/Employees/GetAllEmployees?page=${page}&pageSize=${pageSize}`),
+};
+
 // Lookup API functions
 export const lookupApi = {
   getAllLookups: () => apiRequest("/lookups/GetAllLookups"),

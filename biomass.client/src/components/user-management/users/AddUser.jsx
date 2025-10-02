@@ -37,7 +37,7 @@ import {
 } from "@mui/icons-material";
 import axios from "axios";
 import { getAuthHeaders } from "../../../utils/auth";
-import { getBaseUrl } from "../../../utils/api";
+import { getBaseUrl, employeeApi } from "../../../utils/api";
 
 const AddUser = ({ userData, setUserData, onSuccess, onError }) => {
   // Get current user from localStorage
@@ -73,11 +73,13 @@ const AddUser = ({ userData, setUserData, onSuccess, onError }) => {
   const [successMessage, setSuccessMessage] = useState("");
   const [roles, setRoles] = useState([]);
   const [customers, setCustomers] = useState([]);
+  const [employees, setEmployees] = useState([]);
 
-  // Fetch roles and customers on component mount
+  // Fetch roles, customers, and employees on component mount
   useEffect(() => {
     fetchRoles();
     fetchCustomers();
+    fetchEmployees();
   }, []);
 
   // Load user data for editing
@@ -153,6 +155,17 @@ const AddUser = ({ userData, setUserData, onSuccess, onError }) => {
     }
   };
 
+  const fetchEmployees = async () => {
+    try {
+      const response = await employeeApi.getAllEmployees(1, 100); // Get all employees
+      if (response.success) {
+        setEmployees(response.result.items || []);
+      }
+    } catch (error) {
+      console.error("Error fetching employees:", error);
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -189,7 +202,7 @@ const AddUser = ({ userData, setUserData, onSuccess, onError }) => {
     if (!formData.username.trim()) newErrors.username = "Username is required";
     if (!userData && !formData.passwordHash.trim())
       newErrors.passwordHash = "Password is required";
-    if (!formData.empNo) newErrors.empNo = "Employee number is required";
+    if (!formData.empNo) newErrors.empNo = "Employee is required";
     if (!formData.roleId) newErrors.roleId = "Role is required";
 
     console.log("Validation errors found:", newErrors);
@@ -484,15 +497,10 @@ const AddUser = ({ userData, setUserData, onSuccess, onError }) => {
                 />
               </Grid>
               <Grid item xs={12} md={4}>
-                <TextField
-                  fullWidth
-                  name='empNo'
-                  label='Employee Number'
-                  value={formData.empNo}
-                  onChange={handleChange}
-                  error={!!errors.empNo}
-                  helperText={errors.empNo}
+                <FormControl 
+                  fullWidth 
                   required
+                  error={!!errors.empNo}
                   sx={{
                     "& .MuiOutlinedInput-root": {
                       borderRadius: "12px",
@@ -505,7 +513,26 @@ const AddUser = ({ userData, setUserData, onSuccess, onError }) => {
                       },
                     },
                   }}
-                />
+                >
+                  <InputLabel>Employee</InputLabel>
+                  <Select
+                    name='empNo'
+                    value={formData.empNo}
+                    onChange={handleChange}
+                    label='Employee'
+                  >
+                    {employees.map((employee) => (
+                      <MenuItem key={employee.employeeId} value={employee.employeeId}>
+                        {employee.fullName}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  {errors.empNo && (
+                    <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.75 }}>
+                      {errors.empNo}
+                    </Typography>
+                  )}
+                </FormControl>
               </Grid>
               <Grid item xs={12} md={4}>
                 <TextField

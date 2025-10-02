@@ -35,6 +35,7 @@ import {
   Notifications as NotificationsIcon,
   Search as SearchIcon,
   Home as HomeIcon,
+  Badge as EmployeeIcon,
 } from '@mui/icons-material';
 import { colors, borderRadius, shadows } from '../theme';
 
@@ -158,6 +159,7 @@ const menuItems = [
   { text: 'Customer Locations', icon: <LocationIcon />, path: '/customer-locations' },
   { text: 'Vendor Management', icon: <StoreIcon />, path: '/vendor-management' },
   { text: 'Vehicle Management', icon: <VehicleIcon />, path: '/vehicle-management' },
+  { text: 'Employees', icon: <EmployeeIcon />, path: '/employees' },
   { text: 'Money Account', icon: <AccountIcon />, path: '/money-account' },
   { text: 'Cost Centers', icon: <CostCenterIcon />, path: '/cost-centers' },
   { text: 'Lookup', icon: <SettingsIcon />, path: '/lookup-management' },

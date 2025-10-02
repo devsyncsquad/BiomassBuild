@@ -358,6 +358,14 @@ export const customerLocationsApi = {
 // Employee API functions
 export const employeeApi = {
   getAllEmployees: (page = 1, pageSize = 20) => apiRequest(`/Employees/GetAllEmployees?page=${page}&pageSize=${pageSize}`),
+  createEmployee: (employeeData) => apiRequest("/Employees/CreateEmployee", {
+    method: "POST",
+    body: JSON.stringify(employeeData),
+  }),
+  updateEmployee: (id, employeeData) => apiRequest(`/Employees/UpdateEmployee/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(employeeData),
+  }),
 };
 
 // Lookup API functions

@@ -22,6 +22,7 @@ import VehicleManagement from "./components/vehicle-management/VehicleManagement
 import UserManagement from "./components/user-management";
 import MoneyAccount from "./components/MoneyAccount";
 import CostCenters from "./components/CostCenters";
+import Employees from "./components/Employees";
 import Lookup from "./components/lookup/Lookup";
 import "./App.css";
 import {
@@ -503,6 +504,16 @@ function App() {
                 <ProtectedRoute>
                   <Layout>
                     <VehicleManagement />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path='/employees'
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Employees />
                   </Layout>
                 </ProtectedRoute>
               }

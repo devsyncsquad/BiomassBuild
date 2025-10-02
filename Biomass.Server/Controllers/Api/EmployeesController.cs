@@ -77,7 +77,7 @@ namespace Biomass.Server.Controllers.Api
 		[HttpPut("UpdateEmployee/{id}")]
 		public async Task<IActionResult> UpdateEmployee(int id, [FromBody] UpdateEmployeeRequest request)
 		{
-			if (id != request.EmployeeId) return BadRequest(new ServiceResponse<bool> { Success = false, Message = "ID mismatch" });
+			//if (id != request.EmployeeId) return BadRequest(new ServiceResponse<bool> { Success = false, Message = "ID mismatch" });
 			var result = await _service.UpdateAsync(id, request);
 			if (!result.Success) return BadRequest(result);
 			return Ok(result);

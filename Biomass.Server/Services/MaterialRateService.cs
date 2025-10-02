@@ -170,7 +170,7 @@ namespace Biomass.Server.Services
                 {
                     var lookup = await _context.Lookups
                         .FirstOrDefaultAsync(l => l.LookupName == request.MaterialType && 
-                                                 l.LookupDomain == "MatrialType" && 
+                                                 l.LookupDomain == "MaterialType" && 
                                                  l.Enabled);
                     materialId = lookup?.LookupId;
                 }

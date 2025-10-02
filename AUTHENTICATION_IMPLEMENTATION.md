@@ -116,7 +116,7 @@ const handleSubmit = async (e) => {
   e.preventDefault();
   
   try {
-    const response = await axios.post('https://localhost:7084/api/users/authenticate', {
+    const response = await axios.post('http://100.42.177.77:88/api/users/authenticate', {
       username: username,
       password: password
     });

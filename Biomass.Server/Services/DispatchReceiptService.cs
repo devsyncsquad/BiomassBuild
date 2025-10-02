@@ -76,7 +76,7 @@ namespace Biomass.Server.Services
                 AdvancesApplied = request.AdvancesApplied,
                 AmountPayable = amountPayable,
                 Remarks = request.Remarks,
-                Status = request.Status,
+                Status = "Received",
                 CreatedBy = request.CreatedBy,
                 CreatedAt = DateTime.UtcNow,
                 FilesUrl = request.FilesUrl,
@@ -84,6 +84,14 @@ namespace Biomass.Server.Services
             };
 
             _context.DispatchReceipts.Add(dispatchReceipt);
+            
+            // Update the dispatch status to "Received"
+            var dispatch = await _context.Dispatches.FindAsync(request.DispatchId);
+            if (dispatch != null)
+            {
+                dispatch.Status = "Received";
+            }
+            
             await _context.SaveChangesAsync();
 
             return dispatchReceipt.ReceiptId;

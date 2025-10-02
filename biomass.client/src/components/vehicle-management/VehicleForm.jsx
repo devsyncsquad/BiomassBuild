@@ -17,6 +17,7 @@ import {
   CircularProgress,
   Checkbox,
   FormControlLabel,
+  Autocomplete,
 } from "@mui/material";
 import axios from "axios";
 import { useVendors } from "../../hooks/useVendors";
@@ -33,6 +34,7 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
   // Fetch vendors and lookups
   const { data: vendorsResponse } = useVendors();
   const { data: vehicleTypesResponse } = useLookupsByDomain("VEHICLE_TYPE");
+  const { data: fuelTypesResponse } = useLookupsByDomain("FuelType");
 
   // State for cost centers
   const [costCenters, setCostCenters] = useState([]);
@@ -52,9 +54,10 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
     fetchCostCenters();
   }, []);
 
-  // Extract vendors and vehicle types from response
+  // Extract vendors, vehicle types, and fuel types from response
   const vendors = vendorsResponse?.result || [];
   const vehicleTypes = vehicleTypesResponse?.result || [];
+  const fuelTypes = fuelTypesResponse?.result || [];
 
   const [formData, setFormData] = useState({
     vehicleId: "",
@@ -450,14 +453,22 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
             </Grid>
 
             <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                required
-                label='Fuel Type'
-                name='fuelType'
-                value={formData.fuelType}
-                onChange={handleChange}
-              />
+              <FormControl fullWidth required>
+                <InputLabel>Fuel Type</InputLabel>
+                <Select
+                  name='fuelType'
+                  value={formData.fuelType}
+                  onChange={handleChange}
+                  label='Fuel Type'
+                >
+                  {Array.isArray(fuelTypes) &&
+                    fuelTypes.map((fuelType) => (
+                      <MenuItem key={fuelType.lookupId} value={fuelType.lookupName}>
+                        {fuelType.lookupName}
+                      </MenuItem>
+                    ))}
+                </Select>
+              </FormControl>
             </Grid>
 
             <Grid item xs={12} sm={6}>
@@ -543,24 +554,40 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
             </Grid>
 
             <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel>Cost Center</InputLabel>
-                <Select
-                  name='costCenterId'
-                  value={formData.costCenterId}
-                  onChange={handleChange}
-                  label='Cost Center'
-                >
-                  <MenuItem value="">
-                    <em>None</em>
-                  </MenuItem>
-                  {costCenters.map((center) => (
-                    <MenuItem key={center.costCenterId} value={center.costCenterId}>
-                      {center.name} ({center.code})
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+              <Autocomplete
+                fullWidth
+                options={costCenters}
+                getOptionLabel={(option) => option ? `${option.name} (${option.code})` : ''}
+                value={costCenters.find(center => center.costCenterId == formData.costCenterId) || null}
+                onChange={(event, newValue) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    costCenterId: newValue ? newValue.costCenterId : ""
+                  }));
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Cost Center"
+                    placeholder="Search cost centers..."
+                  />
+                )}
+                renderOption={(props, option) => (
+                  <Box component="li" {...props}>
+                    <Box>
+                      <Typography variant="body1">{option.name}</Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Code: {option.code}
+                      </Typography>
+                    </Box>
+                  </Box>
+                )}
+                isOptionEqualToValue={(option, value) => option.costCenterId === value.costCenterId}
+                noOptionsText="No cost centers found"
+                clearOnEscape
+                selectOnFocus
+                handleHomeEndKeys
+              />
             </Grid>
 
             {/* Driver Information */}

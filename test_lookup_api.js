@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const API_BASE = 'https://localhost:7084/api/lookups';
+const API_BASE = 'http://100.42.177.77:88/api/lookups';
 
 async function testLookupAPI() {
   console.log('🧪 Testing Lookup API Endpoints...\n');

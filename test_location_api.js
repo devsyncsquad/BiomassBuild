@@ -1,7 +1,7 @@
 // Test script to verify Location API functionality
 const axios = require('axios');
 
-const API_BASE = 'https://localhost:7084/api';
+const API_BASE = 'http://100.42.177.77:88/api';
 
 async function testLocationAPI() {
   try {

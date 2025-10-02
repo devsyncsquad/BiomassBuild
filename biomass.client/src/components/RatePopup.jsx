@@ -684,7 +684,7 @@ const RatePopup = ({
                 <Grid item xs={12} sm={6} md={3}>
                   <TextField
                     fullWidth
-                    label='Transporter Rate'
+                    label='Is this Rate per mund'
                     type='number'
                     value={formData.transporterRate}
                     onChange={(e) =>

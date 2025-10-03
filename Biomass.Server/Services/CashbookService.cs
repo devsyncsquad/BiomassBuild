@@ -15,26 +15,27 @@ namespace Biomass.Server.Services
 	{
 		private readonly ApplicationDbContext _db;
 		private readonly IWebHostEnvironment _environment;
-        private readonly string _uploadFolder = "wwwroot/uploads"; // Ensure this folder exists
+        private readonly string _uploadFolder;
+        
         public CashbookService(ApplicationDbContext db, IWebHostEnvironment environment)
 		{
 			_db = db;
 			_environment = environment;
+            _uploadFolder = Path.Combine(_environment.WebRootPath, "uploads", "cashbook_receipts");
+            // Create cashbook receipts directory if it doesn't exist
+            if (!Directory.Exists(_uploadFolder))
+            {
+                Directory.CreateDirectory(_uploadFolder);
+            }
 		}
 
         public async Task<long> SaveCashbookEntryAsync(CashbookEntryDto dto)
         {
-			
-            string filePath = null;
+            string? receiptPath = null;
 
             if (dto.ReceiptFile != null)
             {
-                var timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmssfff"); // e.g., 20250816_183245123
-                var fileName = $"{timestamp}_{dto.ReceiptFile.FileName}";
-                filePath = Path.Combine(_uploadFolder, fileName);
-
-                using var stream = new FileStream(filePath, FileMode.Create);
-                await dto.ReceiptFile.CopyToAsync(stream);
+                receiptPath = await SaveReceiptFileAsync(dto.ReceiptFile);
             }
 		
 				var entry = new Cashbook
@@ -53,7 +54,7 @@ namespace Biomass.Server.Services
 					Remarks = dto.Remarks,
 					Status = dto.Status,
 					//Meta = string.IsNullOrWhiteSpace(dto.MetaJson) ? null : JsonDocument.Parse(dto.MetaJson).RootElement,
-					ReceiptPath = filePath,
+					ReceiptPath = receiptPath,
 					CostCenterSubId=dto.CostCenterSubId,
 					DispatchId = dto.DispatchId,
                     //TransferGroupId = dto.TransferGroupId,
@@ -84,15 +85,10 @@ namespace Biomass.Server.Services
             var groupId = Guid.NewGuid();
 
             // Save receipt file (if any)
-            string filePath = null;
+            string? receiptPath = null;
             if (dto.ReceiptFile != null)
             {
-                var timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmssfff");
-                var fileName = $"{timestamp}_{dto.ReceiptFile.FileName}";
-                filePath = Path.Combine(_uploadFolder, fileName);
-
-                using var stream = new FileStream(filePath, FileMode.Create);
-                await dto.ReceiptFile.CopyToAsync(stream);
+                receiptPath = await SaveReceiptFileAsync(dto.ReceiptFile);
             }
 
             // "Out" entry
@@ -111,7 +107,7 @@ namespace Biomass.Server.Services
                 CounterpartyName = dto.CounterpartyName,
                 Remarks = dto.Remarks,
                 Status = dto.Status,
-                ReceiptPath = filePath,
+                ReceiptPath = receiptPath,
                 CostCenterSubId = dto.CostCenterSubId,
                 DispatchId = dto.DispatchId,
                 TransferGroupId = groupId,
@@ -134,7 +130,7 @@ namespace Biomass.Server.Services
                 CounterpartyName = dto.CounterpartyName,
                 Remarks = dto.Remarks,
                 Status = dto.Status,
-                ReceiptPath = filePath,
+                ReceiptPath = receiptPath,
                 CostCenterSubId = dto.CostCenterSubId,
                 DispatchId = dto.DispatchId,
                 TransferGroupId = groupId,
@@ -421,7 +417,8 @@ namespace Biomass.Server.Services
 				{
 					try
 					{
-						var fullPath = Path.Combine(_environment.WebRootPath, entity.ReceiptPath.TrimStart('/'));
+						var fileName = Path.GetFileName(entity.ReceiptPath);
+						var fullPath = Path.Combine(_uploadFolder, fileName);
 						if (File.Exists(fullPath))
 						{
 							File.Delete(fullPath);
@@ -662,17 +659,10 @@ namespace Biomass.Server.Services
 				throw new InvalidOperationException("Only PDF, JPG, and PNG files are allowed");
 			}
 
-			// Create upload directory if it doesn't exist
-			var uploadDir = Path.Combine(_environment.WebRootPath, "uploads", "cashbook_receipts");
-			if (!Directory.Exists(uploadDir))
-			{
-				Directory.CreateDirectory(uploadDir);
-			}
-
 			// Generate unique filename
 			var timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
-			var fileName = $"receipt_{timestamp}{fileExtension}";
-			var filePath = Path.Combine(uploadDir, fileName);
+			var fileName = $"receipt_{timestamp}_{Guid.NewGuid().ToString("N")[..8]}{fileExtension}";
+			var filePath = Path.Combine(_uploadFolder, fileName);
 
 			// Save file
 			using (var stream = new FileStream(filePath, FileMode.Create))

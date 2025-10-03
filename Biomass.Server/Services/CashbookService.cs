@@ -21,7 +21,15 @@ namespace Biomass.Server.Services
 		{
 			_db = db;
 			_environment = environment;
-            _uploadFolder = Path.Combine(_environment.WebRootPath, "uploads", "cashbook_receipts");
+            
+            // Ensure WebRootPath is not null, use ContentRootPath as fallback
+            var webRootPath = _environment.WebRootPath ?? _environment.ContentRootPath;
+            if (string.IsNullOrEmpty(webRootPath))
+            {
+                throw new InvalidOperationException("WebRootPath and ContentRootPath are both null or empty. Cannot determine upload directory.");
+            }
+            
+            _uploadFolder = Path.Combine(webRootPath, "uploads", "cashbook_receipts");
             // Create cashbook receipts directory if it doesn't exist
             if (!Directory.Exists(_uploadFolder))
             {

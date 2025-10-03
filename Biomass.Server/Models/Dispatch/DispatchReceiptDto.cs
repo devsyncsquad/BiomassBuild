@@ -90,6 +90,9 @@ namespace Biomass.Server.Models.Dispatch
         public string? FilesUrl { get; set; }
 
         public bool? BiltyReceived { get; set; }
+
+        // For file upload handling in multipart/form-data
+        public IFormFile? SlipImageFile { get; set; }
     }
 
     /// <summary>

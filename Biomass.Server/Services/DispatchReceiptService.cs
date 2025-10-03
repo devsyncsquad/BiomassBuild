@@ -4,6 +4,7 @@ using Biomass.Server.Models.Dispatch;
 using Biomass.Server.Models.Vehicle;
 using Biomass.Server.Models.Vendor;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Biomass.Server.Services
 {
@@ -13,14 +14,35 @@ namespace Biomass.Server.Services
     public class DispatchReceiptService : IDispatchReceiptService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment _environment;
+        private readonly string _receiptUploadsFolder;
 
-        public DispatchReceiptService(ApplicationDbContext context)
+        public DispatchReceiptService(ApplicationDbContext context, IWebHostEnvironment environment)
         {
             _context = context;
+            _environment = environment;
+            _receiptUploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", "dispatch_receipts");
+            // Create dispatch receipt uploads directory if it doesn't exist
+            if (!Directory.Exists(_receiptUploadsFolder))
+            {
+                Directory.CreateDirectory(_receiptUploadsFolder);
+            }
         }
 
         public async Task<long> CreateDispatchReceiptAsync(CreateDispatchReceiptRequest request)
         {
+            // Handle slip image upload if provided
+            string? slipImagePath = null;
+            if (request.SlipImageFile != null)
+            {
+                slipImagePath = await SaveSlipImageFileAsync(request.SlipImageFile);
+            }
+            else if (!string.IsNullOrEmpty(request.SlipImageUrl))
+            {
+                // If SlipImageUrl path is already provided (not from file upload), use it as is
+                slipImagePath = request.SlipImageUrl;
+            }
+
             // Validate that dispatch exists
             var dispatchExists = await _context.Dispatches
                 .AnyAsync(d => d.DispatchId == request.DispatchId);
@@ -64,7 +86,7 @@ namespace Biomass.Server.Services
                 VendorId = request.VendorId,
                 VehicleId = request.VehicleId,
                 SlipNumber = request.SlipNumber,
-                SlipImageUrl = request.SlipImageUrl,
+                SlipImageUrl = slipImagePath,
                 WeightGross = request.WeightGross,
                 WeightTare = request.WeightTare,
                 WeightNet = request.WeightNet,
@@ -319,6 +341,42 @@ namespace Biomass.Server.Services
                     CostCenterId = dispatchReceipt.Vehicle.CostCenterId
                 } : null
             };
+        }
+
+        /// <summary>
+        /// Saves slip image file to dispatch receipts folder
+        /// </summary>
+        /// <param name="file">The uploaded slip image file</param>
+        /// <returns>Relative file path</returns>
+        private async Task<string> SaveSlipImageFileAsync(IFormFile file)
+        {
+            // Validate file size (10MB limit)
+            if (file.Length > 10 * 1024 * 1024)
+            {
+                throw new InvalidOperationException("File size cannot exceed 10MB");
+            }
+
+            // Validate file type
+            var allowedExtensions = new[] { ".pdf", ".jpg", ".jpeg", ".png" };
+            var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (!allowedExtensions.Contains(fileExtension))
+            {
+                throw new InvalidOperationException("Only PDF, JPG, and PNG files are allowed");
+            }
+
+            // Generate unique filename
+            var timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
+            var fileName = $"receipt_slip_{timestamp}_{Guid.NewGuid().ToString("N")[..8]}{fileExtension}";
+            var filePath = Path.Combine(_receiptUploadsFolder, fileName);
+
+            // Save file
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            // Return relative path for database storage
+            return $"/uploads/dispatch_receipts/{fileName}";
         }
     }
 }

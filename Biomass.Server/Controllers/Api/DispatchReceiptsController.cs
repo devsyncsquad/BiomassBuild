@@ -22,7 +22,8 @@ namespace Biomass.Server.Controllers.Api
         /// <param name="request">The dispatch receipt creation request</param>
         /// <returns>The created dispatch receipt ID</returns>
         [HttpPost]
-        public async Task<ActionResult<ServiceResponse<long>>> CreateDispatchReceipt([FromBody] CreateDispatchReceiptRequest request)
+        [Consumes("multipart/form-data")]
+        public async Task<ActionResult<ServiceResponse<long>>> CreateDispatchReceipt([FromForm] CreateDispatchReceiptRequest request)
         {
             try
             {

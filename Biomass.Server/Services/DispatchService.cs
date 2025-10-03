@@ -66,6 +66,12 @@ namespace Biomass.Server.Services
                     }
                 }
 
+                var slipExists = _context.Dispatches.Where(v => v.SlipNumber == request.SlipNumber);
+                if (slipExists.Any()) {
+                    throw new InvalidOperationException($"Slip number {request.SlipNumber} is already added in system.");
+                }
+                        
+
                 // Calculate PayableWeightMund based on PayableWeight
                 var payableWeightMund = request.PayableWeight.HasValue && request.PayableWeight > 0 ? Math.Floor((decimal)request.PayableWeight.Value / 40) : 0;
 

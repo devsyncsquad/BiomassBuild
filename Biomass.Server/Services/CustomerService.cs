@@ -365,7 +365,7 @@ namespace Biomass.Server.Services
             try
             {
                 var customers = await _context.VUserCustomers
-                    .Where(v => v.UserId == userId)
+                    .Where(v => v.UserId == userId && v.Status=="Active")
                     .ToListAsync();
 
                 response.Result = customers;

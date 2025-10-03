@@ -6,16 +6,26 @@ using Biomass.Server.Models.Dispatch;
 using Biomass.Server.Models.Vehicle;
 using Biomass.Server.Models.Vendor;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Biomass.Server.Services
 {
     public class DispatchService : IDispatchService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment _environment;
+        private readonly string _dispatchUploadsFolder;
 
-        public DispatchService(ApplicationDbContext context)
+        public DispatchService(ApplicationDbContext context, IWebHostEnvironment environment)
         {
             _context = context;
+            _environment = environment;
+            _dispatchUploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", "dispatches");
+            // Create dispatch uploads directory if it doesn't exist
+            if (!Directory.Exists(_dispatchUploadsFolder))
+            {
+                Directory.CreateDirectory(_dispatchUploadsFolder);
+            }
         }
 
         public async Task<List<DispatchDto>> GetDispatchesAsync()
@@ -40,6 +50,17 @@ namespace Biomass.Server.Services
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
+                // Handle slip picture upload if provided
+                string? slipPicturePath = null;
+                if (request.SlipPictureFile != null)
+                {
+                    slipPicturePath = await SaveSlipPictureFileAsync(request.SlipPictureFile);
+                }
+                else if (!string.IsNullOrEmpty(request.SlipPicture))
+                {
+                    // If SlipPicture path is already provided (not from file upload), use it as is
+                    slipPicturePath = request.SlipPicture;
+                }
                 // Find transporter vendor - use provided one or auto-detect
                 Vendor? transporterVendor = null;
                 
@@ -83,7 +104,7 @@ namespace Biomass.Server.Services
                     MaterialType = request.MaterialType,
                     MaterialRate = request.MaterialRate,
                     SlipNumber = request.SlipNumber,
-                    SlipPicture = request.SlipPicture,
+                    SlipPicture = slipPicturePath,
                     FirstWeight = request.FirstWeight,
                     SecondWeight = request.SecondWeight,
                     NetWeight = request.NetWeight,
@@ -407,6 +428,42 @@ namespace Biomass.Server.Services
             
             // Otherwise, use fixed amount (default to 0 if null)
             return fixedAmount ?? 0;
+        }
+
+        /// <summary>
+        /// Saves slip picture file to dispatches folder
+        /// </summary>
+        /// <param name="file">The uploaded slip picture file</param>
+        /// <returns>Relative file path</returns>
+        private async Task<string> SaveSlipPictureFileAsync(IFormFile file)
+        {
+            // Validate file size (10MB limit)
+            if (file.Length > 10 * 1024 * 1024)
+            {
+                throw new InvalidOperationException("File size cannot exceed 10MB");
+            }
+
+            // Validate file type
+            var allowedExtensions = new[] { ".pdf", ".jpg", ".jpeg", ".png" };
+            var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (!allowedExtensions.Contains(fileExtension))
+            {
+                throw new InvalidOperationException("Only PDF, JPG, and PNG files are allowed");
+            }
+
+            // Generate unique filename
+            var timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
+            var fileName = $"slip_{timestamp}_{Guid.NewGuid().ToString("N")[..8]}{fileExtension}";
+            var filePath = Path.Combine(_dispatchUploadsFolder, fileName);
+
+            // Save file
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            // Return relative path for database storage
+            return $"/uploads/dispatches/{fileName}";
         }
 //>>>>>>> dispatch_02
     }

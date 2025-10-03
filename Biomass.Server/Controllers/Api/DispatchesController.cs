@@ -51,7 +51,8 @@ namespace Biomass.Server.Controllers.Api
         }
 
         [HttpPost]
-        public async Task<ActionResult<ServiceResponse<int>>> CreateDispatch([FromBody] CreateDispatchRequest request)
+        [Consumes("multipart/form-data")]
+        public async Task<ActionResult<ServiceResponse<int>>> CreateDispatch([FromForm] CreateDispatchRequest request)
         {
             var dispatchId = await _dispatchService.CreateDispatchAsync(request);
             return CreatedAtAction(nameof(GetDispatch), new { id = dispatchId }, new ServiceResponse<int>

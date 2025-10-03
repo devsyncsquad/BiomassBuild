@@ -125,6 +125,9 @@ namespace Biomass.Server.Models.Dispatch
         public decimal? LaborRatePerMund { get; set; }
 
         public decimal? TransporterRatePerMund { get; set; }
+
+        // For file upload handling in multipart/form-data
+        public IFormFile? SlipPictureFile { get; set; }
     }
 
     public class UpdateDispatchRequest

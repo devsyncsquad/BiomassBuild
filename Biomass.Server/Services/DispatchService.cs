@@ -194,6 +194,7 @@ namespace Biomass.Server.Services
                         Remarks = request.Remarks,
                         CreatedBy = request.CreatedBy,
                         CreatedAt = DateTime.UtcNow,
+                        SlipNumber = request.SlipNumber
                         //ReferenceNo = request.VehicleId,
                     });
                 }

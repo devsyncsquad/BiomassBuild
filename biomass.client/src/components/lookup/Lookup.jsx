@@ -304,33 +304,16 @@ const Lookup = () => {
   };
 
   // Handle filter changes
-  const handleFilterChange = async (field, value) => {
+  const handleFilterChange = (field, value) => {
     setFilters((prev) => ({ ...prev, [field]: value }));
     setPagination((prev) => ({ ...prev, page: 0 })); // Reset to first page
 
-    // If changing domain, fetch filtered data
-    if (field === "domain" && value) {
-      try {
-        const response = await axios.post(`${API_BASE}/by-domain`, {
-          domain: value,
-        });
-        if (response.data?.success) {
-          setAllLookups(response.data.result || []);
-        } else {
-          setError(
-            response.data?.message || "Failed to fetch lookups for domain"
-          );
-        }
-      } catch (err) {
-        console.error("Error fetching domain lookups:", err);
-        setError(
-          err.response?.data?.message || "Failed to fetch lookups for domain"
-        );
-      }
-    } else if (field === "domain" && !value) {
-      // If domain is cleared, fetch all lookups again
+    // If domain is cleared, fetch all lookups again
+    if (field === "domain" && !value) {
       fetchLookups();
     }
+    // Note: Domain filtering is now handled client-side in filteredLookups useMemo
+    // This allows proper combination with other filters like status
   };
 
   const handleFilterReset = () => {

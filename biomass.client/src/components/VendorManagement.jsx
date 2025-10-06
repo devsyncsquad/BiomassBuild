@@ -136,9 +136,9 @@ const VendorManagement = () => {
     return allVendors.filter((vendor) => {
       const matchesSearch =
         !searchTerm ||
-        vendor.vendorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        vendor.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        vendor.cnic.toLowerCase().includes(searchTerm.toLowerCase());
+        (vendor.vendorName && vendor.vendorName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (vendor.address && vendor.address.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (vendor.cnic && vendor.cnic.toLowerCase().includes(searchTerm.toLowerCase()));
 
       const matchesStatus =
         !selectedStatus ||
@@ -460,7 +460,64 @@ const VendorManagement = () => {
 
       {/* Vendor Cards */}
       <Grid container spacing={3} sx={{ px: 3 }}>
-        {vendors.map((vendor) => (
+        {vendors.length === 0 ? (
+          <Grid item xs={12}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                py: 8,
+                textAlign: "center",
+              }}
+            >
+              <Typography
+                variant="h6"
+                sx={{
+                  color: colors.text.secondary,
+                  mb: 2,
+                  fontWeight: 500,
+                }}
+              >
+                {searchTerm || selectedStatus
+                  ? "No vendors match your search criteria"
+                  : "No vendors found"}
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: colors.text.secondary,
+                  mb: 3,
+                }}
+              >
+                {searchTerm || selectedStatus
+                  ? "Try adjusting your search terms or filters"
+                  : "Add your first vendor to get started"}
+              </Typography>
+              {(searchTerm || selectedStatus) && (
+                <Button
+                  variant="outlined"
+                  onClick={() => {
+                    setSearchTerm("");
+                    setSelectedStatus("");
+                  }}
+                  sx={{
+                    borderColor: colors.primary.main,
+                    color: colors.primary.main,
+                    "&:hover": {
+                      borderColor: colors.primary.dark,
+                      backgroundColor: colors.primary.light,
+                    },
+                  }}
+                >
+                  Clear Filters
+                </Button>
+              )}
+            </Box>
+          </Grid>
+        ) : (
+          vendors.map((vendor) => (
           <Grid item xs={12} sm={6} md={4} key={vendor.vendorId}>
             <Card
               sx={{
@@ -665,7 +722,8 @@ const VendorManagement = () => {
               </CardContent>
             </Card>
           </Grid>
-        ))}
+        ))
+        )}
       </Grid>
 
       {/* Field Requirements Footer */}

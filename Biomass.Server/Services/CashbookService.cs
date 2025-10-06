@@ -650,55 +650,103 @@ namespace Biomass.Server.Services
 
 		private async Task<string> SaveReceiptFileAsync(IFormFile receipt)
 		{
-			// Validate file size (10MB limit)
-			if (receipt.Length > 10 * 1024 * 1024)
+			try
 			{
-				throw new InvalidOperationException("File size cannot exceed 10MB");
-			}
+				Console.WriteLine($"SaveReceiptFileAsync: Starting file save for {receipt.FileName}");
+				Console.WriteLine($"SaveReceiptFileAsync: File size: {receipt.Length} bytes");
+				Console.WriteLine($"SaveReceiptFileAsync: Content type: {receipt.ContentType}");
 
-			// Validate file type
-			var allowedExtensions = new[] { ".pdf", ".jpg", ".jpeg", ".png" };
-			var fileExtension = Path.GetExtension(receipt.FileName).ToLowerInvariant();
-			if (!allowedExtensions.Contains(fileExtension))
-			{
-				throw new InvalidOperationException("Only PDF, JPG, and PNG files are allowed");
-			}
-
-			// Get upload folder path and create if it doesn't exist
-			var webRootPath = _environment.WebRootPath ?? _environment.ContentRootPath;
-			if (string.IsNullOrEmpty(webRootPath))
-			{
-				throw new InvalidOperationException("WebRootPath and ContentRootPath are both null or empty. Cannot determine upload directory.");
-			}
-			
-			var uploadFolder = Path.Combine(webRootPath, "uploads", "Receipts");
-			
-			// Create Receipts directory if it doesn't exist
-			if (!Directory.Exists(uploadFolder))
-			{
-				try
+				// Validate file size (10MB limit)
+				if (receipt.Length > 10 * 1024 * 1024)
 				{
-					Directory.CreateDirectory(uploadFolder);
+					Console.WriteLine("SaveReceiptFileAsync: File size exceeds 10MB limit");
+					throw new InvalidOperationException("File size cannot exceed 10MB");
 				}
-				catch (Exception ex)
+
+				// Validate file type
+				var allowedExtensions = new[] { ".pdf", ".jpg", ".jpeg", ".png" };
+				var fileExtension = Path.GetExtension(receipt.FileName).ToLowerInvariant();
+				Console.WriteLine($"SaveReceiptFileAsync: File extension: {fileExtension}");
+				
+				if (!allowedExtensions.Contains(fileExtension))
 				{
-					throw new InvalidOperationException($"Failed to create upload directory: {uploadFolder}. Error: {ex.Message}", ex);
+					Console.WriteLine($"SaveReceiptFileAsync: Invalid file extension: {fileExtension}");
+					throw new InvalidOperationException("Only PDF, JPG, and PNG files are allowed");
 				}
+
+				// Get upload folder path and create if it doesn't exist
+				var webRootPath = _environment.WebRootPath ?? _environment.ContentRootPath;
+				Console.WriteLine($"SaveReceiptFileAsync: WebRootPath: {_environment.WebRootPath}");
+				Console.WriteLine($"SaveReceiptFileAsync: ContentRootPath: {_environment.ContentRootPath}");
+				Console.WriteLine($"SaveReceiptFileAsync: Using path: {webRootPath}");
+				
+				if (string.IsNullOrEmpty(webRootPath))
+				{
+					// Fallback to current directory if both paths are null
+					webRootPath = Directory.GetCurrentDirectory();
+					Console.WriteLine($"SaveReceiptFileAsync: Using fallback path: {webRootPath}");
+				}
+				
+				var uploadFolder = Path.Combine(webRootPath, "uploads", "Receipts");
+				Console.WriteLine($"SaveReceiptFileAsync: Upload folder: {uploadFolder}");
+				
+				// Create Receipts directory if it doesn't exist
+				if (!Directory.Exists(uploadFolder))
+				{
+					Console.WriteLine($"SaveReceiptFileAsync: Creating directory: {uploadFolder}");
+					try
+					{
+						Directory.CreateDirectory(uploadFolder);
+						Console.WriteLine($"SaveReceiptFileAsync: Directory created successfully");
+					}
+					catch (Exception ex)
+					{
+						Console.WriteLine($"SaveReceiptFileAsync: Failed to create directory: {ex.Message}");
+						throw new InvalidOperationException($"Failed to create upload directory: {uploadFolder}. Error: {ex.Message}", ex);
+					}
+				}
+				else
+				{
+					Console.WriteLine($"SaveReceiptFileAsync: Directory already exists");
+				}
+
+				// Generate unique filename
+				var timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
+				var fileName = $"receipt_{timestamp}_{Guid.NewGuid().ToString("N")[..8]}{fileExtension}";
+				var filePath = Path.Combine(uploadFolder, fileName);
+				Console.WriteLine($"SaveReceiptFileAsync: Full file path: {filePath}");
+
+				// Save file
+				using (var stream = new FileStream(filePath, FileMode.Create))
+				{
+					Console.WriteLine($"SaveReceiptFileAsync: Starting file copy");
+					await receipt.CopyToAsync(stream);
+					Console.WriteLine($"SaveReceiptFileAsync: File copy completed");
+				}
+
+				// Verify file was saved
+				if (File.Exists(filePath))
+				{
+					var fileInfo = new FileInfo(filePath);
+					Console.WriteLine($"SaveReceiptFileAsync: File saved successfully. Size: {fileInfo.Length} bytes");
+				}
+				else
+				{
+					Console.WriteLine($"SaveReceiptFileAsync: ERROR - File was not saved!");
+					throw new InvalidOperationException("File was not saved successfully");
+				}
+
+				// Return relative path for database storage
+				var relativePath = $"/uploads/Receipts/{fileName}";
+				Console.WriteLine($"SaveReceiptFileAsync: Returning relative path: {relativePath}");
+				return relativePath;
 			}
-
-			// Generate unique filename
-			var timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
-			var fileName = $"receipt_{timestamp}_{Guid.NewGuid().ToString("N")[..8]}{fileExtension}";
-			var filePath = Path.Combine(uploadFolder, fileName);
-
-			// Save file
-			using (var stream = new FileStream(filePath, FileMode.Create))
+			catch (Exception ex)
 			{
-				await receipt.CopyToAsync(stream);
+				Console.WriteLine($"SaveReceiptFileAsync: Exception occurred: {ex.Message}");
+				Console.WriteLine($"SaveReceiptFileAsync: Stack trace: {ex.StackTrace}");
+				throw;
 			}
-
-			// Return relative path for database storage
-			return $"/uploads/Receipts/{fileName}";
 		}
 
         public async Task<ServiceResponse<CashbookDto>> UpdateCashbookStatusAsync(long cashId, string newStatus)

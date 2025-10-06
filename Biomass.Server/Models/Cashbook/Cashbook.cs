@@ -79,5 +79,8 @@ namespace Biomass.Server.Models.Cashbook
 
         [Column("transfer_role")]
         public string? TransferRole { get; set; }
+
+        [Column("slipnumber")]
+        public string? SlipNumber { get; set; }
     }
 }

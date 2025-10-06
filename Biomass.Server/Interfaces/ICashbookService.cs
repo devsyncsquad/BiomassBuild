@@ -27,6 +27,7 @@ namespace Biomass.Server.Interfaces
 		public decimal? WalletDelta { get; set; }
 		public long? DispatchId { get; set; }
 		public int? CostCenterSubId { get; set; }
+		public string? SlipNumber { get; set; }
     }
 
 	public class CashTransactionDetailed
@@ -102,6 +103,9 @@ namespace Biomass.Server.Interfaces
 		
 		[Column("status")]
 		public string Status { get; set; } = string.Empty;
+
+		[Column("slipnumber")]
+		public string? SlipNumber { get; set; }
 	}
 
 	public class CreateCashbookRequest
@@ -118,6 +122,7 @@ namespace Biomass.Server.Interfaces
 		public string? ReferenceNo { get; set; }
 		public string? CounterpartyName { get; set; }
 		public string? Remarks { get; set; }
+		public string? SlipNumber { get; set; }
 	}
 
 	public class CancelCashbookRequest

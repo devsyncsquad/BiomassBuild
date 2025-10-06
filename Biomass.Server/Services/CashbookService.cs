@@ -26,9 +26,9 @@ namespace Biomass.Server.Services
         {
             string? receiptPath = null;
 
-            if (dto.ReceiptFile != null)
+            if (dto.ReceiptPath != null)
             {
-                receiptPath = await SaveReceiptFileAsync(dto.ReceiptFile);
+                receiptPath = await SaveReceiptFileAsync(dto.ReceiptPath);
             }
 		
 				var entry = new Cashbook
@@ -52,6 +52,7 @@ namespace Biomass.Server.Services
 					DispatchId = dto.DispatchId,
                     //TransferGroupId = dto.TransferGroupId,
 					//TransferRole=dto.TransferRole
+					SlipNumber = dto.SlipNumber
                 };
             try
             {
@@ -79,9 +80,9 @@ namespace Biomass.Server.Services
 
             // Save receipt file (if any)
             string? receiptPath = null;
-            if (dto.ReceiptFile != null)
+            if (dto.ReceiptPath != null)
             {
-                receiptPath = await SaveReceiptFileAsync(dto.ReceiptFile);
+                receiptPath = await SaveReceiptFileAsync(dto.ReceiptPath);
             }
 
             // "Out" entry
@@ -104,7 +105,8 @@ namespace Biomass.Server.Services
                 CostCenterSubId = dto.CostCenterSubId,
                 DispatchId = dto.DispatchId,
                 TransferGroupId = groupId,
-                TransferRole = "Out"
+                TransferRole = "Out",
+                SlipNumber = dto.SlipNumber
             };
 
             // "In" entry
@@ -127,7 +129,8 @@ namespace Biomass.Server.Services
                 CostCenterSubId = dto.CostCenterSubId,
                 DispatchId = dto.DispatchId,
                 TransferGroupId = groupId,
-                TransferRole = "In"
+                TransferRole = "In",
+                SlipNumber = dto.SlipNumber
             };
 
             try
@@ -201,7 +204,8 @@ namespace Biomass.Server.Services
                         Remarks = cashbook.Remarks,
                         Status = cashbook.Status,
                         ReceiptPath = cashbook.ReceiptPath,
-                        DispatchId = cashbook.DispatchId
+                        DispatchId = cashbook.DispatchId,
+                        SlipNumber = cashbook.SlipNumber
                     };
 
                     response.Success = true;
@@ -273,7 +277,8 @@ namespace Biomass.Server.Services
 					CounterpartyName = request.CounterpartyName,
 					Remarks = request.Remarks,
 					Status = "Active",
-					ReceiptPath = receiptPath
+					ReceiptPath = receiptPath,
+					SlipNumber = request.SlipNumber
 				};
 
 				_db.Cashbooks.Add(entity);
@@ -296,7 +301,8 @@ namespace Biomass.Server.Services
 					CounterpartyName = entity.CounterpartyName,
 					Remarks = entity.Remarks,
 					Status = entity.Status,
-					ReceiptPath = entity.ReceiptPath
+					ReceiptPath = entity.ReceiptPath,
+					SlipNumber = entity.SlipNumber
 				};
 				response.Success = true;
 				response.Message = "Cashbook entry created successfully";
@@ -341,7 +347,8 @@ namespace Biomass.Server.Services
 					Remarks = entity.Remarks,
 					Meta = entity.Meta,
 					Status = entity.Status,
-					ReceiptPath = entity.ReceiptPath
+					ReceiptPath = entity.ReceiptPath,
+					SlipNumber = entity.SlipNumber
 				};
 				response.Success = true;
 			}
@@ -533,7 +540,7 @@ namespace Biomass.Server.Services
 						money_account_id, money_account_name, wallet_employee_id, employee_wallet_name,
 						category_id, category_name, cost_center_id, costcenter_name, cost_center_sub_id, costcenter_sub_name,
 						payment_mode_id, payment_mode_name, reference_no, counterparty_name, remarks, meta,
-						bank_delta, wallet_delta, status
+						bank_delta, wallet_delta, status, slipnumber
 					FROM v_cashbook_effects 
 					WHERE wallet_employee_id = {0} 
 						AND status != 'Cancelled' 
@@ -612,7 +619,7 @@ namespace Biomass.Server.Services
 						money_account_id, money_account_name, wallet_employee_id, employee_wallet_name,
 						category_id, category_name, cost_center_id, costcenter_name, cost_center_sub_id, costcenter_sub_name,
 						payment_mode_id, payment_mode_name, reference_no, counterparty_name, remarks, meta,
-						bank_delta, wallet_delta, status
+						bank_delta, wallet_delta, status, slipnumber
 					FROM v_cashbook_effects 
 					WHERE wallet_employee_id = {0} 
 						AND status = {1}

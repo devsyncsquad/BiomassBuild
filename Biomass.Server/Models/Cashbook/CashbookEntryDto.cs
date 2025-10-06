@@ -19,10 +19,11 @@
         public string? Remarks { get; set; }
         public string? Status { get; set; }
         public string? MetaJson { get; set; } // Optional JSON string
-        public IFormFile? ReceiptFile { get; set; } // PDF or JPG
+        public IFormFile? ReceiptPath { get; set; } // PDF or JPG
         public int? DispatchId { get; set; }
         public int VendorId { get; set; }
         public string? TransferRole { get; internal set; }
+        public string? SlipNumber { get; set; }
     }
 
     public class CashbookTransferEntryDto
@@ -44,10 +45,11 @@
         public string? Remarks { get; set; }
         public string? Status { get; set; }
         public string? MetaJson { get; set; } // Optional JSON string
-        public IFormFile? ReceiptFile { get; set; } // PDF or JPG
+        public IFormFile? ReceiptPath { get; set; } // PDF or JPG
         public int? DispatchId { get; set; }
         public int VendorId { get; set; }
         public string? TransferRole { get; internal set; }
+        public string? SlipNumber { get; set; }
 
         // New transfer-related properties
         public int? MoneyAccountFrom { get; set; }

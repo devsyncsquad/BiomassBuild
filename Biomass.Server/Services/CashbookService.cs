@@ -29,11 +29,18 @@ namespace Biomass.Server.Services
                 throw new InvalidOperationException("WebRootPath and ContentRootPath are both null or empty. Cannot determine upload directory.");
             }
             
-            _uploadFolder = Path.Combine(webRootPath, "uploads", "cashbook_receipts");
-            // Create cashbook receipts directory if it doesn't exist
-            if (!Directory.Exists(_uploadFolder))
+            _uploadFolder = Path.Combine(webRootPath, "uploads", "Receipts");
+            // Create Receipts directory if it doesn't exist
+            try
             {
-                Directory.CreateDirectory(_uploadFolder);
+                if (!Directory.Exists(_uploadFolder))
+                {
+                    Directory.CreateDirectory(_uploadFolder);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Failed to create upload directory: {_uploadFolder}. Error: {ex.Message}", ex);
             }
 		}
 
@@ -679,7 +686,7 @@ namespace Biomass.Server.Services
 			}
 
 			// Return relative path for database storage
-			return $"/uploads/cashbook_receipts/{fileName}";
+			return $"/uploads/Receipts/{fileName}";
 		}
 
         public async Task<ServiceResponse<CashbookDto>> UpdateCashbookStatusAsync(long cashId, string newStatus)

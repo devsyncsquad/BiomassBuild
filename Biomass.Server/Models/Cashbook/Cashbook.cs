@@ -35,7 +35,6 @@ namespace Biomass.Server.Models.Cashbook
 		[Column("wallet_employee_id")]
 		public int? WalletEmployeeId { get; set; }
 
-		[Required]
 		[Column("category_id")]
 		public int? CategoryId { get; set; }
 

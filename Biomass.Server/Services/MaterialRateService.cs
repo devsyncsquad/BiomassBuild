@@ -398,7 +398,7 @@ namespace Biomass.Server.Services
                         Status = x.mr.Status,
                         CreatedBy = x.mr.CreatedBy,
                         CreatedOn = x.mr.CreatedOn,
-                        CustomerName = x.c.CompanyName ?? $"{x.c.FirstName} {x.c.LastName}",
+                        CustomerName = $"{x.c.FirstName} {x.c.LastName}",
                         LocationName = x.cl.LocationName,
                         LocationCode = x.cl.LocationCode,
                         //MaterialId = x.mr.MaterialId ?? 0 // Handle null MaterialId

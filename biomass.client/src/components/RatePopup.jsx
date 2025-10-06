@@ -711,7 +711,7 @@ const RatePopup = ({
                     onChange={(e) =>
                       handleInputChange(
                         "dieselRate",
-                        parseFloat(e.target.value) || 0
+                        parseFloat(e.target.value)
                       )
                     }
                     InputProps={{

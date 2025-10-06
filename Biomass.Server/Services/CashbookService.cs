@@ -41,7 +41,7 @@ namespace Biomass.Server.Services
 					WalletEmployeeId = dto.WalletEmployeeId,
 					CategoryId = (int)dto.CategoryId,
 					CostCenterId = dto.CostCenterId,
-					PaymentModeId = dto.PaymentModeId,
+                    PaymentModeId = dto.PaymentModeId,
 					ReferenceNo = dto.ReferenceNo,
 					CounterpartyName = dto.CounterpartyName,
 					Remarks = dto.Remarks,

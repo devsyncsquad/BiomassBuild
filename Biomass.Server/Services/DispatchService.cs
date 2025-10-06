@@ -14,18 +14,13 @@ namespace Biomass.Server.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _environment;
-        private readonly string _dispatchUploadsFolder;
+        private  string _dispatchUploadsFolder;
 
         public DispatchService(ApplicationDbContext context, IWebHostEnvironment environment)
         {
             _context = context;
             _environment = environment;
-            _dispatchUploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", "dispatches");
-            // Create dispatch uploads directory if it doesn't exist
-            if (!Directory.Exists(_dispatchUploadsFolder))
-            {
-                Directory.CreateDirectory(_dispatchUploadsFolder);
-            }
+            
         }
 
         public async Task<List<DispatchDto>> GetDispatchesAsync()
@@ -50,6 +45,13 @@ namespace Biomass.Server.Services
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
+                _dispatchUploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", "dispatches");
+                // Create dispatch uploads directory if it doesn't exist
+                if (!Directory.Exists(_dispatchUploadsFolder))
+                {
+                    Directory.CreateDirectory(_dispatchUploadsFolder);
+                }
+
                 // Handle slip picture upload if provided
                 string? slipPicturePath = null;
                 if (request.SlipPictureFile != null)

@@ -15,6 +15,7 @@ namespace Biomass.Server.Models.Vehicle
         public string? VehicleRegNumber { get; set; }
         public int? VendorId { get; set; }
         public int? CostCenterId { get; set; }
+        public int? CostCenterSubId { get; set; }
         public string? IsWeightAllocated { get; set; }
         public int? WeightAllowed { get; set; }
         public Driver.DriverDto? Driver { get; set; }

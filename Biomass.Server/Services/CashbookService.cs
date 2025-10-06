@@ -15,33 +15,11 @@ namespace Biomass.Server.Services
 	{
 		private readonly ApplicationDbContext _db;
 		private readonly IWebHostEnvironment _environment;
-        private readonly string _uploadFolder;
         
         public CashbookService(ApplicationDbContext db, IWebHostEnvironment environment)
 		{
 			_db = db;
 			_environment = environment;
-            
-            // Ensure WebRootPath is not null, use ContentRootPath as fallback
-            var webRootPath = _environment.WebRootPath ?? _environment.ContentRootPath;
-            if (string.IsNullOrEmpty(webRootPath))
-            {
-                throw new InvalidOperationException("WebRootPath and ContentRootPath are both null or empty. Cannot determine upload directory.");
-            }
-            
-            _uploadFolder = Path.Combine(webRootPath, "uploads", "Receipts");
-            // Create Receipts directory if it doesn't exist
-            try
-            {
-                if (!Directory.Exists(_uploadFolder))
-                {
-                    Directory.CreateDirectory(_uploadFolder);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException($"Failed to create upload directory: {_uploadFolder}. Error: {ex.Message}", ex);
-            }
 		}
 
         public async Task<long> SaveCashbookEntryAsync(CashbookEntryDto dto)
@@ -433,10 +411,15 @@ namespace Biomass.Server.Services
 					try
 					{
 						var fileName = Path.GetFileName(entity.ReceiptPath);
-						var fullPath = Path.Combine(_uploadFolder, fileName);
-						if (File.Exists(fullPath))
+						var webRootPath = _environment.WebRootPath ?? _environment.ContentRootPath;
+						if (!string.IsNullOrEmpty(webRootPath))
 						{
-							File.Delete(fullPath);
+							var uploadFolder = Path.Combine(webRootPath, "uploads", "Receipts");
+							var fullPath = Path.Combine(uploadFolder, fileName);
+							if (File.Exists(fullPath))
+							{
+								File.Delete(fullPath);
+							}
 						}
 					}
 					catch (Exception fileEx)
@@ -674,10 +657,32 @@ namespace Biomass.Server.Services
 				throw new InvalidOperationException("Only PDF, JPG, and PNG files are allowed");
 			}
 
+			// Get upload folder path and create if it doesn't exist
+			var webRootPath = _environment.WebRootPath ?? _environment.ContentRootPath;
+			if (string.IsNullOrEmpty(webRootPath))
+			{
+				throw new InvalidOperationException("WebRootPath and ContentRootPath are both null or empty. Cannot determine upload directory.");
+			}
+			
+			var uploadFolder = Path.Combine(webRootPath, "uploads", "Receipts");
+			
+			// Create Receipts directory if it doesn't exist
+			if (!Directory.Exists(uploadFolder))
+			{
+				try
+				{
+					Directory.CreateDirectory(uploadFolder);
+				}
+				catch (Exception ex)
+				{
+					throw new InvalidOperationException($"Failed to create upload directory: {uploadFolder}. Error: {ex.Message}", ex);
+				}
+			}
+
 			// Generate unique filename
 			var timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
 			var fileName = $"receipt_{timestamp}_{Guid.NewGuid().ToString("N")[..8]}{fileExtension}";
-			var filePath = Path.Combine(_uploadFolder, fileName);
+			var filePath = Path.Combine(uploadFolder, fileName);
 
 			// Save file
 			using (var stream = new FileStream(filePath, FileMode.Create))

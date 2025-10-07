@@ -9,7 +9,6 @@ using Biomass.Server.Models.Vendor;
 using Biomass.Server.Models.CostCenter;
 using Biomass.Server.Models.Employee;
 using Biomass.Server.Models.Cashbook;
-using Biomass.Server.Models.Lookup;
 using Biomass.Server.Models.MoneyAccount;
 using Biomass.Server.Models.Vehicle;
 using Biomass.Server.Models.Driver;

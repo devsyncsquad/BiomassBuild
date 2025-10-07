@@ -137,5 +137,21 @@ namespace Biomass.Server.Controllers.Api
 			if (!result.Success) return BadRequest(result);
 			return Ok(result);
 		}
+
+		[HttpGet("GetAdvanceEntries")]
+		public async Task<IActionResult> GetAdvanceEntries()
+		{
+			var result = await _service.GetAdvanceEntriesAsync();
+			if (!result.Success) return BadRequest(result);
+			return Ok(result);
+		}
+
+		[HttpGet("GetAdvanceEntriesByCostCenterSubId")]
+		public async Task<IActionResult> GetAdvanceEntriesByCostCenterSubId([FromQuery] int costCenterSubId)
+		{
+			var result = await _service.GetAdvanceEntriesByCostCenterSubIdAsync(costCenterSubId);
+			if (!result.Success) return BadRequest(result);
+			return Ok(result);
+		}
 	}
 }

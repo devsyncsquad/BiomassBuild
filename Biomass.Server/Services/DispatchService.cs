@@ -195,8 +195,7 @@ namespace Biomass.Server.Services
                         DispatchId = dispatch.DispatchId,
                         Remarks = request.Remarks,
                         CreatedBy = request.CreatedBy,
-                        CreatedAt = DateTime.UtcNow,
-                        SlipNumber = request.SlipNumber
+                        CreatedAt = DateTime.UtcNow
                         //ReferenceNo = request.VehicleId,
                     });
                 }
@@ -207,6 +206,43 @@ namespace Biomass.Server.Services
                     _context.ApLedgers.AddRange(apLedgerEntries);
                 }
                 await _context.SaveChangesAsync();
+
+                // Update cashbook entries with dispatch_id if CashIds are provided
+                if (request.CashIds != null && request.CashIds.Any())
+                {
+                    // Validate that all cash_ids exist and don't already have a dispatch_id
+                    var existingCashbookEntries = await _context.Cashbooks
+                        .Where(c => request.CashIds.Contains(c.CashId))
+                        .ToListAsync();
+
+                    var providedCashIds = request.CashIds.ToHashSet();
+                    var foundCashIds = existingCashbookEntries.Select(c => c.CashId).ToHashSet();
+                    var missingCashIds = providedCashIds.Except(foundCashIds).ToList();
+
+                    if (missingCashIds.Any())
+                    {
+                        throw new InvalidOperationException($"Cash IDs not found: {string.Join(", ", missingCashIds)}");
+                    }
+
+                    // Check if any cashbook entries already have a dispatch_id
+                    var entriesWithDispatch = existingCashbookEntries
+                        .Where(c => c.DispatchId.HasValue)
+                        .Select(c => c.CashId)
+                        .ToList();
+
+                    if (entriesWithDispatch.Any())
+                    {
+                        throw new InvalidOperationException($"Cash IDs already have dispatch assigned: {string.Join(", ", entriesWithDispatch)}");
+                    }
+
+                    // Update cashbook entries with the new dispatch_id
+                    foreach (var cashbookEntry in existingCashbookEntries)
+                    {
+                        cashbookEntry.DispatchId = dispatch.DispatchId;
+                    }
+
+                    await _context.SaveChangesAsync();
+                }
 
                 await transaction.CommitAsync();
                 return dispatch.DispatchId;

@@ -111,17 +111,6 @@ namespace Biomass.Server.Services
 
             try
             {
-                // Check if email already exists
-                var existingCustomer = await _context.Customers
-                    .FirstOrDefaultAsync(c => c.Email == request.Email);
-
-                if (existingCustomer != null)
-                {
-                    response.Success = false;
-                    response.Message = "Customer with this email already exists";
-                    return response;
-                }
-
                 var customer = new Customer
                 {
                     FirstName = request.FirstName,
@@ -187,17 +176,6 @@ namespace Biomass.Server.Services
                 {
                     response.Success = false;
                     response.Message = "Customer not found";
-                    return response;
-                }
-
-                // Check if email already exists for another customer
-                var existingCustomer = await _context.Customers
-                    .FirstOrDefaultAsync(c => c.Email == request.Email && c.CustomerId != customerId);
-
-                if (existingCustomer != null)
-                {
-                    response.Success = false;
-                    response.Message = "Customer with this email already exists";
                     return response;
                 }
 

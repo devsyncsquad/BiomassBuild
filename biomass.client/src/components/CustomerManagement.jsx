@@ -300,7 +300,32 @@ const CustomerManagement = () => {
     setOpenRegistration(true);
   };
 
+  const validateCustomer = () => {
+    const errors = {};
+    
+    if (!newCustomer.firstName.trim()) {
+      errors.firstName = 'First Name is required';
+    }
+    
+    if (!newCustomer.lastName.trim()) {
+      errors.lastName = 'Last Name is required';
+    }
+    
+    if (!newCustomer.companyId) {
+      errors.companyId = 'Company is required';
+    }
+    
+    return errors;
+  };
+
   const handleSaveCustomer = async () => {
+    // Validate required fields
+    const errors = validateCustomer();
+    if (Object.keys(errors).length > 0) {
+      showSnackbar('Please fill in all required fields: ' + Object.values(errors).join(', '), 'error');
+      return;
+    }
+
     try {
       // Get company name from selected company
       const selectedCompany = companies.find(
@@ -1022,7 +1047,7 @@ const CustomerManagement = () => {
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
-                label='First Name'
+                label='First Name *'
                 value={newCustomer.firstName}
                 onChange={(e) =>
                   setNewCustomer({ ...newCustomer, firstName: e.target.value })
@@ -1043,7 +1068,7 @@ const CustomerManagement = () => {
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
-                label='Last Name'
+                label='Last Name *'
                 value={newCustomer.lastName}
                 onChange={(e) =>
                   setNewCustomer({ ...newCustomer, lastName: e.target.value })
@@ -1106,10 +1131,10 @@ const CustomerManagement = () => {
             </Grid>
             <Grid item xs={12}>
               <FormControl fullWidth margin='normal'>
-                <InputLabel>Company</InputLabel>
+                <InputLabel>Company *</InputLabel>
                 <Select
                   value={newCustomer.companyId}
-                  label='Company'
+                  label='Company *'
                   onChange={(e) => handleCompanyChange(e.target.value)}
                   sx={{
                     "& .MuiOutlinedInput-notchedOutline": {
@@ -1196,7 +1221,7 @@ const CustomerManagement = () => {
             <Grid item xs={12} md={4}>
               <TextField
                 fullWidth
-                label='Postal Code'
+                label='NTN Number'
                 value={newCustomer.postalCode}
                 onChange={(e) =>
                   setNewCustomer({ ...newCustomer, postalCode: e.target.value })

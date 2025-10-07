@@ -97,34 +97,6 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave, onEdit 
       newErrors.vendorName = 'Vendor name is required';
     }
 
-    if (!formData.address.trim()) {
-      newErrors.address = 'Vendor address is required';
-    }
-
-    if (!formData.phone1.trim()) {
-      newErrors.phone1 = 'Primary phone number is required';
-    } else if (!/^[\+]?[0-9\s\-\(\)]{10,20}$/.test(formData.phone1)) {
-      newErrors.phone1 = 'Please enter a valid phone number (up to 20 characters)';
-    }
-
-    if (formData.phone2 && !/^[\+]?[0-9\s\-\(\)]{10,20}$/.test(formData.phone2)) {
-      newErrors.phone2 = 'Please enter a valid phone number (up to 20 characters)';
-    }
-
-    if (formData.phone3 && !/^[\+]?[0-9\s\-\(\)]{10,20}$/.test(formData.phone3)) {
-      newErrors.phone3 = 'Please enter a valid phone number (up to 20 characters)';
-    }
-
-    if (!formData.cnic.trim()) {
-      newErrors.cnic = 'CNIC is required';
-    } else if (!/^\d{13}$|^\d{5}-\d{7}-\d$/.test(formData.cnic)) {
-      newErrors.cnic = 'Please enter a valid CNIC (13 digits or format: 12345-1234567-1)';
-    }
-
-    if (!formData.status) {
-      newErrors.status = 'Status is required';
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -273,7 +245,7 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave, onEdit 
         </Typography>
 
         <Grid container spacing={3}>
-          
+          Vendor Registration
 
           <Grid item xs={12} md={6}>
             <TextField
@@ -314,7 +286,7 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave, onEdit 
           <Grid item xs={12}>
             <TextField
               fullWidth
-              label="CNIC *"
+              label="CNIC"
               value={formData.cnic}
               onChange={(e) => handleInputChange('cnic', e.target.value)}
               error={!!errors.cnic}
@@ -329,7 +301,7 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave, onEdit 
           <Grid item xs={12}>
             <TextField
               fullWidth
-              label="Address *"
+              label="Address"
               value={formData.address}
               onChange={(e) => handleInputChange('address', e.target.value)}
               error={!!errors.address}
@@ -386,7 +358,7 @@ const VendorRegistration = ({ open, onClose, vendor, isEditMode, onSave, onEdit 
           <Grid item xs={12} md={4}>
             <TextField
               fullWidth
-              label="Phone Number 1 *"
+              label="Phone Number 1"
               value={formData.phone1}
               onChange={(e) => handleInputChange('phone1', e.target.value)}
               error={!!errors.phone1}

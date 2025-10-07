@@ -425,6 +425,13 @@ const CustomerManagement = () => {
     setOpenLocationForm(false);
   };
 
+  // Function to refresh locations data
+  const handleRefreshLocationsData = (locationsData) => {
+    console.log("Locations data refreshed:", locationsData);
+    // You can add additional logic here if needed to update the UI
+    // For example, if you have a locations state in CustomerManagement
+  };
+
   const handleDeleteCustomer = async (customer) => {
     if (
       window.confirm(
@@ -1336,6 +1343,7 @@ const CustomerManagement = () => {
         onClose={() => setOpenLocationForm(false)}
         customerId={selectedCustomer?.customerId}
         onSave={handleSaveLocation}
+        onRefreshData={handleRefreshLocationsData}
       />
 
       {/* Enhanced Snackbar */}

@@ -291,15 +291,15 @@ export const deleteCompany = (companyId) => companyApi.deleteCompany(companyId);
 
 // Customer Management API functions
 export const customerApi = {
-  getCustomers: () => apiRequest("/api/customers/GetAllCustomers"),
-  getCustomerById: (customerId) => apiRequest(`/api/customers/${customerId}`),
+  getCustomers: () => apiRequest("/customers/GetAllCustomers"),
+  getCustomerById: (customerId) => apiRequest(`/customers/${customerId}`),
   saveCustomer: (customerData) =>
-    apiRequest("/api/customers", {
+    apiRequest("/customers", {
       method: "POST",
       body: JSON.stringify(customerData),
     }),
   updateCustomer: (customerData) =>
-    apiRequest("/api/customers", {
+    apiRequest("/customers", {
       method: "PUT",
       body: JSON.stringify(customerData),
     }),
@@ -320,37 +320,37 @@ export const deleteCustomer = (customerId) =>
 
 // Material Rates API functions
 export const materialRatesApi = {
-  getAllMaterialRates: () => apiRequest("/api/materialrates/GetAllMaterialRates"),
-  getMaterialRateById: (id) => apiRequest(`/api/materialrates/GetMaterialRateById/${id}`),
-  getMaterialRatesByLocationId: (locationId) => apiRequest(`/api/materialrates/GetMaterialRatesByLocationId/${locationId}`),
+  getAllMaterialRates: () => apiRequest("/materialrates/GetAllMaterialRates"),
+  getMaterialRateById: (id) => apiRequest(`/materialrates/GetMaterialRateById/${id}`),
+  getMaterialRatesByLocationId: (locationId) => apiRequest(`/materialrates/GetMaterialRatesByLocationId/${locationId}`),
   checkExistingActiveRates: (customerId, locationId, materialType, effectiveDate) => 
-    apiRequest(`/api/materialrates/CheckExistingActiveRates?customerId=${customerId}&locationId=${locationId}&materialType=${materialType}&effectiveDate=${effectiveDate}`),
-  createMaterialRate: (rateData) => apiRequest("/api/materialrates/CreateMaterialRate", {
+    apiRequest(`/materialrates/CheckExistingActiveRates?customerId=${customerId}&locationId=${locationId}&materialType=${materialType}&effectiveDate=${effectiveDate}`),
+  createMaterialRate: (rateData) => apiRequest("/materialrates/CreateMaterialRate", {
     method: "POST",
     body: JSON.stringify(rateData),
   }),
-  updateMaterialRate: (id, rateData) => apiRequest(`/api/materialrates/UpdateMaterialRate/${id}`, {
+  updateMaterialRate: (id, rateData) => apiRequest(`/materialrates/UpdateMaterialRate/${id}`, {
     method: "PUT",
     body: JSON.stringify(rateData),
   }),
-  deleteMaterialRate: (id) => apiRequest(`/api/materialrates/DeleteMaterialRate/${id}`, {
+  deleteMaterialRate: (id) => apiRequest(`/materialrates/DeleteMaterialRate/${id}`, {
     method: "DELETE",
   }),
 };
 
 // Customer Locations API functions
 export const customerLocationsApi = {
-  getLocationsByCustomerId: (customerId) => apiRequest(`/api/customerlocations/GetLocationsByCustomerId/${customerId}`),
-  getAllLocations: () => apiRequest("/api/customerlocations/GetAllLocations"),
-  createLocation: (locationData) => apiRequest("/api/customerlocations/CreateLocation", {
+  getLocationsByCustomerId: (customerId) => apiRequest(`/customerlocations/GetLocationsByCustomerId/${customerId}`),
+  getAllLocations: () => apiRequest("/customerlocations/GetAllLocations"),
+  createLocation: (locationData) => apiRequest("/customerlocations/CreateLocation", {
     method: "POST",
     body: JSON.stringify(locationData),
   }),
-  updateLocation: (locationId, locationData) => apiRequest(`/api/customerlocations/UpdateLocation/${locationId}`, {
+  updateLocation: (locationId, locationData) => apiRequest(`/customerlocations/UpdateLocation/${locationId}`, {
     method: "PUT",
     body: JSON.stringify(locationData),
   }),
-  deleteLocation: (locationId) => apiRequest(`/api/customerlocations/DeleteLocation/${locationId}`, {
+  deleteLocation: (locationId) => apiRequest(`/customerlocations/DeleteLocation/${locationId}`, {
     method: "DELETE",
   }),
 };

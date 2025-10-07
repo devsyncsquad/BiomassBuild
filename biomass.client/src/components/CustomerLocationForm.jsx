@@ -32,6 +32,7 @@ export const CustomerLocationForm = ({
   customerId,
   locationData = null,
   onSave,
+  onRefreshData,
 }) => {
   const [formData, setFormData] = useState({
     customerId: customerId,
@@ -77,8 +78,8 @@ export const CustomerLocationForm = ({
   // Helper functions to get vendor names
   const getVendorName = (vendorId) => {
     if (!vendorId || !vendors.length) return '';
-    const vendor = vendors.find(v => v.vendorId === vendorId || v.VendorId === vendorId);
-    return vendor ? (vendor.vendorName || vendor.VendorName) : '';
+    const vendor = vendors.find(v => v.vendorId === vendorId);
+    return vendor ? vendor.vendorName : '';
   };
 
   // Fetch customers and vendors when form opens
@@ -115,7 +116,7 @@ export const CustomerLocationForm = ({
   const fetchVendors = async () => {
     setLoadingVendors(true);
     try {
-      const response = await fetch(`${getBaseUrl()}/vendors/labor-and-loader`);
+      const response = await fetch(`${getBaseUrl()}/vendors/all`);
       const data = await response.json();
       
       if (data.success) {
@@ -141,6 +142,8 @@ export const CustomerLocationForm = ({
       customerId,
       isEditingExisting,
       hasLocationId: locationData?.locationId,
+      vendorsLoaded: vendors.length > 0,
+      loadingVendors,
     });
 
     if (isEditingExisting) {
@@ -202,9 +205,39 @@ export const CustomerLocationForm = ({
       setIsEditing(false);
       console.log("Setting form to NEW location mode");
     }
-  }, [locationData, customerId]);
+  }, [locationData, customerId, vendors]);
+
+  // Separate useEffect to handle vendor data loading for edit mode
+  useEffect(() => {
+    if (isEditing && vendors.length > 0 && locationData) {
+      console.log("Vendors loaded for edit mode, updating form data:", {
+        vendors: vendors.length,
+        defaultBucket: locationData.defaultBucket || locationData.DefaultBucket,
+        laborVendor: locationData.laborVendor || locationData.LaborVendor,
+      });
+      
+      // Update form data with vendor information when vendors are loaded
+      setFormData(prev => ({
+        ...prev,
+        defaultBucket: locationData.defaultBucket || locationData.DefaultBucket || null,
+        laborVendor: locationData.laborVendor || locationData.LaborVendor || null,
+      }));
+    }
+  }, [isEditing, vendors, locationData]);
 
   const handleInputChange = (field, value) => {
+    // Handle special cases
+    if (field === "locationCode") {
+      // Convert location code to uppercase
+      value = value.toUpperCase();
+    } else if (field === "advancePercentageAllowed") {
+      // Validate advance percentage doesn't exceed 100%
+      if (value > 100) {
+        alert("Advance percentage cannot be greater than 100%");
+        return;
+      }
+    }
+    
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -217,6 +250,29 @@ export const CustomerLocationForm = ({
       centerEnabled: checked,
       centerDispatchWeightLimit: checked ? prev.centerDispatchWeightLimit : 0,
     }));
+  };
+
+  // Function to refresh locations data and vendors
+  const refreshLocationsData = async () => {
+    try {
+      // Refresh locations data
+      const locationsResponse = await customerLocationsApi.getAllLocations();
+      console.log("Refreshed locations data:", locationsResponse);
+      
+      // Refresh vendors data when editing
+      if (isEditing) {
+        const vendorsResponse = await fetch(`${getBaseUrl()}/vendors/all`);
+        const vendorsData = await vendorsResponse.json();
+        console.log("Refreshed vendors data:", vendorsData);
+      }
+      
+      // Call the onRefreshData callback if provided
+      if (onRefreshData) {
+        onRefreshData(locationsResponse);
+      }
+    } catch (error) {
+      console.error("Error refreshing data:", error);
+    }
   };
 
   const handleSave = async () => {
@@ -331,6 +387,8 @@ export const CustomerLocationForm = ({
 
       if (response.success) {
         onSave(response.result);
+        // Refresh locations data after successful save
+        await refreshLocationsData();
         onClose();
       } else {
         alert("Error saving location: " + response.message);
@@ -362,10 +420,17 @@ export const CustomerLocationForm = ({
     }
   };
 
+  // Custom close handler that refreshes data
+  const handleClose = async () => {
+    // Refresh locations data when closing the form
+    await refreshLocationsData();
+    onClose();
+  };
+
   return (
     <Dialog
       open={open}
-      onClose={onClose}
+      onClose={handleClose}
       maxWidth='xl'
       fullWidth
       PaperProps={{
@@ -395,7 +460,7 @@ export const CustomerLocationForm = ({
           <Button
             variant='outlined'
             startIcon={<CancelIcon />}
-            onClick={onClose}
+            onClick={handleClose}
             sx={{
               color: "white",
               borderColor: "white",
@@ -1104,8 +1169,8 @@ export const CustomerLocationForm = ({
                   {console.log("Loader Vendor debug:", { 
                     formDataDefaultBucket: formData.defaultBucket, 
                     vendors: vendors.length,
-                    vendorIds: vendors.map(v => v.vendorId || v.VendorId),
-                    vendorNames: vendors.map(v => v.vendorName || v.VendorName),
+                    vendorIds: vendors.map(v => v.vendorId),
+                    vendorNames: vendors.map(v => v.vendorName),
                     selectedVendorName: getVendorName(formData.defaultBucket),
                     vendorsData: vendors,
                     loadingVendors: loadingVendors
@@ -1113,9 +1178,9 @@ export const CustomerLocationForm = ({
                   <Select
                     labelId="loader-vendor-label"
                     value={formData.defaultBucket || ''}
-                    onChange={(e) =>
-                      handleInputChange("defaultBucket", e.target.value ? parseInt(e.target.value) : null)
-                    }
+                    onChange={(e) => {
+                      handleInputChange("defaultBucket", e.target.value ? parseInt(e.target.value) : null);
+                    }}
                     label='Select Loader Vendor'
                     disabled={loadingVendors}
                   >
@@ -1123,8 +1188,8 @@ export const CustomerLocationForm = ({
                       <em>{loadingVendors ? 'Loading vendors...' : 'Select a vendor'}</em>
                     </MenuItem>
                     {vendors.map((vendor) => (
-                      <MenuItem key={vendor.vendorId || vendor.VendorId} value={vendor.vendorId || vendor.VendorId}>
-                        {vendor.vendorName || vendor.VendorName}
+                      <MenuItem key={vendor.vendorId} value={vendor.vendorId}>
+                        {vendor.vendorName}
                       </MenuItem>
                     ))}
                   </Select>
@@ -1135,8 +1200,8 @@ export const CustomerLocationForm = ({
                   {console.log("Labor Vendor debug:", { 
                     formDataLaborVendor: formData.laborVendor, 
                     vendors: vendors.length,
-                    vendorIds: vendors.map(v => v.vendorId || v.VendorId),
-                    vendorNames: vendors.map(v => v.vendorName || v.VendorName),
+                    vendorIds: vendors.map(v => v.vendorId),
+                    vendorNames: vendors.map(v => v.vendorName),
                     selectedVendorName: getVendorName(formData.laborVendor),
                     vendorsData: vendors,
                     loadingVendors: loadingVendors
@@ -1144,9 +1209,9 @@ export const CustomerLocationForm = ({
                   <Select
                     labelId="labor-vendor-label"
                     value={formData.laborVendor || ''}
-                    onChange={(e) =>
-                      handleInputChange("laborVendor", e.target.value ? parseInt(e.target.value) : null)
-                    }
+                    onChange={(e) => {
+                      handleInputChange("laborVendor", e.target.value ? parseInt(e.target.value) : null);
+                    }}
                     label='Select Labor Vendor'
                     disabled={loadingVendors}
                   >
@@ -1154,8 +1219,8 @@ export const CustomerLocationForm = ({
                       <em>{loadingVendors ? 'Loading vendors...' : 'Select a vendor'}</em>
                     </MenuItem>
                     {vendors.map((vendor) => (
-                      <MenuItem key={vendor.vendorId || vendor.VendorId} value={vendor.vendorId || vendor.VendorId}>
-                        {vendor.vendorName || vendor.VendorName}
+                      <MenuItem key={vendor.vendorId} value={vendor.vendorId}>
+                        {vendor.vendorName}
                       </MenuItem>
                     ))}
                   </Select>

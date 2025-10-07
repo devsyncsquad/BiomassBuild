@@ -278,6 +278,9 @@ const CustomerLocations = ({ customer, onClose }) => {
         savedLocation.laborChargeType || savedLocation.LaborChargeType,
       laborChargesCost:
         savedLocation.laborChargesCost || savedLocation.LaborChargesCost,
+      // Add vendor configuration fields
+      defaultBucket: savedLocation.defaultBucket || savedLocation.DefaultBucket,
+      laborVendor: savedLocation.laborVendor || savedLocation.LaborVendor,
       status: savedLocation.status || savedLocation.Status,
       createdOn: savedLocation.createdOn || savedLocation.CreatedOn,
       lastUpdatedOn: savedLocation.lastUpdatedOn || savedLocation.LastUpdatedOn,
@@ -310,6 +313,35 @@ const CustomerLocations = ({ customer, onClose }) => {
       console.log("Adding new location");
       setLocations((prev) => [...prev, convertedLocation]);
     }
+    
+    // Refresh locations from server to ensure we have the latest data
+    const refreshLocations = async () => {
+      try {
+        if (customer) {
+          // Fetch locations for the specific customer
+          const response = await axios.get(
+            `${getBaseUrl()}/customerlocations/GetLocationsByCustomerId/${customer.customerId}`
+          );
+          if (response.data.success) {
+            setLocations(response.data.result);
+          }
+        } else {
+          // Fetch all locations for standalone mode
+          const response = await axios.get(
+            `${getBaseUrl()}/customerlocations/GetAllLocations`
+          );
+          if (response.data.success) {
+            setLocations(response.data.result);
+          }
+        }
+      } catch (error) {
+        console.error("Error refreshing locations:", error);
+      }
+    };
+    
+    // Refresh locations data
+    refreshLocations();
+    
     setOpenLocationForm(false);
     setEditingLocation(null);
   };
@@ -1124,6 +1156,10 @@ const CustomerLocations = ({ customer, onClose }) => {
         customerId={customer?.customerId} // Pass customerId only if in standalone mode
         locationData={editingLocation}
         onSave={handleSaveLocation}
+        onRefreshData={(locationsData) => {
+          console.log("Locations data refreshed from form:", locationsData);
+          // The handleSaveLocation already handles refreshing, so we don't need to do anything here
+        }}
       />
 
       {/* Rate Popup Dialog */}

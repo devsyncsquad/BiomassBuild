@@ -23,7 +23,6 @@ namespace Biomass.Server.Models.Driver
         [StringLength(20)]
         public string? CNIC { get; set; }
 
-        [Required]
         [StringLength(50)]
         public string LicenseNumber { get; set; }
 

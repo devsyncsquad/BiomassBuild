@@ -19,7 +19,6 @@ namespace Biomass.Server.Models.Driver
         [Column("cnic")]
         public string? CNIC { get; set; }
 
-        [Required]
         [StringLength(50)]
         [Column("licensenumber")]
         public string LicenseNumber { get; set; }

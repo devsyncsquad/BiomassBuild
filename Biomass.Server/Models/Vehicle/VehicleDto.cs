@@ -27,13 +27,11 @@ namespace Biomass.Server.Models.Vehicle
         [StringLength(50)]
         public string VehicleNumber { get; set; }
 
-        [Required]
         [StringLength(50)]
         public string VehicleType { get; set; }
 
         public decimal? Capacity { get; set; }
 
-        [Required]
         [StringLength(50)]
         public string FuelType { get; set; }
 
@@ -56,13 +54,11 @@ namespace Biomass.Server.Models.Vehicle
         [StringLength(50)]
         public string VehicleNumber { get; set; }
 
-        [Required]
         [StringLength(50)]
         public string VehicleType { get; set; }
 
         public decimal? Capacity { get; set; }
 
-        [Required]
         [StringLength(50)]
         public string FuelType { get; set; }
 

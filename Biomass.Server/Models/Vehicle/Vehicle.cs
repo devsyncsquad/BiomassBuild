@@ -15,7 +15,6 @@ namespace Biomass.Server.Models.Vehicle
         [Column("vehiclenumber")]
         public string? VehicleNumber { get; set; }
 
-        [Required]
         [StringLength(50)]
         [Column("vehicletype")]
         public string? VehicleType { get; set; }
@@ -23,7 +22,6 @@ namespace Biomass.Server.Models.Vehicle
         [Column("capacity")]
         public decimal? Capacity { get; set; }
 
-        [Required]
         [StringLength(50)]
         [Column("fueltype")]
         public string? FuelType { get; set; }

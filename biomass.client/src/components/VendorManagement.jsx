@@ -518,7 +518,7 @@ const VendorManagement = () => {
           </Grid>
         ) : (
           vendors.map((vendor) => (
-          <Grid item xs={12} sm={6} md={4} key={vendor.vendorId}>
+          <Grid item xs={12} sm={6} md={3} key={vendor.vendorId}>
             <Card
               sx={{
                 bgcolor: colors.background.paper,

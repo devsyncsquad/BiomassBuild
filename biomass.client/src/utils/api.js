@@ -291,7 +291,7 @@ export const deleteCompany = (companyId) => companyApi.deleteCompany(companyId);
 
 // Customer Management API functions
 export const customerApi = {
-  getCustomers: () => apiRequest("/customers/GetAllCustomers"),
+  getCustomers: () => apiRequest("/api/customers/GetAllCustomers"),
   getCustomerById: (customerId) => apiRequest(`/api/customers/${customerId}`),
   saveCustomer: (customerData) =>
     apiRequest("/api/customers", {
@@ -320,37 +320,37 @@ export const deleteCustomer = (customerId) =>
 
 // Material Rates API functions
 export const materialRatesApi = {
-  getAllMaterialRates: () => apiRequest("/materialrates/GetAllMaterialRates"),
-  getMaterialRateById: (id) => apiRequest(`/materialrates/GetMaterialRateById/${id}`),
-  getMaterialRatesByLocationId: (locationId) => apiRequest(`/materialrates/GetMaterialRatesByLocationId/${locationId}`),
+  getAllMaterialRates: () => apiRequest("/api/materialrates/GetAllMaterialRates"),
+  getMaterialRateById: (id) => apiRequest(`/api/materialrates/GetMaterialRateById/${id}`),
+  getMaterialRatesByLocationId: (locationId) => apiRequest(`/api/materialrates/GetMaterialRatesByLocationId/${locationId}`),
   checkExistingActiveRates: (customerId, locationId, materialType, effectiveDate) => 
-    apiRequest(`/materialrates/CheckExistingActiveRates?customerId=${customerId}&locationId=${locationId}&materialType=${materialType}&effectiveDate=${effectiveDate}`),
-  createMaterialRate: (rateData) => apiRequest("/materialrates/CreateMaterialRate", {
+    apiRequest(`/api/materialrates/CheckExistingActiveRates?customerId=${customerId}&locationId=${locationId}&materialType=${materialType}&effectiveDate=${effectiveDate}`),
+  createMaterialRate: (rateData) => apiRequest("/api/materialrates/CreateMaterialRate", {
     method: "POST",
     body: JSON.stringify(rateData),
   }),
-  updateMaterialRate: (id, rateData) => apiRequest(`/materialrates/UpdateMaterialRate/${id}`, {
+  updateMaterialRate: (id, rateData) => apiRequest(`/api/materialrates/UpdateMaterialRate/${id}`, {
     method: "PUT",
     body: JSON.stringify(rateData),
   }),
-  deleteMaterialRate: (id) => apiRequest(`/materialrates/DeleteMaterialRate/${id}`, {
+  deleteMaterialRate: (id) => apiRequest(`/api/materialrates/DeleteMaterialRate/${id}`, {
     method: "DELETE",
   }),
 };
 
 // Customer Locations API functions
 export const customerLocationsApi = {
-  getLocationsByCustomerId: (customerId) => apiRequest(`/customerlocations/GetLocationsByCustomerId/${customerId}`),
-  getAllLocations: () => apiRequest("/customerlocations/GetAllLocations"),
-  createLocation: (locationData) => apiRequest("/customerlocations/CreateLocation", {
+  getLocationsByCustomerId: (customerId) => apiRequest(`/api/customerlocations/GetLocationsByCustomerId/${customerId}`),
+  getAllLocations: () => apiRequest("/api/customerlocations/GetAllLocations"),
+  createLocation: (locationData) => apiRequest("/api/customerlocations/CreateLocation", {
     method: "POST",
     body: JSON.stringify(locationData),
   }),
-  updateLocation: (locationId, locationData) => apiRequest(`/customerlocations/UpdateLocation/${locationId}`, {
+  updateLocation: (locationId, locationData) => apiRequest(`/api/customerlocations/UpdateLocation/${locationId}`, {
     method: "PUT",
     body: JSON.stringify(locationData),
   }),
-  deleteLocation: (locationId) => apiRequest(`/customerlocations/DeleteLocation/${locationId}`, {
+  deleteLocation: (locationId) => apiRequest(`/api/customerlocations/DeleteLocation/${locationId}`, {
     method: "DELETE",
   }),
 };
@@ -370,20 +370,20 @@ export const employeeApi = {
 
 // Lookup API functions
 export const lookupApi = {
-  getAllLookups: () => apiRequest("/lookups/GetAllLookups"),
+  getAllLookups: () => apiRequest("/api/lookups/GetAllLookups"),
   getLookupsByDomain: (domain) => apiRequest("/lookups/by-domain", {
     method: "POST",
     body: JSON.stringify({ Domain: domain }),
   }),
-  createLookup: (lookupData) => apiRequest("/lookups", {
+  createLookup: (lookupData) => apiRequest("/api/lookups", {
     method: "POST",
     body: JSON.stringify(lookupData),
   }),
-  updateLookup: (id, lookupData) => apiRequest(`/lookups/${id}`, {
+  updateLookup: (id, lookupData) => apiRequest(`/api/lookups/${id}`, {
     method: "PUT",
     body: JSON.stringify(lookupData),
   }),
-  deleteLookup: (id) => apiRequest(`/lookups/${id}`, {
+  deleteLookup: (id) => apiRequest(`/api/lookups/${id}`, {
     method: "DELETE",
   }),
 };

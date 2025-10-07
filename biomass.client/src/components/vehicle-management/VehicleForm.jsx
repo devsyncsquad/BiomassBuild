@@ -118,19 +118,26 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    
+    // Convert vehicle number and registration number to uppercase
+    let processedValue = value;
+    if (name === 'vehicleNumber' || name === 'vehicleRegNumber') {
+      processedValue = value.toUpperCase();
+    }
+    
     if (name.startsWith("driver.")) {
       const driverField = name.split(".")[1];
       setFormData((prev) => ({
         ...prev,
         driver: {
           ...prev.driver,
-          [driverField]: value,
+          [driverField]: processedValue,
         },
       }));
     } else {
       setFormData((prev) => ({
         ...prev,
-        [name]: value,
+        [name]: processedValue,
       }));
     }
   };
@@ -140,7 +147,7 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
     setLoading(true);
     setError(null);
 
-    // Validate required fields and field lengths according to database schema
+    // Validate only required fields: Vehicle Number, Registration Number, Vendor, Cost Center
     const validations = {
       vehicleNumber: {
         required: true,
@@ -148,43 +155,18 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
         label: "Vehicle Number",
         unique: true
       },
-      vehicleType: {
+      vehicleRegNumber: {
         required: true,
         maxLength: 50,
-        label: "Vehicle Type"
+        label: "Registration Number"
       },
-      fuelType: {
+      vendorId: {
         required: true,
-        maxLength: 50,
-        label: "Fuel Type"
+        label: "Vendor"
       },
-      status: {
-        maxLength: 20,
-        label: "Status"
-      },
-      capacity: {
-        type: "decimal",
-        label: "Capacity",
-        validate: (value) => {
-          if (value && (isNaN(value) || value < 0)) {
-            return "Capacity must be a positive number";
-          }
-          // Check decimal places (10,2)
-          if (value && value.toString().split('.')[1]?.length > 2) {
-            return "Capacity can have maximum 2 decimal places";
-          }
-          return null;
-        }
-      },
-      weightAllowed: {
-        type: "integer",
-        label: "Weight Allowed",
-        validate: (value) => {
-          if (value && (!Number.isInteger(Number(value)) || Number(value) < 0)) {
-            return "Weight Allowed must be a positive integer";
-          }
-          return null;
-        }
+      costCenterId: {
+        required: true,
+        label: "Cost Center"
       }
     };
 
@@ -214,15 +196,6 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
         }
       }
     });
-
-    // Validate CNIC
-    if (formData.driver.cnic) {
-      if (formData.driver.cnic.length !== 13) {
-        validationErrors.push("CNIC must be exactly 13 digits");
-      } else if (!/^\d+$/.test(formData.driver.cnic)) {
-        validationErrors.push("CNIC must contain only numbers");
-      }
-    }
 
     // Check for validation errors
     if (validationErrors.length > 0) {
@@ -422,7 +395,7 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
             </Grid>
 
             <Grid item xs={12} sm={6}>
-              <FormControl fullWidth required>
+              <FormControl fullWidth>
                 <InputLabel>Vehicle Type</InputLabel>
                 <Select
                   name='vehicleType'
@@ -443,7 +416,6 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                required
                 type='number'
                 label='Capacity'
                 name='capacity'
@@ -453,7 +425,7 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
             </Grid>
 
             <Grid item xs={12} sm={6}>
-              <FormControl fullWidth required>
+              <FormControl fullWidth>
                 <InputLabel>Fuel Type</InputLabel>
                 <Select
                   name='fuelType'
@@ -472,7 +444,7 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
             </Grid>
 
             <Grid item xs={12} sm={6}>
-              <FormControl fullWidth required>
+              <FormControl fullWidth>
                 <InputLabel>Status</InputLabel>
                 <Select
                   name='status'
@@ -600,7 +572,6 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                required
                 label='Driver Name'
                 name='driver.fullName'
                 value={formData.driver.fullName}
@@ -611,7 +582,6 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                required
                 label='CNIC'
                 name='driver.cnic'
                 value={formData.driver.cnic}
@@ -629,7 +599,6 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                required
                 label='License Number'
                 name='driver.licenseNumber'
                 value={formData.driver.licenseNumber}
@@ -640,7 +609,6 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                required
                 label='Phone Number'
                 name='driver.phoneNumber'
                 value={formData.driver.phoneNumber}
@@ -661,7 +629,7 @@ const VehicleForm = ({ open, onClose, vehicle, onSuccess }) => {
             </Grid>
 
             <Grid item xs={12} sm={6}>
-              <FormControl fullWidth required>
+              <FormControl fullWidth>
                 <InputLabel>Driver Status</InputLabel>
                 <Select
                   name='driver.status'

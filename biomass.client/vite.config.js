@@ -53,10 +53,11 @@ export default defineConfig({
                 secure: false
             },
             '^/api': {
-                target: 'https://localhost:7084',
+                //target: 'https://localhost:7084',
+                target: 'http://100.42.177.77:88',
                 changeOrigin: true,
                 secure: false,
-                rewrite: (path) => path.replace(/^\/api/, '/api')
+                rewrite: (path) => path
             }
         },
         port: parseInt(env.DEV_SERVER_PORT || '53731'),

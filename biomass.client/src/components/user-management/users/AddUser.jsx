@@ -177,10 +177,44 @@ const AddUser = ({ userData, setUserData, onSuccess, onError }) => {
       processedValue = value === "" ? "" : parseInt(value) || "";
     }
 
-    setFormData({
-      ...formData,
-      [name]: processedValue,
-    });
+    // Handle employee selection auto-fill
+    if (name === 'empNo' && processedValue) {
+      const selectedEmployee = employees.find(emp => emp.employeeId === processedValue);
+      if (selectedEmployee) {
+        // Parse fullName into firstName and lastName
+        const nameParts = selectedEmployee.fullName.trim().split(' ');
+        const firstName = nameParts[0] || '';
+        const lastName = nameParts.slice(1).join(' ') || '';
+        
+        setFormData({
+          ...formData,
+          [name]: processedValue,
+          firstName: firstName,
+          lastName: lastName,
+          phoneNumber: selectedEmployee.phone || '',
+        });
+        
+        console.log("Auto-filled employee data:", {
+          employeeId: selectedEmployee.employeeId,
+          fullName: selectedEmployee.fullName,
+          firstName,
+          lastName,
+          phone: selectedEmployee.phone
+        });
+      } else {
+        // Normal field change if no employee found
+        setFormData({
+          ...formData,
+          [name]: processedValue,
+        });
+      }
+    } else {
+      // Normal field change for all other fields
+      setFormData({
+        ...formData,
+        [name]: processedValue,
+      });
+    }
 
     if (errors[name]) {
       setErrors({

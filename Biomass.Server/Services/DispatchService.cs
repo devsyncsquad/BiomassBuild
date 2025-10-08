@@ -409,6 +409,17 @@ namespace Biomass.Server.Services
             return dispatches.Select(MapToDtoFromView).ToList();
         }
 
+        public async Task<List<DispatchDto>> GetDispatchesBySlipNumberAsync(string slipNumber)
+        {
+            // Get dispatches matching the slip number
+            var dispatches = await _context.VDispatches
+                .Where(d => d.SlipNumber == slipNumber)
+                .OrderByDescending(d => d.CreatedOn)
+                .ToListAsync();
+
+            return dispatches.Select(MapToDtoFromView).ToList();
+        }
+
         private static DispatchDto MapToDtoFromView(VDispatchDto vDispatch)
         {
             return new DispatchDto

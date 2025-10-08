@@ -11,5 +11,6 @@ namespace Biomass.Server.Interfaces
         Task<bool> DeleteDispatchAsync(int id);
 
         Task<List<DispatchDto>> GetDispatchesByUserAndStatusAsync(int userId, string status);
+        Task<List<DispatchDto>> GetDispatchesBySlipNumberAsync(string slipNumber);
     }
 }

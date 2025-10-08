@@ -151,5 +151,28 @@ namespace Biomass.Server.Controllers.Api
                 Success = true
             });
         }
+
+        [HttpGet("dispatchedBySlipNumber/{slipNumber}")]
+        public async Task<ActionResult<ServiceResponse<List<DispatchDto>>>> GetDispatchesBySlipNumber(string slipNumber)
+        {
+            var dispatches = await _dispatchService.GetDispatchesBySlipNumberAsync(slipNumber);
+
+            if (!dispatches.Any())
+            {
+                return Ok(new ServiceResponse<List<DispatchDto>>
+                {
+                    Result = dispatches,
+                    Message = "No dispatches found for the specified slip number",
+                    Success = true
+                });
+            }
+
+            return Ok(new ServiceResponse<List<DispatchDto>>
+            {
+                Result = dispatches,
+                Message = $"Found {dispatches.Count} dispatch(es) with slip number '{slipNumber}'",
+                Success = true
+            });
+        }
     }
 }

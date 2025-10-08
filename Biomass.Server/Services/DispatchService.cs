@@ -42,14 +42,22 @@ namespace Biomass.Server.Services
 
         public async Task<int> CreateDispatchAsync(CreateDispatchRequest request)
         {
+            Console.WriteLine($"🚀 CreateDispatchAsync called");
+            Console.WriteLine($"📦 VehicleId: {request.VehicleId}, LocationId: {request.LocationId}");
+            Console.WriteLine($"📦 SlipNumber: {request.SlipNumber}");
+            Console.WriteLine($"📦 CashIds: {(request.CashIds != null ? string.Join(", ", request.CashIds) : "null")}");
+            
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
+                Console.WriteLine("✅ Transaction started");
+                
                 _dispatchUploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", "dispatches");
                 // Create dispatch uploads directory if it doesn't exist
                 if (!Directory.Exists(_dispatchUploadsFolder))
                 {
                     Directory.CreateDirectory(_dispatchUploadsFolder);
+                    Console.WriteLine("✅ Created dispatch uploads folder");
                 }
 
                 // Handle slip picture upload if provided
@@ -89,9 +97,22 @@ namespace Biomass.Server.Services
                     }
                 }
 
-                var slipExists = _context.Dispatches.Where(v => v.SlipNumber == request.SlipNumber);
-                if (slipExists.Any()) {
-                    throw new InvalidOperationException($"Slip number {request.SlipNumber} is already added in system.");
+                // Only check for duplicate slip number if one is provided
+                if (!string.IsNullOrWhiteSpace(request.SlipNumber))
+                {
+                    Console.WriteLine($"🔍 Checking if slip number '{request.SlipNumber}' exists...");
+                    var slipExists = await _context.Dispatches
+                        .Where(v => v.SlipNumber == request.SlipNumber)
+                        .AnyAsync();
+                    if (slipExists) {
+                        Console.WriteLine($"❌ Slip number {request.SlipNumber} already exists");
+                        throw new InvalidOperationException($"Slip number {request.SlipNumber} is already added in system.");
+                    }
+                    Console.WriteLine("✅ Slip number is unique");
+                }
+                else
+                {
+                    Console.WriteLine("⚠️ No slip number provided, skipping duplicate check");
                 }
                         
 
@@ -135,8 +156,10 @@ namespace Biomass.Server.Services
                     CreatedOn = DateTime.UtcNow
                 };
 
+                Console.WriteLine("💾 Saving dispatch to database...");
                 _context.Dispatches.Add(dispatch);
                 await _context.SaveChangesAsync();
+                Console.WriteLine($"✅ Dispatch created with ID: {dispatch.DispatchId}");
 
                 // Calculate charges based on variable rates or fixed amounts
                 var bucketCharges = CalculateCharges(request.LoaderCharges, request.BucketRatePerMund, request.NetWeight);
@@ -210,10 +233,15 @@ namespace Biomass.Server.Services
                 // Update cashbook entries with dispatch_id if CashIds are provided
                 if (request.CashIds != null && request.CashIds.Any())
                 {
+                    Console.WriteLine($"💰 Processing {request.CashIds.Count} CashIds...");
+                    
                     // Validate that all cash_ids exist and don't already have a dispatch_id
+                    Console.WriteLine($"🔍 Querying cashbook for IDs: {string.Join(", ", request.CashIds)}");
                     var existingCashbookEntries = await _context.Cashbooks
                         .Where(c => request.CashIds.Contains(c.CashId))
                         .ToListAsync();
+                    
+                    Console.WriteLine($"✅ Found {existingCashbookEntries.Count} cashbook entries");
 
                     var providedCashIds = request.CashIds.ToHashSet();
                     var foundCashIds = existingCashbookEntries.Select(c => c.CashId).ToHashSet();
@@ -221,8 +249,10 @@ namespace Biomass.Server.Services
 
                     if (missingCashIds.Any())
                     {
+                        Console.WriteLine($"❌ Missing Cash IDs: {string.Join(", ", missingCashIds)}");
                         throw new InvalidOperationException($"Cash IDs not found: {string.Join(", ", missingCashIds)}");
                     }
+                    Console.WriteLine("✅ All CashIds found");
 
                     // Check if any cashbook entries already have a dispatch_id
                     var entriesWithDispatch = existingCashbookEntries
@@ -232,24 +262,39 @@ namespace Biomass.Server.Services
 
                     if (entriesWithDispatch.Any())
                     {
+                        Console.WriteLine($"❌ CashIds already have dispatch: {string.Join(", ", entriesWithDispatch)}");
                         throw new InvalidOperationException($"Cash IDs already have dispatch assigned: {string.Join(", ", entriesWithDispatch)}");
                     }
+                    Console.WriteLine("✅ No CashIds have existing dispatch");
 
                     // Update cashbook entries with the new dispatch_id
+                    Console.WriteLine($"💾 Updating {existingCashbookEntries.Count} cashbook entries with DispatchId: {dispatch.DispatchId}");
                     foreach (var cashbookEntry in existingCashbookEntries)
                     {
+                        Console.WriteLine($"   Updating CashId {cashbookEntry.CashId}: DispatchId = {dispatch.DispatchId}");
                         cashbookEntry.DispatchId = dispatch.DispatchId;
                     }
 
+                    Console.WriteLine("💾 Saving cashbook updates...");
                     await _context.SaveChangesAsync();
+                    Console.WriteLine("✅ Cashbook entries updated successfully");
                 }
 
+                Console.WriteLine("✅ Committing transaction...");
                 await transaction.CommitAsync();
+                Console.WriteLine($"✅✅✅ Dispatch {dispatch.DispatchId} created successfully!");
                 return dispatch.DispatchId;
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine($"❌❌❌ ERROR in CreateDispatchAsync: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
+                }
                 await transaction.RollbackAsync();
+                Console.WriteLine("🔄 Transaction rolled back");
                 throw;
             }
         }

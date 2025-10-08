@@ -54,13 +54,37 @@ namespace Biomass.Server.Controllers.Api
         [Consumes("multipart/form-data")]
         public async Task<ActionResult<ServiceResponse<int>>> CreateDispatch([FromForm] CreateDispatchRequest request)
         {
-            var dispatchId = await _dispatchService.CreateDispatchAsync(request);
-            return CreatedAtAction(nameof(GetDispatch), new { id = dispatchId }, new ServiceResponse<int>
+            try
             {
-                Result = dispatchId,
-                Message = "Dispatch created successfully",
-                Success = true
-            });
+                var dispatchId = await _dispatchService.CreateDispatchAsync(request);
+                return CreatedAtAction(nameof(GetDispatch), new { id = dispatchId }, new ServiceResponse<int>
+                {
+                    Result = dispatchId,
+                    Message = "Dispatch created successfully",
+                    Success = true
+                });
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Business logic errors (e.g., slip number exists, invalid vendor, etc.)
+                return BadRequest(new ServiceResponse<int>
+                {
+                    Message = ex.Message,
+                    Success = false
+                });
+            }
+            catch (Exception ex)
+            {
+                // Log the full exception for debugging
+                Console.WriteLine($"❌ Error creating dispatch: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                
+                return StatusCode(500, new ServiceResponse<int>
+                {
+                    Message = $"Failed to create dispatch: {ex.Message}",
+                    Success = false
+                });
+            }
         }
 
         [HttpPut("{id}")]

@@ -7,6 +7,7 @@ using Biomass.Server.Models.Vehicle;
 using Biomass.Server.Models.Vendor;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Hosting;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Biomass.Server.Services
 {
@@ -411,7 +412,7 @@ namespace Biomass.Server.Services
                 TransporterRateAuto = vDispatch.TransporterRateAuto,
                 TransporterChargesType = vDispatch.TransporterChargesType,
                 Amount = vDispatch.Amount,
-                TotalDeduction = vDispatch.TotalDeduction,
+                DispatchDeduction = vDispatch.DispatchDeduction,
                 CreatedBy = vDispatch.CreatedBy,
                 CreatedOn = vDispatch.CreatedOn,
                 Status = vDispatch.Status,
@@ -421,7 +422,10 @@ namespace Biomass.Server.Services
                 LabourVendorId = vDispatch.LabourVendorId,
                 TransporterVendorId=vDispatch.TransporterVendorId,
                 MaterialId=vDispatch.MaterialId,
-                Vehicle = new VehicleDto
+                TotalDeduction=vDispatch.TotalDeduction,
+                InTransitExpenses=vDispatch.InTransitExpenses,
+
+        Vehicle = new VehicleDto
                 {
                     VehicleId = vDispatch.VehicleId,
                     VehicleNumber = vDispatch.VehicleNumber,

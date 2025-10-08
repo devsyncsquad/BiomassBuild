@@ -28,6 +28,8 @@ namespace Biomass.Server.Models.Dispatch
         public string? TransporterChargesType { get; set; }
         public decimal? Amount { get; set; }
         public decimal? TotalDeduction { get; set; }
+        public decimal? DispatchDeduction { get; set; }
+        
         public int? CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
         public string? Status { get; set; }
@@ -40,10 +42,13 @@ namespace Biomass.Server.Models.Dispatch
         public decimal? BucketRatePerMund { get; set; }
         public decimal? LaborRatePerMund { get; set; }
         public decimal? TransporterRatePerMund { get; set; }
-        
+
+        public decimal? InTransitExpenses { get;  set; }
+
         // Navigation properties
         public VehicleDto? Vehicle { get; set; }
         public CustomerLocation? Location { get; set; }
+        
     }
 
     public class CreateDispatchRequest

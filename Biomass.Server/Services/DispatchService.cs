@@ -45,19 +45,40 @@ namespace Biomass.Server.Services
             Console.WriteLine($"🚀 CreateDispatchAsync called");
             Console.WriteLine($"📦 VehicleId: {request.VehicleId}, LocationId: {request.LocationId}");
             Console.WriteLine($"📦 SlipNumber: {request.SlipNumber}");
-            Console.WriteLine($"📦 CashIds: {(request.CashIds != null ? string.Join(", ", request.CashIds) : "null")}");
+            Console.WriteLine($"📦 CashIds NULL CHECK: {(request.CashIds == null ? "NULL" : "NOT NULL")}");
+            Console.WriteLine($"📦 CashIds Count: {request.CashIds?.Count ?? 0}");
+            if (request.CashIds != null && request.CashIds.Any())
+            {
+                Console.WriteLine($"📦 CashIds VALUES: [{string.Join(", ", request.CashIds)}]");
+            }
+            else
+            {
+                Console.WriteLine($"📦 CashIds: EMPTY OR NULL!");
+            }
             
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
                 Console.WriteLine("✅ Transaction started");
                 
-                _dispatchUploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", "dispatches");
+                // Use the uploads folder in ContentRootPath (same level as wwwroot)
+                // This matches the existing pattern used for cashbook_receipts
+                _dispatchUploadsFolder = Path.Combine(_environment.ContentRootPath, "uploads", "dispatches");
+                Console.WriteLine($"📁 Dispatch uploads folder: {_dispatchUploadsFolder}");
+                
                 // Create dispatch uploads directory if it doesn't exist
                 if (!Directory.Exists(_dispatchUploadsFolder))
                 {
-                    Directory.CreateDirectory(_dispatchUploadsFolder);
-                    Console.WriteLine("✅ Created dispatch uploads folder");
+                    try
+                    {
+                        Directory.CreateDirectory(_dispatchUploadsFolder);
+                        Console.WriteLine("✅ Created dispatch uploads folder");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"⚠️ Could not create dispatch uploads folder: {ex.Message}");
+                        Console.WriteLine($"⚠️ Ensure the folder exists and has proper permissions");
+                    }
                 }
 
                 // Handle slip picture upload if provided

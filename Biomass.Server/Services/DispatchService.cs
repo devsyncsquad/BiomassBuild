@@ -146,12 +146,12 @@ namespace Biomass.Server.Services
                 // Create AP Ledger entries only for vendors with non-zero amounts
                 var apLedgerEntries = new List<ApLedger>();
 
-                // Bucket vendor - only create entry if amount > 0
-                if (bucketCharges > 0 && request.BucketVendorId > 0)
+                // Bucket vendor - only create entry if amount > 0 and vendor ID is provided and valid
+                if (bucketCharges > 0 && request.BucketVendorId.HasValue && request.BucketVendorId.Value > 0)
                 {
                     apLedgerEntries.Add(new ApLedger
                     {
-                        VendorId = request.BucketVendorId,
+                        VendorId = request.BucketVendorId.Value,
                         HappenedAt = DateTime.UtcNow,
                         EntryKind = "Bill",
                         Amount = bucketCharges,
@@ -164,12 +164,12 @@ namespace Biomass.Server.Services
                     });
                 }
 
-                // Labour vendor - only create entry if amount > 0
-                if (laborCharges > 0 && request.LabourVendorId > 0)
+                // Labour vendor - only create entry if amount > 0 and vendor ID is provided and valid
+                if (laborCharges > 0 && request.LabourVendorId.HasValue && request.LabourVendorId.Value > 0)
                 {
                     apLedgerEntries.Add(new ApLedger
                     {
-                        VendorId = request.LabourVendorId,
+                        VendorId = request.LabourVendorId.Value,
                         HappenedAt = DateTime.UtcNow,
                         EntryKind = "Bill",
                         Amount = laborCharges,

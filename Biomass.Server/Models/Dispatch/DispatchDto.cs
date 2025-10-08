@@ -99,11 +99,9 @@ namespace Biomass.Server.Models.Dispatch
 
         public decimal? TotalDeduction { get; set; }
 
-        [Required]
-        public int BucketVendorId { get; set; }
+        public int? BucketVendorId { get; set; }
 
-        [Required]
-        public int LabourVendorId { get; set; }
+        public int? LabourVendorId { get; set; }
 
         public int? MaterialId { get; set; }
 

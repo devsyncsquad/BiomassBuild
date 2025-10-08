@@ -10,48 +10,73 @@ namespace Biomass.Server.ModelBinders
             if (bindingContext == null)
                 throw new ArgumentNullException(nameof(bindingContext));
 
+            // Try to get the value using the model name (e.g., "CashIds")
             var value = bindingContext.ValueProvider.GetValue(bindingContext.ModelName);
-            if (value == ValueProviderResult.None)
+            
+            // If not found, try to get indexed values (e.g., "CashIds[0]", "CashIds[1]", etc.)
+            var values = new List<long>();
+            
+            if (value != ValueProviderResult.None && !string.IsNullOrEmpty(value.FirstValue))
             {
-                return Task.CompletedTask;
-            }
+                // Handle comma-separated or JSON array format
+                bindingContext.ModelState.SetModelValue(bindingContext.ModelName, value);
+                var stringValue = value.FirstValue;
 
-            bindingContext.ModelState.SetModelValue(bindingContext.ModelName, value);
-
-            var stringValue = value.FirstValue;
-            if (string.IsNullOrEmpty(stringValue))
-            {
-                return Task.CompletedTask;
-            }
-
-            try
-            {
-                // Handle different formats:
-                // 1. "[144,143,162]" - JSON array format
-                // 2. "144,143,162" - comma separated
-                // 3. "144" - single value
-
-                var cleanValue = stringValue.Trim();
-                
-                // Remove brackets if present (JSON array format)
-                if (cleanValue.StartsWith("[") && cleanValue.EndsWith("]"))
+                try
                 {
-                    cleanValue = cleanValue.Substring(1, cleanValue.Length - 2);
+                    // Handle different formats:
+                    // 1. "[144,143,162]" - JSON array format
+                    // 2. "144,143,162" - comma separated
+                    // 3. "144" - single value
+
+                    var cleanValue = stringValue.Trim();
+                    
+                    // Remove brackets if present (JSON array format)
+                    if (cleanValue.StartsWith("[") && cleanValue.EndsWith("]"))
+                    {
+                        cleanValue = cleanValue.Substring(1, cleanValue.Length - 2);
+                    }
+
+                    // Split by comma and parse to long
+                    values = cleanValue.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                        .Select(v => long.Parse(v.Trim(), CultureInfo.InvariantCulture))
+                        .ToList();
                 }
-
-                // Split by comma and parse to long
-                var values = cleanValue.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(v => long.Parse(v.Trim(), CultureInfo.InvariantCulture))
-                    .ToList();
-
-                bindingContext.Result = ModelBindingResult.Success(values);
+                catch (Exception ex)
+                {
+                    bindingContext.ModelState.TryAddModelError(bindingContext.ModelName, 
+                        $"Invalid format for {bindingContext.ModelName}: {ex.Message}");
+                    return Task.CompletedTask;
+                }
             }
-            catch (Exception ex)
+            else
             {
-                bindingContext.ModelState.TryAddModelError(bindingContext.ModelName, 
-                    $"Invalid format for {bindingContext.ModelName}: {ex.Message}");
+                // Try array notation: CashIds[0], CashIds[1], CashIds[2], etc.
+                int index = 0;
+                while (true)
+                {
+                    var indexedKey = $"{bindingContext.ModelName}[{index}]";
+                    var indexedValue = bindingContext.ValueProvider.GetValue(indexedKey);
+                    
+                    if (indexedValue == ValueProviderResult.None || string.IsNullOrEmpty(indexedValue.FirstValue))
+                        break;
+                    
+                    try
+                    {
+                        values.Add(long.Parse(indexedValue.FirstValue, CultureInfo.InvariantCulture));
+                    }
+                    catch (Exception ex)
+                    {
+                        bindingContext.ModelState.TryAddModelError(indexedKey, 
+                            $"Invalid value for {indexedKey}: {ex.Message}");
+                        return Task.CompletedTask;
+                    }
+                    
+                    index++;
+                }
             }
 
+            bindingContext.Result = ModelBindingResult.Success(values.Any() ? values : null);
             return Task.CompletedTask;
         }
     }

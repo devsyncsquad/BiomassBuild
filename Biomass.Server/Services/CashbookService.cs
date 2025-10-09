@@ -100,7 +100,7 @@ namespace Biomass.Server.Services
                 ReferenceNo = dto.ReferenceNo,
                 CounterpartyName = dto.CounterpartyName,
                 Remarks = dto.Remarks,
-                Status = dto.Status,
+                Status = "Completed",
                 ReceiptPath = receiptPath,
                 CostCenterSubId = dto.CostCenterSubId,
                 DispatchId = dto.DispatchId,

@@ -13,7 +13,8 @@ export const getBaseUrl = () => {
   }
 
   // Fallback to default development URL for production
-  return "http://100.42.177.77:88/api";
+  //return "http://100.42.177.77:88/api";
+  return "https://localhost:7084/api";
 };
 
 // Common headers for API requests

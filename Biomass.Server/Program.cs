@@ -42,6 +42,7 @@ builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<IUserManagement, UserManagmentRepository>();
 builder.Services.AddScoped<ILookupService, LookupService>();
 builder.Services.AddScoped<ICostCenterService, CostCenterService>();
+builder.Services.AddScoped<IUserCostCenterService, UserCostCenterService>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<ICashbookService, CashbookService>();
 builder.Services.AddScoped<IMoneyAccountService, MoneyAccountService>();

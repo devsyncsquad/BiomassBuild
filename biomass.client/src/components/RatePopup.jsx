@@ -95,6 +95,25 @@ const RatePopup = ({
     }
   }, [open, locationId, customerId]);
 
+  // Update formData when customers/locations are loaded and props are provided
+  useEffect(() => {
+    if (customerId && customers.length > 0) {
+      setFormData(prev => ({
+        ...prev,
+        customerId: customerId
+      }));
+    }
+  }, [customerId, customers]);
+
+  useEffect(() => {
+    if (locationId && locations.length > 0) {
+      setFormData(prev => ({
+        ...prev,
+        locationId: locationId
+      }));
+    }
+  }, [locationId, locations]);
+
   // Check for existing active rates when form data changes
   useEffect(() => {
     if (open && !isEditing) {
@@ -505,11 +524,7 @@ const RatePopup = ({
             <Box sx={{ mb: 3 }}>
               <Typography variant='h6' gutterBottom>
                 Add New Rate
-              </Typography>
-              <Typography variant='body2' color='text.secondary' gutterBottom>
-                {locationName && `Location: ${locationName}`}{" "}
-                {customerName && `| Customer: ${customerName}`}
-              </Typography>
+              </Typography>             
 
               {error && (
                 <Alert severity='error' sx={{ mt: 2, mb: 2 }}>
@@ -589,6 +604,13 @@ const RatePopup = ({
                       }
                       label='Customer'
                       required
+                      disabled={!!customerId} // Disable if customerId prop is provided
+                      displayEmpty
+                      renderValue={(selected) => {
+                        if (!selected) return <em>Customer</em>;
+                        const customer = customers.find(c => c.customerId === selected);
+                        return customer ? (customer.customerName || `${customer.firstName} ${customer.lastName}`) : <em>Customer</em>;
+                      }}
                     >
                       {customers.map((customer) => (
                         <MenuItem
@@ -613,7 +635,13 @@ const RatePopup = ({
                       }
                       label='Location'
                       required
-                      disabled={!formData.customerId}
+                      disabled={!!locationId || !formData.customerId} // Disable if locationId prop is provided OR no customer selected
+                      displayEmpty
+                      renderValue={(selected) => {
+                        if (!selected) return <em>Location</em>;
+                        const location = locations.find(l => l.locationId === selected);
+                        return location ? `${location.locationName} (${location.locationCode})` : <em>Location</em>;
+                      }}
                     >
                       {locations.map((location) => (
                         <MenuItem

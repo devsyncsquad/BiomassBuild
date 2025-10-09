@@ -55,6 +55,7 @@ namespace Biomass.Server.Data
         public DbSet<VLocationDto> VLocations { get; set; }
         public DbSet<VDispatchDto> VDispatches { get; set; }
         public DbSet<VUserCustomer> VUserCustomers { get; set; }
+        public DbSet<UserCostCenter> UserCostCenters { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
 {
     // Define v_locations view
@@ -659,6 +660,44 @@ namespace Biomass.Server.Data
                       .WithMany()
                       .HasForeignKey(a => a.CashId)
                       .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<UserCostCenter>(e =>
+            {
+                e.ToTable("user_cost_centers");
+
+                // Composite PK: (user_id, cost_center_id)
+                e.HasKey(x => new { x.UserId, x.CostCenterId });
+
+                e.Property(x => x.UserId).HasColumnName("user_id");
+                e.Property(x => x.CostCenterId).HasColumnName("cost_center_id");
+                e.Property(x => x.CanPost).HasColumnName("can_post");
+
+                // FKs (adjust principal PK property names to your models)
+                e.HasOne(x => x.User)
+                    .WithMany() // or .WithMany(u => u.UserCostCenters)
+                    .HasForeignKey(x => x.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                e.HasOne(x => x.CostCenter)
+                    .WithMany() // or .WithMany(c => c.UserCostCenters)
+                    .HasForeignKey(x => x.CostCenterId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // Ensure your principal entities map bigint -> long and snake_case:
+            modelBuilder.Entity<Users>(e =>
+            {
+                e.ToTable("Users");
+                e.HasKey(u => u.UserId);
+                e.Property(u => u.UserId).HasColumnName("UserId"); // long
+            });
+
+            modelBuilder.Entity<CostCenter>(e =>
+            {
+                e.ToTable("cost_centers");
+                e.HasKey(c => c.CostCenterId);
+                e.Property(c => c.CostCenterId).HasColumnName("cost_center_id"); // long
             });
         }
     }

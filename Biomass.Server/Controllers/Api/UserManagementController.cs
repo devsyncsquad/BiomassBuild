@@ -18,11 +18,13 @@ namespace Biomass.Server.Controllers
     {
         private IUserManagement _interfaceUserManagement;
         private readonly ApplicationDbContext _context;
+        private readonly IUserCostCenterService _userCostCenterService;
 
-        public UserManagementController(IUserManagement interfaceUserManagement, ApplicationDbContext context)
+        public UserManagementController(IUserManagement interfaceUserManagement, ApplicationDbContext context, IUserCostCenterService userCostCenterService)
         {
             _interfaceUserManagement = interfaceUserManagement;
             _context = context;
+            _userCostCenterService = userCostCenterService;
         }
 
         #region USER
@@ -591,6 +593,137 @@ namespace Biomass.Server.Controllers
             var data = _interfaceUserManagement.GetUserLastLoginLogsList();
             return data;
         }
+        #endregion
+
+        #region USER COST CENTER ASSIGNMENT
+
+        [HttpGet("GetUserCostCenterAssignment/{userId}")]
+        public async Task<ActionResult<ServiceResponse<UserCostCenterAssignmentDto>>> GetUserCostCenterAssignment(int userId)
+        {
+            try
+            {
+                var assignment = await _userCostCenterService.GetUserCostCenterAssignmentAsync(userId);
+                return Ok(new ServiceResponse<UserCostCenterAssignmentDto>
+                {
+                    Result = assignment,
+                    Message = "User cost center assignment retrieved successfully",
+                    Success = true
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(new ServiceResponse<UserCostCenterAssignmentDto>
+                {
+                    Message = ex.Message,
+                    Success = false
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ServiceResponse<UserCostCenterAssignmentDto>
+                {
+                    Message = $"Error retrieving user cost center assignment: {ex.Message}",
+                    Success = false
+                });
+            }
+        }
+
+        [HttpPost("AssignCostCenterToUser")]
+        public async Task<ActionResult<ServiceResponse<UserCostCenterDto>>> AssignCostCenterToUser([FromBody] AssignCostCenterRequest request)
+        {
+            try
+            {
+                var assignment = await _userCostCenterService.AssignCostCenterToUserAsync(request);
+                return Ok(new ServiceResponse<UserCostCenterDto>
+                {
+                    Result = assignment,
+                    Message = "Cost center assigned to user successfully",
+                    Success = true
+                });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new ServiceResponse<UserCostCenterDto>
+                {
+                    Message = ex.Message,
+                    Success = false
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new ServiceResponse<UserCostCenterDto>
+                {
+                    Message = ex.Message,
+                    Success = false
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ServiceResponse<UserCostCenterDto>
+                {
+                    Message = $"Error assigning cost center to user: {ex.Message}",
+                    Success = false
+                });
+            }
+        }
+
+        [HttpDelete("UnassignCostCenterFromUser/{userId}/{costCenterId}")]
+        public async Task<ActionResult<ServiceResponse<bool>>> UnassignCostCenterFromUser(int userId, int costCenterId)
+        {
+            try
+            {
+                var result = await _userCostCenterService.UnassignCostCenterFromUserAsync(userId, costCenterId);
+                if (result)
+                {
+                    return Ok(new ServiceResponse<bool>
+                    {
+                        Result = true,
+                        Message = "Cost center unassigned from user successfully",
+                        Success = true
+                    });
+                }
+                else
+                {
+                    return NotFound(new ServiceResponse<bool>
+                    {
+                        Message = "Cost center assignment not found",
+                        Success = false
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ServiceResponse<bool>
+                {
+                    Message = $"Error unassigning cost center from user: {ex.Message}",
+                    Success = false
+                });
+            }
+        }
+
+        [HttpGet("GetUserCostCenters/{userId}")]
+        public async Task<ActionResult<ServiceResponse<List<UserCostCenterDto>>>> GetUserCostCenters(int userId)
+        {
+            try
+            {
+                var userCostCenters = await _userCostCenterService.GetUserCostCentersAsync(userId);
+                return Ok(new ServiceResponse<List<UserCostCenterDto>>
+                {
+                    Result = userCostCenters,
+                    Message = "User cost centers retrieved successfully",
+                    Success = true
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ServiceResponse<List<UserCostCenterDto>>
+                {
+                    Message = $"Error retrieving user cost centers: {ex.Message}",
+                    Success = false
+                });
+            }
+        }
+
         #endregion
     }
 } 

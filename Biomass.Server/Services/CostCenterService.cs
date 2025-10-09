@@ -126,5 +126,42 @@ namespace Biomass.Server.Services
             }
             return response;
         }
+
+        public async Task<List<CostCenterViewDto>> GetAllCostCentersViewAsync()
+        {
+            try
+            {
+                var costCenters = await _context.CostCenters
+                    .Include(cc => cc.Parent)
+                    .OrderBy(cc => cc.Code)
+                    .ToListAsync();
+
+                return costCenters.Select(MapToViewDto).ToList();
+            }
+            catch (Exception ex)
+            {
+                // Log the exception if you have logging configured
+                throw;
+            }
+        }
+
+        private static CostCenterViewDto MapToViewDto(CostCenter costCenter)
+        {
+            return new CostCenterViewDto
+            {
+                CostCenterId = costCenter.CostCenterId,
+                Code = costCenter.Code,
+                Name = costCenter.Name,
+                IsActive = costCenter.IsActive,
+                ParentCostCenterId = costCenter.ParentCostCenterId,
+                CompanyId = costCenter.CompanyId,
+                CreatedAt = costCenter.CreatedAt,
+                CostCenterType = costCenter.ParentCostCenterId == null ? "Parent" : "Child",
+                ParentId = costCenter.Parent?.CostCenterId,
+                ParentCode = costCenter.Parent?.Code,
+                ParentName = costCenter.Parent?.Name,
+                ParentIsActive = costCenter.Parent?.IsActive
+            };
+        }
     }
 }

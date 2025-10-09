@@ -140,10 +140,10 @@ const CostCenters = () => {
     // Apply type filter
     switch (filterType) {
       case "parent":
-        filtered = filtered.filter((cc) => !cc.isChild);
+        filtered = filtered.filter((cc) => cc.parentCostCenterId === null);
         break;
       case "child":
-        filtered = filtered.filter((cc) => cc.isChild);
+        filtered = filtered.filter((cc) => cc.parentCostCenterId !== null);
         break;
       default:
         break;
@@ -334,15 +334,15 @@ const CostCenters = () => {
   };
 
   const getParentCostCenters = () => {
-    return costCenters.filter((cc) => !cc.isChild); // Changed from is_child
+    return costCenters.filter((cc) => cc.parentCostCenterId === null); // Show only cost centers with parentCostCenterId = null
   };
 
-  const getStatusColor = (isChild) => {
-    return isChild ? "warning" : "success";
+  const getStatusColor = (parentCostCenterId) => {
+    return parentCostCenterId ? "warning" : "success";
   };
 
-  const getStatusLabel = (isChild) => {
-    return isChild ? "Child" : "Parent";
+  const getStatusLabel = (parentCostCenterId) => {
+    return parentCostCenterId ? "Child" : "Parent";
   };
 
   return (
@@ -600,16 +600,16 @@ const CostCenters = () => {
                       </TableCell>
                       <TableCell>
                         <Chip
-                          label={getStatusLabel(costCenter.isChild)}
-                          color={getStatusColor(costCenter.isChild)}
+                          label={getStatusLabel(costCenter.parentCostCenterId)}
+                          color={getStatusColor(costCenter.parentCostCenterId)}
                           size='small'
                           icon={<AccountTreeIcon />}
                         />
                       </TableCell>
                       <TableCell>
-                        {costCenter.parentName ? (
+                        {costCenter.parentCostCenterId ? (
                           <Chip
-                            label={costCenter.parentName}
+                            label={costCenter.parentName || `${costCenter.parentCode} - ${costCenter.parentName}`}
                             variant='outlined'
                             size='small'
                             color='secondary'

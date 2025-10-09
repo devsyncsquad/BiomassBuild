@@ -16,6 +16,7 @@ import Users from "./users";
 import Roles from "./roles";
 import Menus from "./addMenu";
 import AssignMenus from "./assignMenus";
+import AssignCostCenters from "./assignCostCenters";
 import SectionHeader from "./shared/SectionHeader";
 import userManagementTheme from "./theme";
 
@@ -34,6 +35,11 @@ const UserManagement = () => {
       label: "Assign Menus",
       icon: <AssignmentIcon />,
       component: <AssignMenus />,
+    },
+    {
+      label: "Assign Cost Centers",
+      icon: <AssignmentIcon />,
+      component: <AssignCostCenters />,
     },
     // { label: "Companies", icon: <BusinessIcon />, component: <Companies /> },
   ];

@@ -17,17 +17,17 @@ namespace Biomass.Server.Controllers.Api
             _costCenterService = costCenterService;
         }
 
-        [HttpGet("GetAllCostCentersView")]
-        public async Task<ActionResult<ServiceResponse<List<CostCenterDto>>>> GetAllCostCenters()
-        {
-            var costCenters = await _costCenterService.GetAllCostCentersAsync();
-            return Ok(new ServiceResponse<List<CostCenterDto>>
-            {
-                Result = costCenters,
-                Message = "Cost centers retrieved successfully",
-                Success = true
-            });
-        }
+        //[HttpGet("GetAllCostCentersView")]
+        //public async Task<ActionResult<ServiceResponse<List<CostCenterDto>>>> GetAllCostCenters()
+        //{
+        //    var costCenters = await _costCenterService.GetAllCostCentersAsync();
+        //    return Ok(new ServiceResponse<List<CostCenterDto>>
+        //    {
+        //        Result = costCenters,
+        //        Message = "Cost centers retrieved successfully",
+        //        Success = true
+        //    });
+        //}
 
         [HttpGet("active")]
         public async Task<ActionResult<ServiceResponse<List<CostCenterDto>>>> GetActiveCostCenters()
@@ -124,6 +124,18 @@ namespace Biomass.Server.Controllers.Api
             {
                 Result = costCenters,
                 Message = "Active parent cost centers with children retrieved successfully",
+                Success = true
+            });
+        }
+
+        [HttpGet("GetAllCostCentersView")]
+        public async Task<ActionResult<ServiceResponse<List<CostCenterViewDto>>>> GetAllCostCentersView()
+        {
+            var costCenters = await _costCenterService.GetAllCostCentersViewAsync();
+            return Ok(new ServiceResponse<List<CostCenterViewDto>>
+            {
+                Result = costCenters,
+                Message = "Cost centers retrieved successfully",
                 Success = true
             });
         }

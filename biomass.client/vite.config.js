@@ -54,7 +54,8 @@ export default defineConfig({
             },
             '^/api': {
                 //target: 'https://localhost:7084',
-                target: 'http://100.42.177.77:88',
+                //target: 'http://100.42.177.77:88',
+                target: 'https://localhost:7084',
                 changeOrigin: true,
                 secure: false,
                 rewrite: (path) => path

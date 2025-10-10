@@ -127,5 +127,20 @@ namespace Biomass.Server.Controllers.Api
                 Success = true
             });
         }
+
+        [HttpGet("GetUserActiveParentCostCentersWithChildren")]
+        public async Task<ActionResult<ServiceResponse<List<CostCenterDto>>>> GetUserActiveParentCostCentersWithChildren([FromQuery] int userId, [FromQuery] int? companyId = null)
+        {
+            // TODO: Add authorization check to validate userId against current user
+            // This should be implemented based on your authentication system
+            
+            var costCenters = await _costCenterService.GetUserActiveParentCostCentersAsync(userId, companyId);
+            return Ok(new ServiceResponse<List<CostCenterDto>>
+            {
+                Result = costCenters,
+                Message = "User active parent cost centers with children retrieved successfully",
+                Success = true
+            });
+        }
     }
 }

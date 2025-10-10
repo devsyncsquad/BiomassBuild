@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
 using Biomass.Server.Models.Vehicle;
 using Biomass.Server.Models.Customer;
 
@@ -27,6 +28,8 @@ namespace Biomass.Server.Models.Dispatch
         public string? TransporterChargesType { get; set; }
         public decimal? Amount { get; set; }
         public decimal? TotalDeduction { get; set; }
+        public decimal? DispatchDeduction { get; set; }
+        
         public int? CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
         public string? Status { get; set; }
@@ -39,10 +42,13 @@ namespace Biomass.Server.Models.Dispatch
         public decimal? BucketRatePerMund { get; set; }
         public decimal? LaborRatePerMund { get; set; }
         public decimal? TransporterRatePerMund { get; set; }
-        
+
+        public decimal? InTransitExpenses { get;  set; }
+
         // Navigation properties
         public VehicleDto? Vehicle { get; set; }
         public CustomerLocation? Location { get; set; }
+        
     }
 
     public class CreateDispatchRequest
@@ -98,11 +104,9 @@ namespace Biomass.Server.Models.Dispatch
 
         public decimal? TotalDeduction { get; set; }
 
-        [Required]
-        public int BucketVendorId { get; set; }
+        public int? BucketVendorId { get; set; }
 
-        [Required]
-        public int LabourVendorId { get; set; }
+        public int? LabourVendorId { get; set; }
 
         public int? MaterialId { get; set; }
 
@@ -125,6 +129,9 @@ namespace Biomass.Server.Models.Dispatch
         public decimal? LaborRatePerMund { get; set; }
 
         public decimal? TransporterRatePerMund { get; set; }
+
+        // Array of cash IDs to link with this dispatch
+        public List<long>? CashIds { get; set; }
 
         // For file upload handling in multipart/form-data
         public IFormFile? SlipPictureFile { get; set; }

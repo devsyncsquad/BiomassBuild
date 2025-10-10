@@ -8,7 +8,10 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.ModelBinderProviders.Insert(0, new Biomass.Server.ModelBinders.CommaSeparatedListModelBinderProvider());
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -50,6 +53,7 @@ builder.Services.AddScoped<IVehicleService, VehicleService>();
 builder.Services.AddScoped<IDriverService, DriverService>();
 builder.Services.AddScoped<IDispatchService, DispatchService>();
 builder.Services.AddScoped<IDispatchReceiptService, DispatchReceiptService>();
+builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
 //builder.Services.AddScoped<IUserService, Us>();
 //builder.Services.AddScoped<IAuthService, AuthService>();
 

@@ -192,5 +192,8 @@ namespace Biomass.Server.Interfaces
 		
 		// Transfer Operations
 		Task<(long OutId, long InId)> SaveTransferCashbookEntriesAsync(CashbookTransferEntryDto dto);
-	}
+
+        Task<ServiceResponse<List<CashTransactionDetailed>>> GetAdvanceEntriesAsync();
+        Task<ServiceResponse<List<CashTransactionDetailed>>> GetAdvanceEntriesByCostCenterSubIdAsync(int costCenterSubId);
+    }
 }

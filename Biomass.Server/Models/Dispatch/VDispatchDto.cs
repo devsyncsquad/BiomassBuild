@@ -83,8 +83,8 @@ namespace Biomass.Server.Models.Dispatch
         [Column("amount")]
         public decimal? Amount { get; set; }
         
-        [Column("totaldeduction")]
-        public decimal? TotalDeduction { get; set; }
+        [Column("dispatchdeduction")]
+        public decimal? DispatchDeduction { get; set; }
         
         [Column("createdby")]
         public int? CreatedBy { get; set; }
@@ -129,6 +129,14 @@ namespace Biomass.Server.Models.Dispatch
 
         [Column("material_id")]
         public int? MaterialId { get; set; }
+
+        [Column("totaldeduction")]
+        public decimal? TotalDeduction { get; set; }
+
+        [Column("intransitexpenses")]
+        public decimal? InTransitExpenses { get; set; }
+
+
 
 
     }

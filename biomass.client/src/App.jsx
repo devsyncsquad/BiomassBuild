@@ -489,7 +489,7 @@ function App() {
               }
             />
             <Route
-              path='/lookup-management'
+              path='/lookups'
               element={
                 <ProtectedRoute>
                   <Layout>

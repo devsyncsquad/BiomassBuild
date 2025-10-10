@@ -151,19 +151,23 @@ const MainContent = styled(Box)(({ theme, open }) => ({
   }),
 }));
 
-const menuItems = [
-  { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
-  { text: 'User Management', icon: <PeopleIcon />, path: '/user-management' },
-  { text: 'Company Management', icon: <BusinessIcon />, path: '/company-management' },
-  { text: 'Customer Management', icon: <PeopleIcon />, path: '/customer-management' },
-  { text: 'Customer Locations', icon: <LocationIcon />, path: '/customer-locations' },
-  { text: 'Vendor Management', icon: <StoreIcon />, path: '/vendor-management' },
-  { text: 'Vehicle Management', icon: <VehicleIcon />, path: '/vehicle-management' },
-  { text: 'Employees', icon: <EmployeeIcon />, path: '/employees' },
-  { text: 'Money Account', icon: <AccountIcon />, path: '/money-account' },
-  { text: 'Cost Centers', icon: <CostCenterIcon />, path: '/cost-centers' },
-  { text: 'Lookup', icon: <SettingsIcon />, path: '/lookup-management' },
-];
+// Static menu mapping for icon and path resolution
+const menuMapping = {
+  'Dashboard': { icon: <DashboardIcon />, path: '/' },
+  'User Management': { icon: <PeopleIcon />, path: '/user-management' },
+  'Company Management': { icon: <BusinessIcon />, path: '/company-management' },
+  'Customer Management': { icon: <PeopleIcon />, path: '/customer-management' },
+  'Customer Locations': { icon: <LocationIcon />, path: '/customer-locations' },
+  'Vendor Management': { icon: <StoreIcon />, path: '/vendor-management' },
+  'Vehicle Management': { icon: <VehicleIcon />, path: '/vehicle-management' },
+  'Employees': { icon: <EmployeeIcon />, path: '/employees' },
+  'Money Account': { icon: <AccountIcon />, path: '/money-account' },
+  'Cost Centers': { icon: <CostCenterIcon />, path: '/cost-centers' },
+  'Lookups': { icon: <SettingsIcon />, path: '/lookups' },
+};
+
+// No default menu items - only show assigned menus
+const defaultMenuItems = [];
 
 const AppLayout = ({ children, user, onLogout }) => {
   const theme = useTheme();
@@ -172,10 +176,71 @@ const AppLayout = ({ children, user, onLogout }) => {
   const currentPath = location.pathname;
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [open, setOpen] = useState(!isMobile);
+  const [menuItems, setMenuItems] = useState(defaultMenuItems);
 
   useEffect(() => {
     setOpen(!isMobile);
   }, [isMobile]);
+
+  // Load assigned menus from localStorage
+  useEffect(() => {
+    try {
+      const assignedMenusData = localStorage.getItem('assignedMenus');
+      if (assignedMenusData) {
+        const assignedMenus = JSON.parse(assignedMenusData);
+        console.log('Loading assigned menus:', assignedMenus);
+        
+        if (assignedMenus && assignedMenus.length > 0) {
+          // Convert assigned menus to menu items format
+          const filteredMenuItems = assignedMenus
+            .filter(menu => menu.isEnabled === 'Y') // Only show enabled menus
+            .map(menu => {
+              const menuName = menu.menuName;
+              const mapping = menuMapping[menuName];
+              
+              if (mapping) {
+                return {
+                  text: menuName,
+                  icon: mapping.icon,
+                  path: mapping.path,
+                  menuId: menu.menuId,
+                  orderNo: menu.orderNo || 0
+                };
+              }
+              
+              // Fallback for unknown menu names - use link if available
+              console.warn(`Unknown menu name: ${menuName}, using link: ${menu.link}`);
+              return {
+                text: menuName,
+                icon: <SettingsIcon />, // Default icon
+                path: menu.link || '/',
+                menuId: menu.menuId,
+                orderNo: menu.orderNo || 0
+              };
+            })
+            .filter(item => item !== null) // Remove null items
+            .sort((a, b) => (a.orderNo || 0) - (b.orderNo || 0)); // Sort by order
+          
+          if (filteredMenuItems.length > 0) {
+            setMenuItems(filteredMenuItems);
+            console.log('Set filtered menu items:', filteredMenuItems);
+          } else {
+            console.log('No valid assigned menus found, showing empty menu');
+            setMenuItems([]);
+          }
+        } else {
+          console.log('No assigned menus found, showing empty menu');
+          setMenuItems([]);
+        }
+      } else {
+        console.log('No assigned menus data in localStorage, showing empty menu');
+        setMenuItems([]);
+      }
+    } catch (error) {
+      console.error('Error loading assigned menus:', error);
+      setMenuItems([]);
+    }
+  }, []);
 
   const handleDrawerToggle = () => {
     setOpen(!open);
@@ -231,19 +296,32 @@ const AppLayout = ({ children, user, onLogout }) => {
 
         {/* Navigation Menu */}
         <List sx={{ pt: 1 }}>
-          {menuItems.map((item) => (
-            <ListItem key={item.text} disablePadding>
-                             <StyledListItemButton
-                 active={isActivePath(item.path)}
-                 onClick={() => handleNavigation(item.path)}
-               >
-                <ListItemIcon>{item.icon}</ListItemIcon>
-                                 <StyledListItemText 
-                   primary={item.text} 
-                 />
-              </StyledListItemButton>
+          {menuItems.length > 0 ? (
+            menuItems.map((item) => (
+              <ListItem key={item.text} disablePadding>
+                <StyledListItemButton
+                  active={isActivePath(item.path)}
+                  onClick={() => handleNavigation(item.path)}
+                >
+                  <ListItemIcon>{item.icon}</ListItemIcon>
+                  <StyledListItemText 
+                    primary={item.text} 
+                  />
+                </StyledListItemButton>
+              </ListItem>
+            ))
+          ) : (
+            <ListItem disablePadding>
+              <Box sx={{ p: 2, textAlign: 'center', width: '100%' }}>
+                <Typography variant="body2" sx={{ color: colors.text.secondary }}>
+                  No menu items assigned
+                </Typography>
+                <Typography variant="caption" sx={{ color: colors.text.disabled }}>
+                  Contact administrator for menu access
+                </Typography>
+              </Box>
             </ListItem>
-          ))}
+          )}
         </List>
 
                  {/* User Section */}

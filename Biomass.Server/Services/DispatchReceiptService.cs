@@ -15,18 +15,12 @@ namespace Biomass.Server.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _environment;
-        private readonly string _receiptUploadsFolder;
+        private string _receiptUploadsFolder;
 
         public DispatchReceiptService(ApplicationDbContext context, IWebHostEnvironment environment)
         {
             _context = context;
             _environment = environment;
-            _receiptUploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", "dispatch_receipts");
-            // Create dispatch receipt uploads directory if it doesn't exist
-            if (!Directory.Exists(_receiptUploadsFolder))
-            {
-                Directory.CreateDirectory(_receiptUploadsFolder);
-            }
         }
 
         public async Task<long> CreateDispatchReceiptAsync(CreateDispatchReceiptRequest request)
@@ -350,6 +344,25 @@ namespace Biomass.Server.Services
         /// <returns>Relative file path</returns>
         private async Task<string> SaveSlipImageFileAsync(IFormFile file)
         {
+            // Use the uploads folder in ContentRootPath (same level as wwwroot)
+            // This matches the existing pattern used for cashbook_receipts and dispatches
+            _receiptUploadsFolder = Path.Combine(_environment.ContentRootPath, "uploads", "dispatch_receipts");
+            
+            // Create dispatch receipt uploads directory if it doesn't exist
+            if (!Directory.Exists(_receiptUploadsFolder))
+            {
+                try
+                {
+                    Directory.CreateDirectory(_receiptUploadsFolder);
+                    Console.WriteLine("✅ Created dispatch receipt uploads folder");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"⚠️ Could not create dispatch receipt uploads folder: {ex.Message}");
+                    Console.WriteLine($"⚠️ Ensure the folder exists and has proper permissions");
+                }
+            }
+
             // Validate file size (10MB limit)
             if (file.Length > 10 * 1024 * 1024)
             {

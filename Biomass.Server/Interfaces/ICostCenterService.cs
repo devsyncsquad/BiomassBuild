@@ -11,6 +11,10 @@ namespace Biomass.Server.Interfaces
         Task<CostCenterDto?> UpdateCostCenterAsync(int id, CostCenter costCenter);
         Task<bool> DeleteCostCenterAsync(int id);
         Task<List<CostCenterDto>> GetActiveParentCostCentersAsync(int? companyId = null);
+
         Task<List<CostCenterViewDto>> GetAllCostCentersViewAsync();
+
+        Task<List<CostCenterDto>> GetUserActiveParentCostCentersAsync(int userId, int? companyId = null);
+
     }
 }

@@ -9,7 +9,6 @@ using Biomass.Server.Models.Vendor;
 using Biomass.Server.Models.CostCenter;
 using Biomass.Server.Models.Employee;
 using Biomass.Server.Models.Cashbook;
-using Biomass.Server.Models.Lookup;
 using Biomass.Server.Models.MoneyAccount;
 using Biomass.Server.Models.Vehicle;
 using Biomass.Server.Models.Driver;
@@ -55,7 +54,7 @@ namespace Biomass.Server.Data
         public DbSet<VLocationDto> VLocations { get; set; }
         public DbSet<VDispatchDto> VDispatches { get; set; }
         public DbSet<VUserCustomer> VUserCustomers { get; set; }
-        public DbSet<UserCostCenter> UserCostCenters { get; set; }
+        public DbSet<VUserCostCenter> VUserCostCenters { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
 {
     // Define v_locations view
@@ -76,6 +75,13 @@ namespace Biomass.Server.Data
     modelBuilder.Entity<VUserCustomer>(entity =>
     {
         entity.ToView("VUserCustomer");
+        entity.HasNoKey();
+    });
+
+    // Define v_user_cost_centers view
+    modelBuilder.Entity<VUserCostCenter>(entity =>
+    {
+        entity.ToView("v_user_cost_centers");
         entity.HasNoKey();
     });
             modelBuilder.Entity<Company>(entity =>

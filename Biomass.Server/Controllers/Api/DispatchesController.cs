@@ -54,13 +54,37 @@ namespace Biomass.Server.Controllers.Api
         [Consumes("multipart/form-data")]
         public async Task<ActionResult<ServiceResponse<int>>> CreateDispatch([FromForm] CreateDispatchRequest request)
         {
-            var dispatchId = await _dispatchService.CreateDispatchAsync(request);
-            return CreatedAtAction(nameof(GetDispatch), new { id = dispatchId }, new ServiceResponse<int>
+            try
             {
-                Result = dispatchId,
-                Message = "Dispatch created successfully",
-                Success = true
-            });
+                var dispatchId = await _dispatchService.CreateDispatchAsync(request);
+                return CreatedAtAction(nameof(GetDispatch), new { id = dispatchId }, new ServiceResponse<int>
+                {
+                    Result = dispatchId,
+                    Message = "Dispatch created successfully",
+                    Success = true
+                });
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Business logic errors (e.g., slip number exists, invalid vendor, etc.)
+                return BadRequest(new ServiceResponse<int>
+                {
+                    Message = ex.Message,
+                    Success = false
+                });
+            }
+            catch (Exception ex)
+            {
+                // Log the full exception for debugging
+                Console.WriteLine($"❌ Error creating dispatch: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                
+                return StatusCode(500, new ServiceResponse<int>
+                {
+                    Message = $"Failed to create dispatch: {ex.Message}",
+                    Success = false
+                });
+            }
         }
 
         [HttpPut("{id}")]
@@ -124,6 +148,29 @@ namespace Biomass.Server.Controllers.Api
             {
                 Result = dispatches,
                 Message = $"Found {dispatches.Count} dispatches for user {userId} with status '{status}'",
+                Success = true
+            });
+        }
+
+        [HttpGet("dispatchedBySlipNumber/{slipNumber}")]
+        public async Task<ActionResult<ServiceResponse<List<DispatchDto>>>> GetDispatchesBySlipNumber(string slipNumber)
+        {
+            var dispatches = await _dispatchService.GetDispatchesBySlipNumberAsync(slipNumber);
+
+            if (!dispatches.Any())
+            {
+                return Ok(new ServiceResponse<List<DispatchDto>>
+                {
+                    Result = dispatches,
+                    Message = "No dispatches found for the specified slip number",
+                    Success = true
+                });
+            }
+
+            return Ok(new ServiceResponse<List<DispatchDto>>
+            {
+                Result = dispatches,
+                Message = $"Found {dispatches.Count} dispatch(es) with slip number '{slipNumber}'",
                 Success = true
             });
         }

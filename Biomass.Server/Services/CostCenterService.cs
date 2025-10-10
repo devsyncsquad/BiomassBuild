@@ -137,12 +137,56 @@ namespace Biomass.Server.Services
                     .ToListAsync();
 
                 return costCenters.Select(MapToViewDto).ToList();
+
+        public async Task<List<CostCenterDto>> GetUserActiveParentCostCentersAsync(int userId, int? companyId = null)
+        {
+            var response = new List<CostCenterDto>();
+            try
+            {
+                // Get user cost centers from the view with can_post = true
+                var userCostCenters = await _context.VUserCostCenters.AsNoTracking()
+                    .Where(v => v.UserId == userId && v.CanPost)
+                    .Where(v => !companyId.HasValue || v.CostCenterId == companyId) // Note: This might need adjustment based on your view structure
+                    .OrderBy(v => v.CostCenterName)
+                    .ToListAsync();
+
+                // Create lookup dictionaries for efficient processing
+                var costCenterLookup = userCostCenters.ToDictionary(c => c.CostCenterId);
+                var dtoLookup = userCostCenters.ToDictionary(c => c.CostCenterId, c => new CostCenterDto
+                {
+                    CostCenterId = c.CostCenterId,
+                    Code = "", // Not available in view, will be empty
+                    Name = c.CostCenterName,
+                    IsActive = c.IsActive,
+                    ParentCostCenterId = c.ParentCostCenterId,
+                    CompanyId = companyId,
+                    CreatedAt = null // Not available in view
+                });
+
+                // Build the hierarchy
+                foreach (var userCostCenter in userCostCenters)
+                {
+                    if (userCostCenter.ParentCostCenterId.HasValue && dtoLookup.ContainsKey(userCostCenter.ParentCostCenterId.Value))
+                    {
+                        dtoLookup[userCostCenter.ParentCostCenterId.Value].Children.Add(dtoLookup[userCostCenter.CostCenterId]);
+                    }
+                }
+
+                // Get only active parent cost centers (those without parents)
+                var parentCostCenters = userCostCenters
+                    .Where(c => c.ParentCostCenterId == null && c.IsActive)
+                    .Select(c => dtoLookup[c.CostCenterId])
+                    .ToList();
+
+                response = parentCostCenters;
+
             }
             catch (Exception ex)
             {
                 // Log the exception if you have logging configured
                 throw;
             }
+
         }
 
         private static CostCenterViewDto MapToViewDto(CostCenter costCenter)
@@ -162,6 +206,9 @@ namespace Biomass.Server.Services
                 ParentName = costCenter.Parent?.Name,
                 ParentIsActive = costCenter.Parent?.IsActive
             };
+
+            return response;
+
         }
     }
 }

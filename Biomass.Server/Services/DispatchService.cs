@@ -7,6 +7,7 @@ using Biomass.Server.Models.Vehicle;
 using Biomass.Server.Models.Vendor;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Hosting;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Biomass.Server.Services
 {
@@ -42,14 +43,43 @@ namespace Biomass.Server.Services
 
         public async Task<int> CreateDispatchAsync(CreateDispatchRequest request)
         {
+            Console.WriteLine($"🚀 CreateDispatchAsync called");
+            Console.WriteLine($"📦 VehicleId: {request.VehicleId}, LocationId: {request.LocationId}");
+            Console.WriteLine($"📦 SlipNumber: {request.SlipNumber}");
+            Console.WriteLine($"📦 CashIds NULL CHECK: {(request.CashIds == null ? "NULL" : "NOT NULL")}");
+            Console.WriteLine($"📦 CashIds Count: {request.CashIds?.Count ?? 0}");
+            if (request.CashIds != null && request.CashIds.Any())
+            {
+                Console.WriteLine($"📦 CashIds VALUES: [{string.Join(", ", request.CashIds)}]");
+            }
+            else
+            {
+                Console.WriteLine($"📦 CashIds: EMPTY OR NULL!");
+            }
+            
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                _dispatchUploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", "dispatches");
+                Console.WriteLine("✅ Transaction started");
+                
+                // Use the uploads folder in ContentRootPath (same level as wwwroot)
+                // This matches the existing pattern used for cashbook_receipts
+                _dispatchUploadsFolder = Path.Combine(_environment.ContentRootPath, "uploads", "dispatches");
+                Console.WriteLine($"📁 Dispatch uploads folder: {_dispatchUploadsFolder}");
+                
                 // Create dispatch uploads directory if it doesn't exist
                 if (!Directory.Exists(_dispatchUploadsFolder))
                 {
-                    Directory.CreateDirectory(_dispatchUploadsFolder);
+                    try
+                    {
+                        Directory.CreateDirectory(_dispatchUploadsFolder);
+                        Console.WriteLine("✅ Created dispatch uploads folder");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"⚠️ Could not create dispatch uploads folder: {ex.Message}");
+                        Console.WriteLine($"⚠️ Ensure the folder exists and has proper permissions");
+                    }
                 }
 
                 // Handle slip picture upload if provided
@@ -89,9 +119,22 @@ namespace Biomass.Server.Services
                     }
                 }
 
-                var slipExists = _context.Dispatches.Where(v => v.SlipNumber == request.SlipNumber);
-                if (slipExists.Any()) {
-                    throw new InvalidOperationException($"Slip number {request.SlipNumber} is already added in system.");
+                // Only check for duplicate slip number if one is provided
+                if (!string.IsNullOrWhiteSpace(request.SlipNumber))
+                {
+                    Console.WriteLine($"🔍 Checking if slip number '{request.SlipNumber}' exists...");
+                    var slipExists = await _context.Dispatches
+                        .Where(v => v.SlipNumber == request.SlipNumber)
+                        .AnyAsync();
+                    if (slipExists) {
+                        Console.WriteLine($"❌ Slip number {request.SlipNumber} already exists");
+                        throw new InvalidOperationException($"Slip number {request.SlipNumber} is already added in system.");
+                    }
+                    Console.WriteLine("✅ Slip number is unique");
+                }
+                else
+                {
+                    Console.WriteLine("⚠️ No slip number provided, skipping duplicate check");
                 }
                         
 
@@ -135,8 +178,10 @@ namespace Biomass.Server.Services
                     CreatedOn = DateTime.UtcNow
                 };
 
+                Console.WriteLine("💾 Saving dispatch to database...");
                 _context.Dispatches.Add(dispatch);
                 await _context.SaveChangesAsync();
+                Console.WriteLine($"✅ Dispatch created with ID: {dispatch.DispatchId}");
 
                 // Calculate charges based on variable rates or fixed amounts
                 var bucketCharges = CalculateCharges(request.LoaderCharges, request.BucketRatePerMund, request.NetWeight);
@@ -146,12 +191,12 @@ namespace Biomass.Server.Services
                 // Create AP Ledger entries only for vendors with non-zero amounts
                 var apLedgerEntries = new List<ApLedger>();
 
-                // Bucket vendor - only create entry if amount > 0
-                if (bucketCharges > 0 && request.BucketVendorId > 0)
+                // Bucket vendor - only create entry if amount > 0 and vendor ID is provided and valid
+                if (bucketCharges > 0 && request.BucketVendorId.HasValue && request.BucketVendorId.Value > 0)
                 {
                     apLedgerEntries.Add(new ApLedger
                     {
-                        VendorId = request.BucketVendorId,
+                        VendorId = request.BucketVendorId.Value,
                         HappenedAt = DateTime.UtcNow,
                         EntryKind = "Bill",
                         Amount = bucketCharges,
@@ -164,12 +209,12 @@ namespace Biomass.Server.Services
                     });
                 }
 
-                // Labour vendor - only create entry if amount > 0
-                if (laborCharges > 0 && request.LabourVendorId > 0)
+                // Labour vendor - only create entry if amount > 0 and vendor ID is provided and valid
+                if (laborCharges > 0 && request.LabourVendorId.HasValue && request.LabourVendorId.Value > 0)
                 {
                     apLedgerEntries.Add(new ApLedger
                     {
-                        VendorId = request.LabourVendorId,
+                        VendorId = request.LabourVendorId.Value,
                         HappenedAt = DateTime.UtcNow,
                         EntryKind = "Bill",
                         Amount = laborCharges,
@@ -195,8 +240,10 @@ namespace Biomass.Server.Services
                         DispatchId = dispatch.DispatchId,
                         Remarks = request.Remarks,
                         CreatedBy = request.CreatedBy,
+
                         CreatedAt = DateTime.UtcNow,
                         //SlipNumber = request.SlipNumber
+                        CreatedAt = DateTime.UtcNow
                         //ReferenceNo = request.VehicleId,
                     });
                 }
@@ -208,12 +255,71 @@ namespace Biomass.Server.Services
                 }
                 await _context.SaveChangesAsync();
 
+                // Update cashbook entries with dispatch_id if CashIds are provided
+                if (request.CashIds != null && request.CashIds.Any())
+                {
+                    Console.WriteLine($"💰 Processing {request.CashIds.Count} CashIds...");
+                    
+                    // Validate that all cash_ids exist and don't already have a dispatch_id
+                    Console.WriteLine($"🔍 Querying cashbook for IDs: {string.Join(", ", request.CashIds)}");
+                    var existingCashbookEntries = await _context.Cashbooks
+                        .Where(c => request.CashIds.Contains(c.CashId))
+                        .ToListAsync();
+                    
+                    Console.WriteLine($"✅ Found {existingCashbookEntries.Count} cashbook entries");
+
+                    var providedCashIds = request.CashIds.ToHashSet();
+                    var foundCashIds = existingCashbookEntries.Select(c => c.CashId).ToHashSet();
+                    var missingCashIds = providedCashIds.Except(foundCashIds).ToList();
+
+                    if (missingCashIds.Any())
+                    {
+                        Console.WriteLine($"❌ Missing Cash IDs: {string.Join(", ", missingCashIds)}");
+                        throw new InvalidOperationException($"Cash IDs not found: {string.Join(", ", missingCashIds)}");
+                    }
+                    Console.WriteLine("✅ All CashIds found");
+
+                    // Check if any cashbook entries already have a dispatch_id
+                    var entriesWithDispatch = existingCashbookEntries
+                        .Where(c => c.DispatchId.HasValue)
+                        .Select(c => c.CashId)
+                        .ToList();
+
+                    if (entriesWithDispatch.Any())
+                    {
+                        Console.WriteLine($"❌ CashIds already have dispatch: {string.Join(", ", entriesWithDispatch)}");
+                        throw new InvalidOperationException($"Cash IDs already have dispatch assigned: {string.Join(", ", entriesWithDispatch)}");
+                    }
+                    Console.WriteLine("✅ No CashIds have existing dispatch");
+
+                    // Update cashbook entries with the new dispatch_id
+                    Console.WriteLine($"💾 Updating {existingCashbookEntries.Count} cashbook entries with DispatchId: {dispatch.DispatchId}");
+                    foreach (var cashbookEntry in existingCashbookEntries)
+                    {
+                        Console.WriteLine($"   Updating CashId {cashbookEntry.CashId}: DispatchId = {dispatch.DispatchId}");
+                        cashbookEntry.DispatchId = dispatch.DispatchId;
+                    }
+
+                    Console.WriteLine("💾 Saving cashbook updates...");
+                    await _context.SaveChangesAsync();
+                    Console.WriteLine("✅ Cashbook entries updated successfully");
+                }
+
+                Console.WriteLine("✅ Committing transaction...");
                 await transaction.CommitAsync();
+                Console.WriteLine($"✅✅✅ Dispatch {dispatch.DispatchId} created successfully!");
                 return dispatch.DispatchId;
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine($"❌❌❌ ERROR in CreateDispatchAsync: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
+                }
                 await transaction.RollbackAsync();
+                Console.WriteLine("🔄 Transaction rolled back");
                 throw;
             }
         }
@@ -306,6 +412,17 @@ namespace Biomass.Server.Services
             return dispatches.Select(MapToDtoFromView).ToList();
         }
 
+        public async Task<List<DispatchDto>> GetDispatchesBySlipNumberAsync(string slipNumber)
+        {
+            // Get dispatches matching the slip number
+            var dispatches = await _context.VDispatches
+                .Where(d => d.SlipNumber == slipNumber)
+                .OrderByDescending(d => d.CreatedOn)
+                .ToListAsync();
+
+            return dispatches.Select(MapToDtoFromView).ToList();
+        }
+
         private static DispatchDto MapToDtoFromView(VDispatchDto vDispatch)
         {
             return new DispatchDto
@@ -330,7 +447,7 @@ namespace Biomass.Server.Services
                 TransporterRateAuto = vDispatch.TransporterRateAuto,
                 TransporterChargesType = vDispatch.TransporterChargesType,
                 Amount = vDispatch.Amount,
-                TotalDeduction = vDispatch.TotalDeduction,
+                DispatchDeduction = vDispatch.DispatchDeduction,
                 CreatedBy = vDispatch.CreatedBy,
                 CreatedOn = vDispatch.CreatedOn,
                 Status = vDispatch.Status,
@@ -340,7 +457,10 @@ namespace Biomass.Server.Services
                 LabourVendorId = vDispatch.LabourVendorId,
                 TransporterVendorId=vDispatch.TransporterVendorId,
                 MaterialId=vDispatch.MaterialId,
-                Vehicle = new VehicleDto
+                TotalDeduction=vDispatch.TotalDeduction,
+                InTransitExpenses=vDispatch.InTransitExpenses,
+
+        Vehicle = new VehicleDto
                 {
                     VehicleId = vDispatch.VehicleId,
                     VehicleNumber = vDispatch.VehicleNumber,

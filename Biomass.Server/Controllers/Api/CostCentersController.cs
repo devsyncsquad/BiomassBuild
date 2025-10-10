@@ -137,6 +137,9 @@ namespace Biomass.Server.Controllers.Api
             {
                 Result = costCenters,
                 Message = "Cost centers retrieved successfully",
+                Success = true
+            });
+        }
 
         [HttpGet("GetUserActiveParentCostCentersWithChildren")]
         public async Task<ActionResult<ServiceResponse<List<CostCenterDto>>>> GetUserActiveParentCostCentersWithChildren([FromQuery] int userId, [FromQuery] int? companyId = null)

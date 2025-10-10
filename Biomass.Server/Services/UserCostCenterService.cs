@@ -17,8 +17,8 @@ namespace Biomass.Server.Services
         public async Task<List<UserCostCenterDto>> GetUserCostCentersAsync(int userId)
         {
             var userCostCenters = await _context.UserCostCenters
-                .Include(ucc => ucc.CostCenter)
                 .Include(ucc => ucc.User)
+                .Include(ucc => ucc.CostCenter)
                 .Where(ucc => ucc.UserId == userId)
                 .OrderBy(ucc => ucc.CostCenter.Name)
                 .ToListAsync();

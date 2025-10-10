@@ -136,7 +136,25 @@ namespace Biomass.Server.Services
                     .OrderBy(cc => cc.Code)
                     .ToListAsync();
 
+                // Debug: Check if parent relationships are loaded
+                var costCentersWithParents = costCenters.Where(cc => cc.ParentCostCenterId.HasValue).ToList();
+                foreach (var cc in costCentersWithParents)
+                {
+                    Console.WriteLine($"Cost Center {cc.Code} has ParentCostCenterId: {cc.ParentCostCenterId}, Parent loaded: {cc.Parent != null}");
+                    if (cc.Parent != null)
+                    {
+                        Console.WriteLine($"Parent details - Code: {cc.Parent.Code}, Name: {cc.Parent.Name}");
+                    }
+                }
+
                 return costCenters.Select(MapToViewDto).ToList();
+            }
+            catch (Exception ex)
+            {
+                // Log the exception if you have logging configured
+                throw;
+            }
+        }
 
         public async Task<List<CostCenterDto>> GetUserActiveParentCostCentersAsync(int userId, int? companyId = null)
         {
@@ -187,6 +205,7 @@ namespace Biomass.Server.Services
                 throw;
             }
 
+            return response; // Ensure a return statement is present in all code paths
         }
 
         private static CostCenterViewDto MapToViewDto(CostCenter costCenter)
@@ -202,13 +221,11 @@ namespace Biomass.Server.Services
                 CreatedAt = costCenter.CreatedAt,
                 CostCenterType = costCenter.ParentCostCenterId == null ? "Parent" : "Child",
                 ParentId = costCenter.Parent?.CostCenterId,
-                ParentCode = costCenter.Parent?.Code,
-                ParentName = costCenter.Parent?.Name,
-                ParentIsActive = costCenter.Parent?.IsActive
+                ParentCode = costCenter.Parent?.Code ?? string.Empty,
+                ParentName = costCenter.Parent?.Name ?? string.Empty,
+                ParentIsActive = costCenter.Parent?.IsActive,
+                Children = new List<CostCenterViewDto>()
             };
-
-            return response;
-
         }
     }
 }

@@ -240,7 +240,7 @@ namespace Biomass.Server.Services
                         DispatchId = dispatch.DispatchId,
                         Remarks = request.Remarks,
                         CreatedBy = request.CreatedBy,
-                        CreatedAt = DateTime.UtcNow
+                        CreatedAt = DateTime.UtcNow,
                         //SlipNumber = request.SlipNumber
                         //ReferenceNo = request.VehicleId,
                     });

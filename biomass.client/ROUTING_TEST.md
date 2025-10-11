@@ -105,7 +105,7 @@ This page shows:
 **Solution**: Clear browser storage and try again.
 
 ### **Issue: API Connection Errors**
-**Solution**: Ensure the backend server is running on `https://localhost:7084`
+**Solution**: Ensure the backend server is running on `http://100.42.177.77:88`
 
 ### **Issue: Certificate Errors**
 **Solution**: Accept the self-signed certificate in your browser.

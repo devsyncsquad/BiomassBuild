@@ -56,6 +56,7 @@ namespace Biomass.Server.Data
         public DbSet<VDispatchDto> VDispatches { get; set; }
         public DbSet<VUserCustomer> VUserCustomers { get; set; }
         public DbSet<VUserCostCenter> VUserCostCenters { get; set; }
+        public DbSet<UserCostCenter> UserCostCenters { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
 {
     // Define v_locations view
@@ -692,20 +693,7 @@ namespace Biomass.Server.Data
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
-            // Ensure your principal entities map bigint -> long and snake_case:
-            modelBuilder.Entity<Users>(e =>
-            {
-                e.ToTable("Users");
-                e.HasKey(u => u.UserId);
-                e.Property(u => u.UserId).HasColumnName("UserId"); // long
-            });
 
-            modelBuilder.Entity<CostCenter>(e =>
-            {
-                e.ToTable("cost_centers");
-                e.HasKey(c => c.CostCenterId);
-                e.Property(c => c.CostCenterId).HasColumnName("cost_center_id"); // long
-            });
         }
     }
 }

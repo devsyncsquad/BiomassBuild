@@ -219,7 +219,7 @@ Potential improvements for future versions:
 ## Troubleshooting
 
 ### Common Issues:
-1. **API Connection**: Ensure backend is running on `https://localhost:7084`
+1. **API Connection**: Ensure backend is running on `http://100.42.177.77:88`
 2. **CORS**: Backend must allow requests from frontend origin
 3. **Data Loading**: Check browser console for API errors
 4. **Validation**: Ensure all required fields are filled

@@ -14,5 +14,6 @@ namespace Biomass.Server.Models.CostCenter
         public string? ParentCode { get; set; }
         public string? ParentName { get; set; }
         public bool? ParentIsActive { get; set; }
+        public List<CostCenterViewDto>? Children { get; set; } = new List<CostCenterViewDto>();
     }
 }

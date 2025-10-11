@@ -137,6 +137,7 @@ namespace Biomass.Server.Controllers.Api
             {
                 Result = costCenters,
                 Message = "Cost centers retrieved successfully",
+                Success = true
             });
         }
 

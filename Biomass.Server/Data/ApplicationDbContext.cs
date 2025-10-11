@@ -45,6 +45,7 @@ namespace Biomass.Server.Data
         public DbSet<Driver> Drivers { get; set; }
 
         public DbSet<CostCenter> CostCenters { get; set; }
+        public DbSet<UserCostCenter> UserCostCenters { get; set; }
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Cashbook> Cashbooks { get; set; }
         public DbSet<MoneyAccount> MoneyAccounts { get; set; }

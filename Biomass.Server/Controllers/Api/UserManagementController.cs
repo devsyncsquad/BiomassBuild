@@ -3,6 +3,7 @@ using Biomass.Server.Data;
 using Biomass.Server.Interfaces;
 using Biomass.Server.Models;
 using Biomass.Server.Models.Company;
+using Biomass.Server.Models.CostCenter;
 using Biomass.Server.Models.Customer;
 using Biomass.Server.Models.UserManagement;
 using Microsoft.AspNetCore.Authorization;

@@ -129,14 +129,15 @@ namespace Biomass.Server.Services
 
         public async Task<List<CostCenterViewDto>> GetAllCostCentersViewAsync()
         {
-            try
-            {
+            
                 var costCenters = await _context.CostCenters
                     .Include(cc => cc.Parent)
                     .OrderBy(cc => cc.Code)
                     .ToListAsync();
 
                 return costCenters.Select(MapToViewDto).ToList();
+            
+        }
 
         public async Task<List<CostCenterDto>> GetUserActiveParentCostCentersAsync(int userId, int? companyId = null)
         {
@@ -187,6 +188,7 @@ namespace Biomass.Server.Services
                 throw;
             }
 
+            return response;
         }
 
         private static CostCenterViewDto MapToViewDto(CostCenter costCenter)
@@ -206,9 +208,6 @@ namespace Biomass.Server.Services
                 ParentName = costCenter.Parent?.Name,
                 ParentIsActive = costCenter.Parent?.IsActive
             };
-
-            return response;
-
         }
     }
 }

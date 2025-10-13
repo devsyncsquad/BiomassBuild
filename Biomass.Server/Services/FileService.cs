@@ -28,22 +28,17 @@ namespace Biomass.Server.Services
             if (file == null || file.Length == 0)
                 return null;
 
-            // Get the web root path, fallback to content root if web root is null
-            var webRootPath = _environment.WebRootPath;
-            if (string.IsNullOrEmpty(webRootPath))
+            // Use ContentRootPath for uploads (consistent with other services)
+            // This keeps all user uploads outside of wwwroot for better security and organization
+            var contentRootPath = _environment.ContentRootPath;
+            if (string.IsNullOrEmpty(contentRootPath))
             {
-                //webRootPath = Path.Combine(_environment.ContentRootPath, "wwwroot");
-                webRootPath = Path.Combine(_environment.ContentRootPath, "uploads", "dispatches");
-
-                // Create wwwroot directory if it doesn't exist
-                if (!Directory.Exists(webRootPath))
-                {
-                    Directory.CreateDirectory(webRootPath);
-                }
+                contentRootPath = Directory.GetCurrentDirectory();
+                Console.WriteLine($"SaveFileAsync: Using fallback path: {contentRootPath}");
             }
 
             // Create directory if it doesn't exist
-            var uploadPath = Path.Combine(webRootPath, folderPath);
+            var uploadPath = Path.Combine(contentRootPath, folderPath);
             if (!Directory.Exists(uploadPath))
             {
                 Directory.CreateDirectory(uploadPath);
@@ -67,14 +62,14 @@ namespace Biomass.Server.Services
             if (string.IsNullOrEmpty(filePath))
                 return false;
 
-            // Get the web root path, fallback to content root if web root is null
-            var webRootPath = _environment.WebRootPath;
-            if (string.IsNullOrEmpty(webRootPath))
+            // Use ContentRootPath for uploads (consistent with other services)
+            var contentRootPath = _environment.ContentRootPath;
+            if (string.IsNullOrEmpty(contentRootPath))
             {
-                webRootPath = Path.Combine(_environment.ContentRootPath, "wwwroot");
+                contentRootPath = Directory.GetCurrentDirectory();
             }
 
-            var fullPath = Path.Combine(webRootPath, filePath);
+            var fullPath = Path.Combine(contentRootPath, filePath);
             if (File.Exists(fullPath))
             {
                 try
@@ -114,20 +109,17 @@ namespace Biomass.Server.Services
             if (file == null || file.Length == 0)
                 return null;
 
-            // Get the web root path, fallback to content root if web root is null
-            var webRootPath = _environment.WebRootPath;
-            if (string.IsNullOrEmpty(webRootPath))
+            // Use ContentRootPath for uploads (consistent with other services)
+            // This keeps all user uploads outside of wwwroot for better security and organization
+            var contentRootPath = _environment.ContentRootPath;
+            if (string.IsNullOrEmpty(contentRootPath))
             {
-                webRootPath = Path.Combine(_environment.ContentRootPath, "wwwroot");
-                // Create wwwroot directory if it doesn't exist
-                if (!Directory.Exists(webRootPath))
-                {
-                    Directory.CreateDirectory(webRootPath);
-                }
+                contentRootPath = Directory.GetCurrentDirectory();
+                Console.WriteLine($"SaveCnicImageAsync: Using fallback path: {contentRootPath}");
             }
 
             // Create directory if it doesn't exist
-            var uploadPath = Path.Combine(webRootPath, folderPath);
+            var uploadPath = Path.Combine(contentRootPath, folderPath);
             if (!Directory.Exists(uploadPath))
             {
                 Directory.CreateDirectory(uploadPath);
@@ -151,16 +143,14 @@ namespace Biomass.Server.Services
 
         public string GetWebRootPath()
         {
-            var webRootPath = _environment.WebRootPath;
-            if (string.IsNullOrEmpty(webRootPath))
+            // Updated to return ContentRootPath for consistency with all upload services
+            // This keeps all user uploads outside of wwwroot for better security and organization
+            var contentRootPath = _environment.ContentRootPath;
+            if (string.IsNullOrEmpty(contentRootPath))
             {
-                webRootPath = Path.Combine(_environment.ContentRootPath, "wwwroot");
-                if (!Directory.Exists(webRootPath))
-                {
-                    Directory.CreateDirectory(webRootPath);
-                }
+                contentRootPath = Directory.GetCurrentDirectory();
             }
-            return webRootPath;
+            return contentRootPath;
         }
     }
 }

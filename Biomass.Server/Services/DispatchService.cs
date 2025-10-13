@@ -638,6 +638,76 @@ namespace Biomass.Server.Services
                 throw;
             }
         }
+
+        // ========================================
+        // DISPATCH RECEIPTS (PENDING PAYMENTS) METHODS
+        // ========================================
+
+        /// <summary>
+        /// Get all pending payments (dispatch receipts with status 'Received' and posted_at is null)
+        /// </summary>
+        public async Task<List<VDispatchReceiptDto>> GetPendingPaymentsAsync()
+        {
+            Console.WriteLine("🔍 GetPendingPaymentsAsync: Fetching all pending payments");
+            
+            var pendingPayments = await _context.VDispatchReceipts
+                .Where(dr => dr.Status == "Received" && dr.PostedAt == null)
+                .OrderByDescending(dr => dr.CreatedAt)
+                .ToListAsync();
+
+            Console.WriteLine($"✅ GetPendingPaymentsAsync: Found {pendingPayments.Count} pending payments");
+            return pendingPayments;
+        }
+
+        /// <summary>
+        /// Get pending payments by user (created_by)
+        /// </summary>
+        public async Task<List<VDispatchReceiptDto>> GetPendingPaymentsByUserAsync(int userId)
+        {
+            Console.WriteLine($"🔍 GetPendingPaymentsByUserAsync: Fetching pending payments for user {userId}");
+            
+            var pendingPayments = await _context.VDispatchReceipts
+                .Where(dr => dr.Status == "Received" 
+                    && dr.PostedAt == null 
+                    && dr.CreatedBy == userId)
+                .OrderByDescending(dr => dr.CreatedAt)
+                .ToListAsync();
+
+            Console.WriteLine($"✅ GetPendingPaymentsByUserAsync: Found {pendingPayments.Count} pending payments for user {userId}");
+            return pendingPayments;
+        }
+
+        /// <summary>
+        /// Get count of all pending payments
+        /// </summary>
+        public async Task<int> GetPendingPaymentsCountAsync()
+        {
+            Console.WriteLine("🔍 GetPendingPaymentsCountAsync: Counting all pending payments");
+            
+            var count = await _context.VDispatchReceipts
+                .Where(dr => dr.Status == "Received" && dr.PostedAt == null)
+                .CountAsync();
+
+            Console.WriteLine($"✅ GetPendingPaymentsCountAsync: Count = {count}");
+            return count;
+        }
+
+        /// <summary>
+        /// Get count of pending payments by user
+        /// </summary>
+        public async Task<int> GetPendingPaymentsCountByUserAsync(int userId)
+        {
+            Console.WriteLine($"🔍 GetPendingPaymentsCountByUserAsync: Counting pending payments for user {userId}");
+            
+            var count = await _context.VDispatchReceipts
+                .Where(dr => dr.Status == "Received" 
+                    && dr.PostedAt == null 
+                    && dr.CreatedBy == userId)
+                .CountAsync();
+
+            Console.WriteLine($"✅ GetPendingPaymentsCountByUserAsync: Count = {count} for user {userId}");
+            return count;
+        }
 //>>>>>>> dispatch_02
     }
 }

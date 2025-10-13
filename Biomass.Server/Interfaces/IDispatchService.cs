@@ -12,5 +12,11 @@ namespace Biomass.Server.Interfaces
 
         Task<List<DispatchDto>> GetDispatchesByUserAndStatusAsync(int userId, string status);
         Task<List<DispatchDto>> GetDispatchesBySlipNumberAsync(string slipNumber);
+
+        // Dispatch Receipts (Pending Payments)
+        Task<List<VDispatchReceiptDto>> GetPendingPaymentsAsync();
+        Task<List<VDispatchReceiptDto>> GetPendingPaymentsByUserAsync(int userId);
+        Task<int> GetPendingPaymentsCountAsync();
+        Task<int> GetPendingPaymentsCountByUserAsync(int userId);
     }
 }

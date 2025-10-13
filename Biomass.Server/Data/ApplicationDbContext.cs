@@ -54,6 +54,7 @@ namespace Biomass.Server.Data
         public DbSet<ApLedger> ApLedgers { get; set; }
         public DbSet<VLocationDto> VLocations { get; set; }
         public DbSet<VDispatchDto> VDispatches { get; set; }
+        public DbSet<VDispatchReceiptDto> VDispatchReceipts { get; set; }
         public DbSet<VUserCustomer> VUserCustomers { get; set; }
         public DbSet<VUserCostCenter> VUserCostCenters { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -69,6 +70,13 @@ namespace Biomass.Server.Data
     modelBuilder.Entity<VDispatchDto>(entity =>
     {
         entity.ToView("v_dispatch");
+        entity.HasNoKey();
+    });
+
+    // Define v_dispatch_receipts view
+    modelBuilder.Entity<VDispatchReceiptDto>(entity =>
+    {
+        entity.ToView("v_dispatch_receipts");
         entity.HasNoKey();
     });
 

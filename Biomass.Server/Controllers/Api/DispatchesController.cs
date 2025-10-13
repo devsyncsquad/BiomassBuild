@@ -174,5 +174,125 @@ namespace Biomass.Server.Controllers.Api
                 Success = true
             });
         }
+
+        // ========================================
+        // PENDING PAYMENTS ENDPOINTS
+        // ========================================
+
+        /// <summary>
+        /// Get all pending payments (dispatch receipts with status 'Received' and not yet posted)
+        /// </summary>
+        [HttpGet("pending-payments")]
+        public async Task<ActionResult<ServiceResponse<List<VDispatchReceiptDto>>>> GetPendingPayments()
+        {
+            try
+            {
+                var pendingPayments = await _dispatchService.GetPendingPaymentsAsync();
+                return Ok(new ServiceResponse<List<VDispatchReceiptDto>>
+                {
+                    Result = pendingPayments,
+                    Message = $"Found {pendingPayments.Count} pending payments",
+                    Success = true
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error fetching pending payments: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                
+                return StatusCode(500, new ServiceResponse<List<VDispatchReceiptDto>>
+                {
+                    Message = $"Failed to fetch pending payments: {ex.Message}",
+                    Success = false
+                });
+            }
+        }
+
+        /// <summary>
+        /// Get pending payments by user ID
+        /// </summary>
+        [HttpGet("pending-payments/user/{userId}")]
+        public async Task<ActionResult<ServiceResponse<List<VDispatchReceiptDto>>>> GetPendingPaymentsByUser(int userId)
+        {
+            try
+            {
+                var pendingPayments = await _dispatchService.GetPendingPaymentsByUserAsync(userId);
+                return Ok(new ServiceResponse<List<VDispatchReceiptDto>>
+                {
+                    Result = pendingPayments,
+                    Message = $"Found {pendingPayments.Count} pending payments for user {userId}",
+                    Success = true
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error fetching pending payments for user {userId}: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                
+                return StatusCode(500, new ServiceResponse<List<VDispatchReceiptDto>>
+                {
+                    Message = $"Failed to fetch pending payments: {ex.Message}",
+                    Success = false
+                });
+            }
+        }
+
+        /// <summary>
+        /// Get count of all pending payments
+        /// </summary>
+        [HttpGet("pending-payments/count")]
+        public async Task<ActionResult<ServiceResponse<int>>> GetPendingPaymentsCount()
+        {
+            try
+            {
+                var count = await _dispatchService.GetPendingPaymentsCountAsync();
+                return Ok(new ServiceResponse<int>
+                {
+                    Result = count,
+                    Message = $"Total pending payments: {count}",
+                    Success = true
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error counting pending payments: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                
+                return StatusCode(500, new ServiceResponse<int>
+                {
+                    Message = $"Failed to count pending payments: {ex.Message}",
+                    Success = false
+                });
+            }
+        }
+
+        /// <summary>
+        /// Get count of pending payments by user ID
+        /// </summary>
+        [HttpGet("pending-payments/count/user/{userId}")]
+        public async Task<ActionResult<ServiceResponse<int>>> GetPendingPaymentsCountByUser(int userId)
+        {
+            try
+            {
+                var count = await _dispatchService.GetPendingPaymentsCountByUserAsync(userId);
+                return Ok(new ServiceResponse<int>
+                {
+                    Result = count,
+                    Message = $"User {userId} has {count} pending payments",
+                    Success = true
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error counting pending payments for user {userId}: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                
+                return StatusCode(500, new ServiceResponse<int>
+                {
+                    Message = $"Failed to count pending payments: {ex.Message}",
+                    Success = false
+                });
+            }
+        }
     }
 }

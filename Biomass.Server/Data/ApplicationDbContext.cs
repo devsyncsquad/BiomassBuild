@@ -45,7 +45,7 @@ namespace Biomass.Server.Data
         public DbSet<Driver> Drivers { get; set; }
 
         public DbSet<CostCenter> CostCenters { get; set; }
-        public DbSet<UserCostCenter> UserCostCenters { get; set; }
+        public DbSet<Biomass.Server.Models.UserManagement.UserCostCenter> UserCostCenters { get; set; }
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Cashbook> Cashbooks { get; set; }
         public DbSet<MoneyAccount> MoneyAccounts { get; set; }
@@ -56,7 +56,6 @@ namespace Biomass.Server.Data
         public DbSet<VDispatchDto> VDispatches { get; set; }
         public DbSet<VUserCustomer> VUserCustomers { get; set; }
         public DbSet<VUserCostCenter> VUserCostCenters { get; set; }
-        public DbSet<UserCostCenter> UserCostCenters { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
 {
     // Define v_locations view

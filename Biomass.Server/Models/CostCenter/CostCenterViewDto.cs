@@ -17,3 +17,5 @@ namespace Biomass.Server.Models.CostCenter
         public List<CostCenterViewDto>? Children { get; set; } = new List<CostCenterViewDto>();
     }
 }
+
+

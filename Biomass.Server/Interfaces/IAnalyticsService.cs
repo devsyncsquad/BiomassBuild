@@ -13,3 +13,5 @@ namespace Biomass.Server.Interfaces
         Task<ServiceResponse<List<CashTransactionDetailed>>> GetEntriesBySlipNumberAsync(string slipNumber);
     }
 }
+
+

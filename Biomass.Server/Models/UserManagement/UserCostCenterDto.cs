@@ -10,12 +10,14 @@ namespace Biomass.Server.Models.UserManagement
         public string? UserName { get; set; }
         public string? CostCenterName { get; set; }
         public string? CostCenterCode { get; set; }
+        public bool? IsActive { get; set; }
     }
 
     public class AssignCostCenterRequest
     {
         public int UserId { get; set; }
         public int CostCenterId { get; set; }
+        public bool? CanPost { get; set; }
         public int? AssignedBy { get; set; }
     }
 

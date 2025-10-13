@@ -148,13 +148,7 @@ namespace Biomass.Server.Services
 
                 return costCenters.Select(MapToViewDto).ToList();
             }
-            catch (Exception ex)
-            {
-                // Log the exception if you have logging configured
-                throw;
-            }
-        }
-
+        
         public async Task<List<CostCenterDto>> GetUserActiveParentCostCentersAsync(int userId, int? companyId = null)
         {
             var response = new List<CostCenterDto>();

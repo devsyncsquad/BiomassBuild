@@ -32,7 +32,9 @@ namespace Biomass.Server.Services
             var webRootPath = _environment.WebRootPath;
             if (string.IsNullOrEmpty(webRootPath))
             {
-                webRootPath = Path.Combine(_environment.ContentRootPath, "wwwroot");
+                //webRootPath = Path.Combine(_environment.ContentRootPath, "wwwroot");
+                webRootPath = Path.Combine(_environment.ContentRootPath, "uploads", "dispatches");
+
                 // Create wwwroot directory if it doesn't exist
                 if (!Directory.Exists(webRootPath))
                 {

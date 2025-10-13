@@ -7,3 +7,4 @@ namespace Biomass.Server.Models.CostCenter
         public bool CanPost { get; set; }
     }
 }
+

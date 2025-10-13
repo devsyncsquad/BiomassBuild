@@ -62,25 +62,7 @@ namespace Biomass.Server.Services
             {
                 Console.WriteLine("✅ Transaction started");
                 
-                // Use the uploads folder in ContentRootPath (same level as wwwroot)
-                // This matches the existing pattern used for cashbook_receipts
-                _dispatchUploadsFolder = Path.Combine(_environment.ContentRootPath, "uploads", "dispatches");
-                Console.WriteLine($"📁 Dispatch uploads folder: {_dispatchUploadsFolder}");
-                
-                // Create dispatch uploads directory if it doesn't exist
-                if (!Directory.Exists(_dispatchUploadsFolder))
-                {
-                    try
-                    {
-                        Directory.CreateDirectory(_dispatchUploadsFolder);
-                        Console.WriteLine("✅ Created dispatch uploads folder");
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"⚠️ Could not create dispatch uploads folder: {ex.Message}");
-                        Console.WriteLine($"⚠️ Ensure the folder exists and has proper permissions");
-                    }
-                }
+                // Directory creation is now handled in SaveSlipPictureFileAsync method
 
                 // Handle slip picture upload if provided
                 string? slipPicturePath = null;
@@ -558,33 +540,103 @@ namespace Biomass.Server.Services
         /// <returns>Relative file path</returns>
         private async Task<string> SaveSlipPictureFileAsync(IFormFile file)
         {
-            // Validate file size (10MB limit)
-            if (file.Length > 10 * 1024 * 1024)
+            try
             {
-                throw new InvalidOperationException("File size cannot exceed 10MB");
-            }
+                Console.WriteLine($"SaveSlipPictureFileAsync: Starting file save for {file.FileName}");
+                Console.WriteLine($"SaveSlipPictureFileAsync: File size: {file.Length} bytes");
+                Console.WriteLine($"SaveSlipPictureFileAsync: Content type: {file.ContentType}");
 
-            // Validate file type
-            var allowedExtensions = new[] { ".pdf", ".jpg", ".jpeg", ".png" };
-            var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
-            if (!allowedExtensions.Contains(fileExtension))
+                // Validate file size (10MB limit)
+                if (file.Length > 10 * 1024 * 1024)
+                {
+                    Console.WriteLine("SaveSlipPictureFileAsync: File size exceeds 10MB limit");
+                    throw new InvalidOperationException("File size cannot exceed 10MB");
+                }
+
+                // Validate file type
+                var allowedExtensions = new[] { ".pdf", ".jpg", ".jpeg", ".png" };
+                var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
+                Console.WriteLine($"SaveSlipPictureFileAsync: File extension: {fileExtension}");
+                
+                if (!allowedExtensions.Contains(fileExtension))
+                {
+                    Console.WriteLine($"SaveSlipPictureFileAsync: Invalid file extension: {fileExtension}");
+                    throw new InvalidOperationException("Only PDF, JPG, and PNG files are allowed");
+                }
+
+                // Get upload folder path and create if it doesn't exist
+                var webRootPath = _environment.WebRootPath ?? _environment.ContentRootPath;
+                Console.WriteLine($"SaveSlipPictureFileAsync: WebRootPath: {_environment.WebRootPath}");
+                Console.WriteLine($"SaveSlipPictureFileAsync: ContentRootPath: {_environment.ContentRootPath}");
+                Console.WriteLine($"SaveSlipPictureFileAsync: Using path: {webRootPath}");
+                
+                if (string.IsNullOrEmpty(webRootPath))
+                {
+                    // Fallback to current directory if both paths are null
+                    webRootPath = Directory.GetCurrentDirectory();
+                    Console.WriteLine($"SaveSlipPictureFileAsync: Using fallback path: {webRootPath}");
+                }
+                
+                var uploadFolder = Path.Combine(webRootPath, "uploads", "dispatches");
+                Console.WriteLine($"SaveSlipPictureFileAsync: Upload folder: {uploadFolder}");
+                
+                // Create dispatches directory if it doesn't exist
+                if (!Directory.Exists(uploadFolder))
+                {
+                    Console.WriteLine($"SaveSlipPictureFileAsync: Creating directory: {uploadFolder}");
+                    try
+                    {
+                        Directory.CreateDirectory(uploadFolder);
+                        Console.WriteLine($"SaveSlipPictureFileAsync: Directory created successfully");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"SaveSlipPictureFileAsync: Failed to create directory: {ex.Message}");
+                        throw new InvalidOperationException($"Failed to create upload directory: {uploadFolder}. Error: {ex.Message}", ex);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"SaveSlipPictureFileAsync: Directory already exists");
+                }
+
+                // Generate unique filename
+                var timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
+                var fileName = $"slip_{timestamp}_{Guid.NewGuid().ToString("N")[..8]}{fileExtension}";
+                var filePath = Path.Combine(uploadFolder, fileName);
+                Console.WriteLine($"SaveSlipPictureFileAsync: Full file path: {filePath}");
+
+                // Save file
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    Console.WriteLine($"SaveSlipPictureFileAsync: Starting file copy");
+                    await file.CopyToAsync(stream);
+                    Console.WriteLine($"SaveSlipPictureFileAsync: File copy completed");
+                }
+
+                // Verify file was saved
+                if (File.Exists(filePath))
+                {
+                    var fileInfo = new FileInfo(filePath);
+                    Console.WriteLine($"SaveSlipPictureFileAsync: File saved successfully. Size: {fileInfo.Length} bytes");
+                }
+                else
+                {
+                    Console.WriteLine($"SaveSlipPictureFileAsync: ERROR - File was not saved!");
+                    throw new InvalidOperationException("File was not saved successfully");
+                }
+
+                // Return relative path for database storage
+                var relativePath = $"/uploads/dispatches/{fileName}";
+                Console.WriteLine($"SaveSlipPictureFileAsync: Returning relative path: {relativePath}");
+                return relativePath;
+            }
+            catch (Exception ex)
             {
-                throw new InvalidOperationException("Only PDF, JPG, and PNG files are allowed");
+                Console.WriteLine($"SaveSlipPictureFileAsync: Exception occurred: {ex.Message}");
+                Console.WriteLine($"SaveSlipPictureFileAsync: Stack trace: {ex.StackTrace}");
+                throw;
             }
-
-            // Generate unique filename
-            var timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
-            var fileName = $"slip_{timestamp}_{Guid.NewGuid().ToString("N")[..8]}{fileExtension}";
-            var filePath = Path.Combine(_dispatchUploadsFolder, fileName);
-
-            // Save file
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
-
-            // Return relative path for database storage
-            return $"/uploads/dispatches/{fileName}";
         }
 //>>>>>>> dispatch_02
     }

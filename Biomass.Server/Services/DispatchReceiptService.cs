@@ -348,6 +348,8 @@ namespace Biomass.Server.Services
             // This matches the existing pattern used for cashbook_receipts and dispatches
             _receiptUploadsFolder = Path.Combine(_environment.ContentRootPath, "uploads", "dispatch_receipts");
             
+
+
             // Create dispatch receipt uploads directory if it doesn't exist
             if (!Directory.Exists(_receiptUploadsFolder))
             {

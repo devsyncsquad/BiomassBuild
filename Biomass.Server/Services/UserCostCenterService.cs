@@ -15,67 +15,10 @@ namespace Biomass.Server.Services
             _context = context;
         }
 
-        public async Task<UserCostCenterAssignmentDto> GetUserCostCenterAssignmentAsync(int userId)
-        {
-            // Get user information
-            var user = await _context.Users.FindAsync(userId);
-            if (user == null)
-            {
-                throw new ArgumentException($"User with ID {userId} not found.");
-            }
-
-            // Get assigned cost centers for the user
-            var assignedCostCenters = await _context.VUserCostCenters
-                .Where(v => v.UserId == userId)
-                .Select(v => new UserCostCenterDto
-                {
-                    UserId = v.UserId,
-                    CostCenterId = v.CostCenterId,
-                    CanPost = v.CanPost,
-                    Username = v.Username,
-                    CostCenterName = v.CostCenterName,
-                    IsActive = v.IsActive
-                })
-                .ToListAsync();
-
-            // Get all available cost centers
-            var availableCostCenters = await _context.CostCenters
-                .Where(cc => cc.IsActive)
-                .Select(cc => new CostCenterDto
-                {
-                    CostCenterId = cc.CostCenterId,
-                    Code = cc.Code,
-                    Name = cc.Name,
-                    IsActive = cc.IsActive,
-                    ParentCostCenterId = cc.ParentCostCenterId,
-                    CompanyId = cc.CompanyId,
-                    CreatedAt = cc.CreatedAt
-                })
-                .ToListAsync();
-            return new UserCostCenterAssignmentDto
-            {
-                UserId = userId,
-                Username = user.Username,
-                UserName = $"{user.FirstName} {user.LastName}",
-                AssignedCostCenters = assignedCostCenters,
-                AvailableCostCenters = availableCostCenters
-            };
-        }
 
 
-        public async Task<List<UserCostCenterDto>> GetUserCostCentersAsync(int userId)
-        {
-            var userCostCenters = await _context.UserCostCenters
-                .Include(ucc => ucc.User)
-                .Include(ucc => ucc.CostCenter)
-                .Where(ucc => ucc.UserId == userId)
-                .OrderBy(ucc => ucc.CostCenter.Name)
-                .ToListAsync();
 
-            return userCostCenters.Select(MapToDto).ToList();
-        }
-
-        public async Task<UserCostCenterAssignmentDto> GetUserCostCenterAssignmentAsync(int userId)
+        public async Task<Biomass.Server.Models.UserManagement.UserCostCenterAssignmentDto> GetUserCostCenterAssignmentAsync(int userId)
         {
             // Fetch user by correct PK column (not FindAsync)
             var user = await _context.Users
@@ -118,11 +61,19 @@ namespace Biomass.Server.Services
                     IsAssigned = false
                 })
                 .ToList();
+
+            return new Biomass.Server.Models.UserManagement.UserCostCenterAssignmentDto
+            {
+                UserId = userId,
+                UserName = $"{user.FirstName} {user.LastName}",
+                AssignedCostCenters = assignedCostCenters,
+                AvailableCostCenters = availableCostCenters
+            };
         }
 
           
 
-        public async Task<UserCostCenterDto> AssignCostCenterToUserAsync(AssignCostCenterRequest request)
+        public async Task<Biomass.Server.Models.UserManagement.UserCostCenterDto> AssignCostCenterToUserAsync(Biomass.Server.Models.UserManagement.AssignCostCenterRequest request)
         {
 
             // Check if user exists
@@ -146,16 +97,16 @@ namespace Biomass.Server.Services
             if (existingAssignment != null)
             {
                 // Update existing assignment
-                existingAssignment.CanPost = request.CanPost;
+                existingAssignment.CanPost =true;
             }
             else
             {
                 // Create new assignment
-                var newAssignment = new UserCostCenter
+                var newAssignment = new Biomass.Server.Models.UserManagement.UserCostCenter
                 {
                     UserId = request.UserId,
                     CostCenterId = request.CostCenterId,
-                    CanPost = request.CanPost
+                    CanPost =true
                 };
                 _context.UserCostCenters.Add(newAssignment);
             }
@@ -163,28 +114,28 @@ namespace Biomass.Server.Services
             await _context.SaveChangesAsync();
 
             // Return the assigned cost center DTO
-            return new UserCostCenterDto
+            return new Biomass.Server.Models.UserManagement.UserCostCenterDto
             {
                 UserId = request.UserId,
                 CostCenterId = request.CostCenterId,
                 CanPost = request.CanPost,
-                Username = user.Username,
+                UserName = user.Username,
                 CostCenterName = costCenter.Name,
                 CostCenterCode = costCenter.Code,
                 IsActive = costCenter.IsActive
             };
         }
 
-        public async Task<List<UserCostCenterDto>> GetUserCostCentersAsync(int userId)
+        public async Task<List<Biomass.Server.Models.UserManagement.UserCostCenterDto>> GetUserCostCentersAsync(int userId)
         {
             var userCostCenters = await _context.VUserCostCenters
                 .Where(v => v.UserId == userId)
-                .Select(v => new UserCostCenterDto
+                .Select(v => new Biomass.Server.Models.UserManagement.UserCostCenterDto
                 {
                     UserId = v.UserId,
                     CostCenterId = v.CostCenterId,
                     CanPost = v.CanPost,
-                    Username = v.Username,
+                    UserName = v.Username,
                     CostCenterName = v.CostCenterName,
                     IsActive = v.IsActive
                 })
@@ -208,39 +159,6 @@ namespace Biomass.Server.Services
             return true;
         }
 
-        public async Task<bool> UnassignCostCenterFromUserAsync(int userId, int costCenterId)
-        {
-            return await RemoveCostCenterFromUserAsync(userId, costCenterId);
-            // Validate existence (don't use FindAsync)
-            var userExists = await _context.Users
-                .AsNoTracking()
-                .AnyAsync(u => u.UserId == request.UserId); // <-- map to your PK property
-            if (!userExists) throw new ArgumentException("User not found");
-
-            var ccExists = await _context.CostCenters
-                .AsNoTracking()
-                .AnyAsync(cc => cc.CostCenterId == request.CostCenterId); // <-- map to your PK property
-            if (!ccExists) throw new ArgumentException("Cost center not found");
-
-            // Insert (align with table: user_id, cost_center_id, can_post)
-            var entity = new UserCostCenter
-            {
-                // IMPORTANT: types should be long if columns are bigint
-                UserId = request.UserId,
-                CostCenterId = request.CostCenterId,
-                //CanPost = request.CanPost // nullable bool? if you want; else set true/false or null
-            };
-
-            _context.UserCostCenters.Add(entity);
-            await _context.SaveChangesAsync();
-
-            return new UserCostCenterDto
-            {
-                UserId = (int)entity.UserId,                 // cast only if your DTO uses int
-                CostCenterId = (int)entity.CostCenterId,     // ditto
-                //CanPost = entity.CanPost
-            };
-        }
 
          public async Task<bool> UnassignCostCenterFromUserAsync(int userId, int costCenterId)
          {
@@ -257,7 +175,7 @@ namespace Biomass.Server.Services
              return true;
          }
 
-        public async Task<List<UserCostCenterDto>> GetAllUserCostCentersAsync()
+        public async Task<List<Biomass.Server.Models.UserManagement.UserCostCenterDto>> GetAllUserCostCentersAsync()
         {
             var userCostCenters = await _context.UserCostCenters
                 .Include(ucc => ucc.CostCenter)
@@ -276,9 +194,9 @@ namespace Biomass.Server.Services
                                ucc.CostCenterId == costCenterId);
         }
 
-        private static UserCostCenterDto MapToDto(UserCostCenter userCostCenter)
+        private static Biomass.Server.Models.UserManagement.UserCostCenterDto MapToDto(Biomass.Server.Models.UserManagement.UserCostCenter userCostCenter)
         {
-            return new UserCostCenterDto
+            return new Biomass.Server.Models.UserManagement.UserCostCenterDto
             {
                 //Id = userCostCenter.Id,
                 UserId = userCostCenter.UserId,

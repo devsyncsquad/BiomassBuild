@@ -6,6 +6,7 @@ using Biomass.Server.Models.Company;
 using Biomass.Server.Models.CostCenter;
 using Biomass.Server.Models.Customer;
 using Biomass.Server.Models.UserManagement;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -599,12 +600,12 @@ namespace Biomass.Server.Controllers
         #region USER COST CENTER ASSIGNMENT
 
         [HttpGet("GetUserCostCenterAssignment/{userId}")]
-        public async Task<ActionResult<ServiceResponse<UserCostCenterAssignmentDto>>> GetUserCostCenterAssignment(int userId)
+        public async Task<ActionResult<ServiceResponse<Models.UserManagement.UserCostCenterAssignmentDto>>> GetUserCostCenterAssignment(int userId)
         {
             try
             {
                 var assignment = await _userCostCenterService.GetUserCostCenterAssignmentAsync(userId);
-                return Ok(new ServiceResponse<UserCostCenterAssignmentDto>
+                return Ok(new ServiceResponse<Models.UserManagement.UserCostCenterAssignmentDto>
                 {
                     Result = assignment,
                     Message = "User cost center assignment retrieved successfully",
@@ -613,7 +614,7 @@ namespace Biomass.Server.Controllers
             }
             catch (ArgumentException ex)
             {
-                return NotFound(new ServiceResponse<UserCostCenterAssignmentDto>
+                return NotFound(new ServiceResponse<Models.UserManagement.UserCostCenterAssignmentDto>
                 {
                     Message = ex.Message,
                     Success = false
@@ -621,7 +622,7 @@ namespace Biomass.Server.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ServiceResponse<UserCostCenterAssignmentDto>
+                return BadRequest(new ServiceResponse<Models.UserManagement.UserCostCenterAssignmentDto>
                 {
                     Message = $"Error retrieving user cost center assignment: {ex.Message}",
                     Success = false
@@ -630,7 +631,7 @@ namespace Biomass.Server.Controllers
         }
 
         [HttpPost("AssignCostCenterToUser")]
-        public async Task<ActionResult<ServiceResponse<UserCostCenterDto>>> AssignCostCenterToUser([FromBody] AssignCostCenterRequest request)
+        public async Task<ActionResult<ServiceResponse<UserCostCenterDto>>> AssignCostCenterToUser([FromBody] Biomass.Server.Models.UserManagement.AssignCostCenterRequest request)
         {
             try
             {

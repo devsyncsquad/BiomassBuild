@@ -564,20 +564,20 @@ namespace Biomass.Server.Services
                     throw new InvalidOperationException("Only PDF, JPG, and PNG files are allowed");
                 }
 
-                // Get upload folder path and create if it doesn't exist
-                var webRootPath = _environment.WebRootPath ?? _environment.ContentRootPath;
-                Console.WriteLine($"SaveSlipPictureFileAsync: WebRootPath: {_environment.WebRootPath}");
+                // Use ContentRootPath for uploads (consistent with dispatch_receipts pattern)
+                // This keeps all user uploads outside of wwwroot for better security and organization
+                var contentRootPath = _environment.ContentRootPath;
                 Console.WriteLine($"SaveSlipPictureFileAsync: ContentRootPath: {_environment.ContentRootPath}");
-                Console.WriteLine($"SaveSlipPictureFileAsync: Using path: {webRootPath}");
+                Console.WriteLine($"SaveSlipPictureFileAsync: Using path: {contentRootPath}");
                 
-                if (string.IsNullOrEmpty(webRootPath))
+                if (string.IsNullOrEmpty(contentRootPath))
                 {
-                    // Fallback to current directory if both paths are null
-                    webRootPath = Directory.GetCurrentDirectory();
-                    Console.WriteLine($"SaveSlipPictureFileAsync: Using fallback path: {webRootPath}");
+                    // Fallback to current directory if ContentRootPath is null
+                    contentRootPath = Directory.GetCurrentDirectory();
+                    Console.WriteLine($"SaveSlipPictureFileAsync: Using fallback path: {contentRootPath}");
                 }
                 
-                var uploadFolder = Path.Combine(webRootPath, "uploads", "dispatches");
+                var uploadFolder = Path.Combine(contentRootPath, "uploads", "dispatches");
                 Console.WriteLine($"SaveSlipPictureFileAsync: Upload folder: {uploadFolder}");
                 
                 // Create dispatches directory if it doesn't exist

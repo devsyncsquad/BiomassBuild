@@ -418,10 +418,10 @@ namespace Biomass.Server.Services
 					try
 					{
 						var fileName = Path.GetFileName(entity.ReceiptPath);
-						var webRootPath = _environment.WebRootPath ?? _environment.ContentRootPath;
-						if (!string.IsNullOrEmpty(webRootPath))
-						{
-							var uploadFolder = Path.Combine(webRootPath, "uploads", "Receipts");
+				var contentRootPath = _environment.ContentRootPath;
+				if (!string.IsNullOrEmpty(contentRootPath))
+				{
+					var uploadFolder = Path.Combine(contentRootPath, "uploads", "Receipts");
 							var fullPath = Path.Combine(uploadFolder, fileName);
 							if (File.Exists(fullPath))
 							{
@@ -674,20 +674,20 @@ namespace Biomass.Server.Services
 					throw new InvalidOperationException("Only PDF, JPG, and PNG files are allowed");
 				}
 
-				// Get upload folder path and create if it doesn't exist
-				var webRootPath = _environment.WebRootPath ?? _environment.ContentRootPath;
-				Console.WriteLine($"SaveReceiptFileAsync: WebRootPath: {_environment.WebRootPath}");
-				Console.WriteLine($"SaveReceiptFileAsync: ContentRootPath: {_environment.ContentRootPath}");
-				Console.WriteLine($"SaveReceiptFileAsync: Using path: {webRootPath}");
-				
-				if (string.IsNullOrEmpty(webRootPath))
-				{
-					// Fallback to current directory if both paths are null
-					webRootPath = Directory.GetCurrentDirectory();
-					Console.WriteLine($"SaveReceiptFileAsync: Using fallback path: {webRootPath}");
-				}
-				
-				var uploadFolder = Path.Combine(webRootPath, "uploads", "Receipts");
+			// Use ContentRootPath for uploads (consistent with dispatch_receipts pattern)
+			// This keeps all user uploads outside of wwwroot for better security and organization
+			var contentRootPath = _environment.ContentRootPath;
+			Console.WriteLine($"SaveReceiptFileAsync: ContentRootPath: {_environment.ContentRootPath}");
+			Console.WriteLine($"SaveReceiptFileAsync: Using path: {contentRootPath}");
+			
+			if (string.IsNullOrEmpty(contentRootPath))
+			{
+				// Fallback to current directory if ContentRootPath is null
+				contentRootPath = Directory.GetCurrentDirectory();
+				Console.WriteLine($"SaveReceiptFileAsync: Using fallback path: {contentRootPath}");
+			}
+			
+			var uploadFolder = Path.Combine(contentRootPath, "uploads", "Receipts");
 				Console.WriteLine($"SaveReceiptFileAsync: Upload folder: {uploadFolder}");
 				
 				// Create Receipts directory if it doesn't exist

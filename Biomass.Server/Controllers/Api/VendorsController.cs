@@ -91,6 +91,7 @@ namespace Biomass.Server.Controllers.Api
         /// Create a new vendor with file uploads
         /// </summary>
         [HttpPost("create")]
+        [Consumes("multipart/form-data")]
         public async Task<ActionResult<ServiceResponse<VendorDto>>> CreateVendor([FromForm] CreateVendorRequest request)
         {
             try
@@ -125,6 +126,7 @@ namespace Biomass.Server.Controllers.Api
         /// Update an existing vendor with file uploads
         /// </summary>
         [HttpPut("update/{id:int}")]
+        [Consumes("multipart/form-data")]
         public async Task<ActionResult<ServiceResponse<VendorDto>>> UpdateVendor(int id, [FromForm] UpdateVendorRequest request)
         {
             try

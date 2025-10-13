@@ -5,6 +5,8 @@ using Biomass.Server.Models.Vehicle;
 using Biomass.Server.Models.Vendor;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Hosting;
+using Biomass.Server.Models.Cashbook;
+using Biomass.Server.Models;
 
 namespace Biomass.Server.Services
 {
@@ -392,6 +394,186 @@ namespace Biomass.Server.Services
 
             // Return relative path for database storage
             return $"/uploads/dispatch_receipts/{fileName}";
+        }
+
+        /// <summary>
+        /// Processes a payment for a dispatch receipt
+        /// </summary>
+        /// <param name="receiptId">The receipt ID</param>
+        /// <param name="request">The payment processing request</param>
+        /// <returns>The payment processing response</returns>
+        public async Task<ProcessPaymentResponse> ProcessPaymentAsync(long receiptId, ProcessPaymentRequest request)
+        {
+            Console.WriteLine($"🚀 ProcessPaymentAsync called for ReceiptId: {receiptId}");
+            Console.WriteLine($"💰 Amount: {request.Amount}, CreatedBy: {request.CreatedBy}");
+            Console.WriteLine($"👤 WalletEmployeeId: {request.WalletEmployeeId}, CategoryId: {request.CategoryId}");
+            Console.WriteLine($"🏢 CostCenterId: {request.CostCenterId}, CostCenterSubId: {request.CostCenterSubId}");
+            Console.WriteLine($"📝 Remarks: {request.Remarks}");
+            
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                Console.WriteLine("✅ Transaction started");
+
+                // 1. Validate receipt exists and has payable amount
+                var receipt = await _context.DispatchReceipts
+                    .Include(r => r.Dispatch)
+                    .Include(r => r.Vendor)
+                    .FirstOrDefaultAsync(r => r.ReceiptId == receiptId);
+                
+                if (receipt == null)
+                {
+                    Console.WriteLine($"❌ Receipt with ID {receiptId} not found");
+                    throw new InvalidOperationException($"Receipt with ID {receiptId} not found.");
+                }
+                
+                Console.WriteLine($"✅ Receipt found. Current AmountPayable: {receipt.AmountPayable}");
+                
+                if (receipt.AmountPayable <= 0)
+                {
+                    Console.WriteLine($"❌ Receipt has no payable amount");
+                    throw new InvalidOperationException("Receipt has no payable amount.");
+                }
+                
+                if (request.Amount > receipt.AmountPayable)
+                {
+                    Console.WriteLine($"❌ Payment amount {request.Amount} exceeds payable amount {receipt.AmountPayable}");
+                    throw new InvalidOperationException("Payment amount cannot exceed payable amount.");
+                }
+
+                // 2. Calculate remaining balance and determine status
+                var remainingBalance = (receipt.AmountPayable ?? 0) - request.Amount;
+                var newStatus = remainingBalance == 0 ? "Completed" : "Received";
+                
+                Console.WriteLine($"💰 Payment calculation: {receipt.AmountPayable} - {request.Amount} = {remainingBalance}");
+                Console.WriteLine($"📊 New status: {newStatus}");
+
+                // 3. Update dispatch_receipt
+                receipt.AmountPayable = remainingBalance;
+                receipt.Status = newStatus;
+                receipt.PostedAt = DateTime.UtcNow;
+                
+                Console.WriteLine("💾 Updating dispatch_receipt...");
+                await _context.SaveChangesAsync();
+
+                // 4. Create cashbook entry
+                Console.WriteLine("💰 Creating cashbook entry...");
+                var cashbookEntry = new Cashbook
+                {
+                    HappenedAt = DateTime.UtcNow,
+                    CashKindId = 32, // As specified
+                    Amount = request.Amount,
+                    Currency = "PKR",
+                    MoneyAccountId = null, // Will be set based on business logic
+                    WalletEmployeeId = request.WalletEmployeeId,
+                    CategoryId = request.CategoryId,
+                    CostCenterId = request.CostCenterId,
+                    CostCenterSubId = request.CostCenterSubId,
+                    PaymentModeId = 36, // As specified
+                    ReferenceNo = receiptId.ToString(),
+                    CounterpartyName = receipt.Vendor?.VendorName,
+                    Remarks = request.Remarks ?? "Pending Payment entry",
+                    Status = "Active",
+                    DispatchId = receipt.DispatchId
+                };
+
+                _context.Cashbooks.Add(cashbookEntry);
+                await _context.SaveChangesAsync();
+                Console.WriteLine($"✅ Cashbook entry created with ID: {cashbookEntry.CashId}");
+
+                // 5. Create AP Ledger entry
+                Console.WriteLine("📊 Creating AP Ledger entry...");
+                var apLedgerEntry = new ApLedger
+                {
+                    VendorId = receipt.VendorId,
+                    HappenedAt = DateTime.UtcNow,
+                    EntryKind = "Payment",
+                    Amount = request.Amount,
+                    Currency = "PKR",
+                    DispatchId = receipt.DispatchId,
+                    CashId = cashbookEntry.CashId,
+                    ReferenceNo = receiptId.ToString(),
+                    Remarks = request.Remarks ?? "Payment processed",
+                    CreatedBy = request.CreatedBy,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                _context.ApLedgers.Add(apLedgerEntry);
+                await _context.SaveChangesAsync();
+                Console.WriteLine($"✅ AP Ledger entry created with ID: {apLedgerEntry.ApEntryId}");
+
+                // 6. Create dispatch_receipts_log entry
+                Console.WriteLine("📝 Creating payment log entry...");
+                var receiptLog = new DispatchReceiptsLog
+                {
+                    ReceiptId = receiptId,
+                    Amount = request.Amount,
+                    CreatedBy = request.CreatedBy,
+                    CreatedOn = DateTime.UtcNow
+                };
+
+                _context.DispatchReceiptsLogs.Add(receiptLog);
+                await _context.SaveChangesAsync();
+                Console.WriteLine($"✅ Payment log entry created with ID: {receiptLog.ReceiptLogId}");
+
+                // 7. Commit transaction
+                Console.WriteLine("✅ Committing transaction...");
+                await transaction.CommitAsync();
+                
+                var response = new ProcessPaymentResponse
+                {
+                    Success = true,
+                    Message = $"Payment of {request.Amount:C} processed successfully. Status: {newStatus}",
+                    ReceiptId = receiptId,
+                    AmountPaid = request.Amount,
+                    RemainingBalance = remainingBalance,
+                    Status = newStatus,
+                    CashbookId = cashbookEntry.CashId,
+                    ApLedgerId = apLedgerEntry.ApEntryId,
+                    ReceiptLogId = receiptLog.ReceiptLogId
+                };
+                
+                Console.WriteLine($"✅✅✅ Payment processed successfully! Status: {newStatus}, Remaining: {remainingBalance:C}");
+                return response;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌❌❌ ERROR in ProcessPaymentAsync: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
+                }
+                await transaction.RollbackAsync();
+                Console.WriteLine("🔄 Transaction rolled back");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Gets payment history for a dispatch receipt
+        /// </summary>
+        /// <param name="receiptId">The receipt ID</param>
+        /// <returns>List of payment log DTOs</returns>
+        public async Task<List<DispatchReceiptsLogDto>> GetPaymentHistoryAsync(long receiptId)
+        {
+            Console.WriteLine($"🔍 GetPaymentHistoryAsync called for ReceiptId: {receiptId}");
+            
+            var paymentLogs = await _context.DispatchReceiptsLogs
+                .Where(log => log.ReceiptId == receiptId)
+                .OrderByDescending(log => log.CreatedOn)
+                .ToListAsync();
+
+            Console.WriteLine($"✅ Found {paymentLogs.Count} payment records");
+
+            return paymentLogs.Select(log => new DispatchReceiptsLogDto
+            {
+                ReceiptLogId = log.ReceiptLogId,
+                ReceiptId = log.ReceiptId,
+                Amount = log.Amount,
+                CreatedBy = log.CreatedBy,
+                CreatedOn = log.CreatedOn
+            }).ToList();
         }
     }
 }

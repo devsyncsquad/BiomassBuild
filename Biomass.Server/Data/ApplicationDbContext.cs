@@ -51,6 +51,7 @@ namespace Biomass.Server.Data
         public DbSet<MoneyAccount> MoneyAccounts { get; set; }
         public DbSet<Dispatch> Dispatches { get; set; }
         public DbSet<DispatchReceipt> DispatchReceipts { get; set; }
+        public DbSet<DispatchReceiptsLog> DispatchReceiptsLogs { get; set; }
         public DbSet<ApLedger> ApLedgers { get; set; }
         public DbSet<VLocationDto> VLocations { get; set; }
         public DbSet<VDispatchDto> VDispatches { get; set; }
@@ -639,7 +640,25 @@ namespace Biomass.Server.Data
                       .OnDelete(DeleteBehavior.Restrict);
 
                 // Add status constraint
-                entity.HasCheckConstraint("dispatch_receipts_status_check", "status IN ('Draft', 'Posted', 'Voided')");
+                entity.HasCheckConstraint("dispatch_receipts_status_check", "status IN ('Draft', 'Posted', 'Voided', 'Received', 'Completed')");
+            });
+
+            // Configure DispatchReceiptsLog entity
+            modelBuilder.Entity<DispatchReceiptsLog>(entity =>
+            {
+                entity.ToTable("dispatch_receipts_log");
+                entity.HasKey(e => e.ReceiptLogId);
+                entity.Property(e => e.ReceiptLogId).HasColumnName("receipt_log_id");
+                entity.Property(e => e.ReceiptId).HasColumnName("receipt_id").IsRequired();
+                entity.Property(e => e.Amount).HasColumnName("amount").HasColumnType("numeric(18,2)");
+                entity.Property(e => e.CreatedBy).HasColumnName("createdby");
+                entity.Property(e => e.CreatedOn).HasColumnName("createdon").IsRequired().HasDefaultValueSql("now()");
+
+                // Configure foreign key relationship
+                entity.HasOne(drl => drl.Receipt)
+                      .WithMany()
+                      .HasForeignKey(drl => drl.ReceiptId)
+                      .OnDelete(DeleteBehavior.Restrict);
             });
 
             // Configure ApLedger entity

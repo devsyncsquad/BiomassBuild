@@ -48,5 +48,20 @@ namespace Biomass.Server.Interfaces
         /// <param name="id">The receipt ID to delete</param>
         /// <returns>True if deleted successfully, false if not found</returns>
         Task<bool> DeleteDispatchReceiptAsync(long id);
+
+        /// <summary>
+        /// Processes a payment for a dispatch receipt
+        /// </summary>
+        /// <param name="receiptId">The receipt ID</param>
+        /// <param name="request">The payment processing request</param>
+        /// <returns>The payment processing response</returns>
+        Task<ProcessPaymentResponse> ProcessPaymentAsync(long receiptId, ProcessPaymentRequest request);
+
+        /// <summary>
+        /// Gets payment history for a dispatch receipt
+        /// </summary>
+        /// <param name="receiptId">The receipt ID</param>
+        /// <returns>List of payment log DTOs</returns>
+        Task<List<DispatchReceiptsLogDto>> GetPaymentHistoryAsync(long receiptId);
     }
 }

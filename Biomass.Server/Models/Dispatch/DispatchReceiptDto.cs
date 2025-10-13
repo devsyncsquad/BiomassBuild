@@ -145,4 +145,56 @@ namespace Biomass.Server.Models.Dispatch
 
         public bool? BiltyReceived { get; set; }
     }
+
+    /// <summary>
+    /// Request model for processing payment on a dispatch receipt
+    /// </summary>
+    public class ProcessPaymentRequest
+    {
+        [Required]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than 0")]
+        public decimal Amount { get; set; }
+
+        [Required]
+        public int CreatedBy { get; set; }
+
+        [StringLength(500)]
+        public string? Remarks { get; set; }
+
+        public int? WalletEmployeeId { get; set; }
+
+        public int? CategoryId { get; set; }
+
+        public int? CostCenterId { get; set; }
+
+        public int? CostCenterSubId { get; set; }
+    }
+
+    /// <summary>
+    /// Response model for payment processing
+    /// </summary>
+    public class ProcessPaymentResponse
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; } = string.Empty;
+        public long ReceiptId { get; set; }
+        public decimal AmountPaid { get; set; }
+        public decimal RemainingBalance { get; set; }
+        public string Status { get; set; } = string.Empty;
+        public long CashbookId { get; set; }
+        public long ApLedgerId { get; set; }
+        public long ReceiptLogId { get; set; }
+    }
+
+    /// <summary>
+    /// DTO for dispatch receipt payment log
+    /// </summary>
+    public class DispatchReceiptsLogDto
+    {
+        public long ReceiptLogId { get; set; }
+        public long ReceiptId { get; set; }
+        public decimal Amount { get; set; }
+        public int? CreatedBy { get; set; }
+        public DateTime CreatedOn { get; set; }
+    }
 }
